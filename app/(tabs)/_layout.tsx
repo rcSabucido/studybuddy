@@ -1,12 +1,13 @@
-<<<<<<< HEAD
 import { Poppins_300Light, Poppins_400Regular, Poppins_500Medium, Poppins_700Bold, useFonts } from "@expo-google-fonts/poppins";
-import { Stack } from "expo-router";
+import AntDesign from '@expo/vector-icons/AntDesign';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { Tabs } from 'expo-router';
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+export default function TabLayout() {
   const [loaded, error] = useFonts({
     Poppins_400Regular,
     Poppins_300Light,
@@ -24,14 +25,7 @@ export default function RootLayout() {
   if (!loaded && !error) {
     return null;
   }
-   return <Stack screenOptions={{ headerShown: false }} />; 
-}
-=======
-import AntDesign from '@expo/vector-icons/AntDesign';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Tabs } from 'expo-router';
-
-export default function TabLayout() {
+  
   return (
     <Tabs screenOptions={{ tabBarActiveTintColor: '#6D00CD' }}>
       <Tabs.Screen
@@ -58,4 +52,3 @@ export default function TabLayout() {
     </Tabs>
   );
 }
->>>>>>> 3313621 (#11 Add colored calendar)

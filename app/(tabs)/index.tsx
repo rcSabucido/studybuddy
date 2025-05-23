@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import Button from '@/components/Button';
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -43,21 +42,4 @@ const styles = StyleSheet.create({
         padding: 20,
         backgroundColor: '#fff',
     }
-}); 
-=======
-import { Text, View } from "react-native";
-
-export default function Index() {
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Edit index.tsx to edit this screen.</Text>
-    </View>
-  );
-}
->>>>>>> 3313621 (#11 Add colored calendar)
+});
