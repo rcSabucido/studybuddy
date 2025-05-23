@@ -2,11 +2,12 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 type Props = {
     label: string
+    bgColor: string
 };
 
-export default function Button({ label }: Props) {
+export default function Button({ label, bgColor }: Props) {
     return (
-        <View style={styles.buttonContainer}>
+        <View style={[styles.buttonContainer, {backgroundColor: bgColor}]}>
             <Pressable style={styles.button} onPress={() => console.log('Button pressed')}>
                 <Text style={styles.buttonLabel}>{label}</Text>
             </Pressable>
@@ -18,7 +19,6 @@ const styles = StyleSheet.create({
     buttonContainer: {
         width:  100,
         height: 50,
-        backgroundColor: '#9B41E9',
         justifyContent: 'center',
         borderRadius: 10,
     },
