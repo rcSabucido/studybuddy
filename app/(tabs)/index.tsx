@@ -1,5 +1,6 @@
 import Button from '@/components/Button';
 import { StyleSheet, Text, View } from 'react-native';
+import { AdjustmentsHorizontalIcon } from 'react-native-heroicons/outline';
 
 export default function Index() {
     return (
@@ -9,7 +10,14 @@ export default function Index() {
                 <Text style={styles.bigText}>You've got</Text>
                 <Text style={styles.purpleText}> x tasks today</Text>
             </View>
-            <Button label="Add Task" bgColor='#9B41E9' />
+            <View style={styles.allButtonContainer}>
+                <View style={styles.buttonContainer}>
+                    <Button label="All Tasks" bgColor='#9B41E9' />
+                    <Button label="Today's Tasks" textColor="0000" bgColor='#D9D9D9' />
+                </View>
+                <Button icon={AdjustmentsHorizontalIcon} bgColor='#9B41E9'></Button>
+            </View>
+            
         </View>
     );
 }
@@ -40,6 +48,20 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         width: '100%',
         padding: 20,
+        paddingTop: 70,
         backgroundColor: '#fff',
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        backgroundColor: '#fff',
+        gap: 10,
+    },
+    allButtonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+        paddingHorizontal: 20,
+        margin: 0
     }
 });

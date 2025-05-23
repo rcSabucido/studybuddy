@@ -1,15 +1,18 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 type Props = {
-    label: string
+    label?: string
     bgColor: string
+    textColor?: string
+    icon?: any
 };
 
-export default function Button({ label, bgColor }: Props) {
+export default function Button({ label, bgColor, textColor = '#fff', icon: IconComponent}: Props) {
     return (
         <View style={[styles.buttonContainer, {backgroundColor: bgColor}]}>
             <Pressable style={styles.button} onPress={() => console.log('Button pressed')}>
-                <Text style={styles.buttonLabel}>{label}</Text>
+                {IconComponent && <IconComponent size={30} color="white"/>}
+                <Text style={[styles.buttonLabel, {color: textColor}]}>{label}</Text>
             </Pressable>
         </View>
     );
@@ -17,7 +20,7 @@ export default function Button({ label, bgColor }: Props) {
 
 const styles = StyleSheet.create({
     buttonContainer: {
-        width:  100,
+        paddingHorizontal: 13,
         height: 50,
         justifyContent: 'center',
         borderRadius: 10,
@@ -29,8 +32,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     buttonLabel: {
-        color: '#fff',
-        fontSize: 16,
+        fontSize: 14,
         fontFamily: 'Poppins_500Medium',
     }
 })
