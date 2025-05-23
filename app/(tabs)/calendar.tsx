@@ -18,7 +18,7 @@ export default function Index() {
             borderWidth: 1,
             borderColor: 'gray',
             borderRadius: 16,
-            padding: '1.6em',
+            padding: 32,
             width: '90%',
             margin: 'auto'
           }}
