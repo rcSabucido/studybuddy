@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
-import { Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { Calendar } from 'react-native-calendars';
 
 export default function Index() {
   const [selected, setSelected] = useState('');
   return (
-    <View
-      style={{
+    <ScrollView
+      contentContainerStyle={{
         flex: 1,
+        flexDirection: 'column',
         justifyContent: "center",
+        alignContent: "center"
       }}
     >
       <View style={{
@@ -16,20 +18,22 @@ export default function Index() {
           flexDirection: 'row',
           paddingTop: 16,
           paddingBottom: 16,
-          margin: 'auto',
+          marginLeft: 'auto',
+          marginRight: 'auto',
           width: '90%',
           justifyContent: 'space-between',
-          maxHeight: 84
+          maxHeight: 84,
         }}>
         <Text style={{
           fontSize: 20,
-          fontWeight: 'bold',
+          fontFamily: 'Poppins_700Bold',
           padding: 12
         }}>Calendar</Text>
         <Text style={{
           fontSize: 20,
           backgroundColor: '#9B41E9',
           color: '#ffffff',
+          fontFamily: 'Poppins_300Light',
           padding: 12,
           borderRadius: 8
         }}>Add Task</Text>
@@ -42,7 +46,7 @@ export default function Index() {
             borderRadius: 16,
             padding: 32,
             width: '90%',
-            margin: 'auto'
+            margin: 'auto',
           }}
           theme={{
             backgroundColor: '#9B41E9',
@@ -62,6 +66,15 @@ export default function Index() {
           }}
         />
       </View>
-    </View>
+      <View>
+        <Text style={{
+          fontSize: 24,
+          color: '#333',
+          fontFamily: 'Poppins_700Bold',
+          paddingTop: 60,
+          margin: 'auto'
+        }}>No tasks so far...</Text>
+      </View>
+    </ScrollView>
   );
 }

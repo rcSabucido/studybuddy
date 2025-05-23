@@ -25,7 +25,7 @@ export default function TabLayout() {
   if (!loaded && !error) {
     return null;
   }
-  
+
   return (
     <Tabs screenOptions={{ tabBarActiveTintColor: '#6D00CD' }}>
       <Tabs.Screen
@@ -33,6 +33,7 @@ export default function TabLayout() {
         options={{
           title: '',
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
+          headerShown: false,
         }}
       />
       <Tabs.Screen
@@ -40,6 +41,7 @@ export default function TabLayout() {
         options={{
           title: '',
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="calendar" color={color} />,
+          headerShown: false,
         }}
       />
       <Tabs.Screen
@@ -47,6 +49,7 @@ export default function TabLayout() {
         options={{
           title: '',
           tabBarIcon: ({ color }) => <AntDesign size={28} name="clockcircle" color={color} />,
+          headerShown: false,
         }}
       />
     </Tabs>
