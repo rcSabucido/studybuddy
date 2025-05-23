@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View } from "react-native";
+import { Text, View } from "react-native";
 import { Calendar } from 'react-native-calendars';
 
 export default function Index() {
@@ -9,10 +9,32 @@ export default function Index() {
       style={{
         flex: 1,
         justifyContent: "center",
-        alignItems: "center",
       }}
     >
-      <View style={{width: '90%'}}>
+      <View style={{
+          flex: 1,
+          flexDirection: 'row',
+          paddingTop: 16,
+          paddingBottom: 16,
+          margin: 'auto',
+          width: '90%',
+          justifyContent: 'space-between',
+          maxHeight: 84
+        }}>
+        <Text style={{
+          fontSize: 20,
+          fontWeight: 'bold',
+          padding: 12
+        }}>Calendar</Text>
+        <Text style={{
+          fontSize: 20,
+          backgroundColor: '#9B41E9',
+          color: '#ffffff',
+          padding: 12,
+          borderRadius: 8
+        }}>Add Task</Text>
+      </View>
+      <View style={{width: '100%'}}>
         <Calendar
           style={{
             borderWidth: 1,
