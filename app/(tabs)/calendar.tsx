@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { Calendar } from 'react-native-calendars';
 
 export default function Index() {
@@ -18,6 +18,7 @@ export default function Index() {
             borderWidth: 1,
             borderColor: 'gray',
             borderRadius: 16,
+            padding: '1.6em',
             width: '90%',
             margin: 'auto'
           }}
@@ -39,7 +40,6 @@ export default function Index() {
           }}
         />
       </View>
-      <Text>Edit calendar.tsx to edit this screen.</Text>
     </View>
   );
 }
