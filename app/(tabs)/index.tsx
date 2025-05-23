@@ -1,8 +1,21 @@
 import Button from '@/components/Button';
+import Tasks from '@/components/Tasks';
+import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { AdjustmentsHorizontalIcon } from 'react-native-heroicons/outline';
 
+
 export default function Index() {
+     const [tasks, setTasks] = useState([
+        { id: 1, label: 'Task 1' },
+        { id: 2, label: 'Task 2' },
+        { id: 3, label: 'Task 3' },
+        { id: 4, label: 'Task 4' },
+    ]);
+
+    const handleDeleteTask = (taskId: number) => {
+        setTasks(tasks.filter(task => task.id !== taskId));
+    };
     return (
         <View style={styles.container}>
             <View style={styles.headerContainer}>
@@ -17,7 +30,15 @@ export default function Index() {
                 </View>
                 <Button icon={AdjustmentsHorizontalIcon} bgColor='#9B41E9'></Button>
             </View>
-            
+            <View style={styles.tasksContainer}>
+                {tasks.map(task => (
+                    <Tasks 
+                        key={task.id}
+                        label={task.label}
+                        onDelete={() => handleDeleteTask(task.id)}
+                    />
+                ))}
+            </View>
         </View>
     );
 }
@@ -63,5 +84,13 @@ const styles = StyleSheet.create({
         width: '100%',
         paddingHorizontal: 20,
         margin: 0
+    },
+    tasksContainer: {
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        marginTop: 20,
+        gap: 10,
     }
 });
