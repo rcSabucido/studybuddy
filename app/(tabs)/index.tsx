@@ -9,7 +9,7 @@ export default function Index() {
                 <Text style={styles.bigText}>You've got</Text>
                 <Text style={styles.purpleText}> x tasks today</Text>
             </View>
-            <Button label="Add Task" />
+            <Button label="Add Task" bgColor='#9B41E9' />
         </View>
     );
 }
