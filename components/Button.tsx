@@ -12,7 +12,7 @@ export default function Button({ label, bgColor, textColor = '#fff', icon: IconC
         <View style={[styles.buttonContainer, {backgroundColor: bgColor}]}>
             <Pressable style={styles.button} onPress={() => console.log('Button pressed')}>
                 {IconComponent && <IconComponent size={30} color="white"/>}
-                <Text style={[styles.buttonLabel, {color: textColor}]}>{label}</Text>
+                { label !== null && label !== undefined ? <Text style={[styles.buttonLabel, {color: textColor}]}>{label}</Text> : null }
             </Pressable>
         </View>
     );
