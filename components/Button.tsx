@@ -13,7 +13,7 @@ export default function Button({ label, bgColor, onPress, textColor = '#fff', ic
         <View style={[styles.buttonContainer, {backgroundColor: bgColor}]}>
             <Pressable style={styles.button} onPress={onPress}>
                 {IconComponent && <IconComponent size={30} color="white"/>}
-                <Text style={[styles.buttonLabel, {color: textColor}]}>{label}</Text>
+                { label !== null && label !== undefined ? <Text style={[styles.buttonLabel, {color: textColor}]}>{label}</Text> : null }
             </Pressable>
         </View>
     );
