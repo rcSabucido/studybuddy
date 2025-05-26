@@ -5,12 +5,13 @@ type Props = {
     bgColor: string
     textColor?: string
     icon?: any
+    onPress?: () => void
 };
 
-export default function Button({ label, bgColor, textColor = '#fff', icon: IconComponent}: Props) {
+export default function Button({ label, bgColor, onPress, textColor = '#fff', icon: IconComponent}: Props) {
     return (
         <View style={[styles.buttonContainer, {backgroundColor: bgColor}]}>
-            <Pressable style={styles.button} onPress={() => console.log('Button pressed')}>
+            <Pressable style={styles.button} onPress={onPress}>
                 {IconComponent && <IconComponent size={30} color="white"/>}
                 <Text style={[styles.buttonLabel, {color: textColor}]}>{label}</Text>
             </Pressable>

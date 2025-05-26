@@ -1,7 +1,9 @@
+import Button from '@/components/Button';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { Calendar } from 'react-native-calendars';
+import { PlusIcon } from 'react-native-heroicons/outline';
     
 function openAddTask() {
   const router = useRouter();
@@ -34,21 +36,7 @@ export default function Index() {
           fontFamily: 'Poppins_700Bold',
           padding: 12
         }}>Calendar</Text>
-        <Pressable
-          onPress={openAddTask}
-          accessibilityLabel='Add a task to your calendar'
-        >
-          <Text style={{
-              fontSize: 20,
-              fontFamily: 'Poppins_300Light',
-              padding: 12,
-              borderRadius: 8,
-              backgroundColor: '#9B41E9',
-              color: '#ffffff'
-            }}>
-            Add Task
-          </Text>
-        </Pressable>
+        <Button onPress={openAddTask} icon={PlusIcon} bgColor='#9B41E9' label='Add Task'></Button>
       </View>
       <View style={{width: '100%'}}>
         <Calendar
