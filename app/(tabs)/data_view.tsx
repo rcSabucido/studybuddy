@@ -1,4 +1,5 @@
 import { Text, View } from "react-native";
+import styles from '../styles';
 
 export default function Index() {
   return (
@@ -39,7 +40,14 @@ export default function Index() {
           marginLeft: 'auto',
           marginRight: 'auto',
         }}>Score: 70%</Text>
-    </View>
+      </View>
+      <View style={styles.content_container}>
+        <Text style={{
+          color: "#ddd",
+          fontSize: 20,
+          fontFamily: 'Poppins_700Bold',
+        }}>Minimum Hours to Study</Text>
+      </View>
     </View>
   );
 }
