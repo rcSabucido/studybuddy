@@ -9,7 +9,37 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      <Text>Edit data_view.tsx to edit this screen.</Text>
+      <View style={{
+        width: '100%',
+      }}>
+        <Text style={{
+            fontSize: 24,
+            color: '#333',
+            fontFamily: 'Poppins_700Bold',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+          }}>You've studied for</Text>
+        <Text style={{
+            fontSize: 24,
+            color: '#333',
+            fontFamily: 'Poppins_700Bold',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+          }}>4 hours today.</Text>
+      </View>
+      <View style={{
+        width: '100%',
+        paddingTop: 24,
+        paddingBottom: 24
+      }}>
+        <Text style={{
+          fontSize: 24,
+          color: '#333',
+          fontFamily: 'Poppins_700Bold',
+          marginLeft: 'auto',
+          marginRight: 'auto',
+        }}>Score: 70%</Text>
+    </View>
     </View>
   );
 }
