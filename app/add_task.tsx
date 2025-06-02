@@ -1,8 +1,13 @@
 import ArrowHeader from '@/components/ArrowHeader';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { Calendar } from 'react-native-calendars';
 
+function openCalendar() {
+  const router = useRouter();
+  router.push("/(tabs)/calendar");
+}
 export default function Index() {
   const [selected, setSelected] = useState('');
   const [name, setName] = useState('');
@@ -18,7 +23,7 @@ export default function Index() {
       }}
     >
       <View style={styles.addTaskContainer}>
-        <ArrowHeader title="Add Task" />
+        <ArrowHeader onPress={openCalendar} title="Add Task" />
       </View>
       <TextInput
           onChangeText={setName}
