@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { DimensionValue, Pressable, StyleSheet, Text, View } from 'react-native';
 
 type Props = {
     label?: string
@@ -6,12 +6,13 @@ type Props = {
     textColor?: string
     icon?: any
     iconWeight?: string | number
+    width?: DimensionValue
     onPress?: () => void
 };
 
-export default function Button({ label, bgColor, onPress, textColor = '#fff', icon: IconComponent, iconWeight="1.5"}: Props) {
+export default function Button({ label, bgColor, onPress, textColor = '#fff', icon: IconComponent, iconWeight="1.5", width='auto'}: Props) {
     return (
-        <View style={[styles.buttonContainer, {backgroundColor: bgColor}]}>
+        <View style={[styles.buttonContainer, {backgroundColor: bgColor, width: width}]}>
             <Pressable style={styles.button} onPress={onPress}>
                 {IconComponent && <IconComponent size={25} strokeWidth={iconWeight} color="white"/>}
                 { label !== null && label !== undefined ? <Text style={[styles.buttonLabel, {color: textColor}]}>{label}</Text> : null }
@@ -22,7 +23,6 @@ export default function Button({ label, bgColor, onPress, textColor = '#fff', ic
 
 const styles = StyleSheet.create({
     buttonContainer: {
-        paddingHorizontal: 13,
         height: 50,
         justifyContent: 'center',
         borderRadius: 10,

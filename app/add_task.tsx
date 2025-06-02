@@ -14,6 +14,7 @@ export default function Index() {
   const [priorityStatus, setPriorityStatus] = useState('');
   const [selectTime, setSelectTime] = useState('');
   const [selectDate, setSelectDate] = useState('');
+  const [focusedInput, setFocusedInput] = useState('');
 
   return (
     <ScrollView
@@ -24,13 +25,18 @@ export default function Index() {
     >
       <View style={styles.addTaskContainer}>
         <ArrowHeader onPress={openCalendar} title="Add Task" />
-      </View>
-      <TextInput
+        <View style={styles.inputContainer}>
+          <TextInput
           onChangeText={setName}
           value={name}
           placeholder="Name"
-          style={styles.input}
-        />
+          style={[styles.input, focusedInput === 'name' && styles.inputFocused]}
+          onFocus={() => setFocusedInput('name')}
+          onBlur={() => setFocusedInput('')}
+          />
+        </View>
+      </View>
+      
       <TextInput
           onChangeText={setPriorityStatus}
           value={priorityStatus}
@@ -97,32 +103,24 @@ export default function Index() {
 const styles = StyleSheet.create({
     input: {
         width: '90%',
-        backgroundColor: '#fffffff',
-        borderColor: 'black',
+        backgroundColor: '#EBE0E0',
         borderRadius: 16,
-        borderWidth: 1,
         marginLeft: 'auto',
         marginRight: 'auto',
         marginBottom: 16,
         padding: 16
     },
+    inputFocused: {
+      borderColor: '#9B41E9',
+      borderWidth: 5,
+    },
     addTaskContainer: {
-      paddingTop: 30,
+      paddingTop: 55,
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
     },
-    headerContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      width: '100%',
-      paddingHorizontal: 20,
-      marginBottom: 20,
-      gap: '26%'
-    },
-    headerText: {
-      fontSize: 20,
-      fontFamily: 'Poppins_700Bold',
-      color: '#333',
+    inputContainer: {
+      width: '100%'
     }
 })
