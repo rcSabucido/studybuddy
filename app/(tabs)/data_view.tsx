@@ -106,7 +106,7 @@ export default function DataView() {
         }}>Deficit</Text>
       </View>
     </ScrollView>
-    { studyHoursVisible && <MinStudyHoursModal onClose={(newValue?: number) => {
+    { studyHoursVisible && <MinStudyHoursModal previousValue={minimumHoursStudy} onClose={(newValue?: number) => {
       setStudyHoursVisible(false);
       setMinimumHoursStudy(newValue ? newValue : minimumHoursStudy);
     }}/> }

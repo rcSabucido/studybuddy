@@ -7,11 +7,12 @@ import {
 } from 'react-native-ui-lib';
 
 type Props = {
-    onClose: (newValue?: number) => void
+  previousValue: number,
+  onClose: (newValue?: number) => void
 };
 
-export default function MinStudyHoursModal({onClose}: Props) {
-  const [minimumHoursStudy, setMinimumHoursStudy] = useState(1);
+export default function MinStudyHoursModal({onClose, previousValue}: Props) {
+  const [minimumHoursStudy, setMinimumHoursStudy] = useState(previousValue);
   const hoursStudyChange = useCallback((item: number | string) => {
     setMinimumHoursStudy(item as number);
   }, []);
