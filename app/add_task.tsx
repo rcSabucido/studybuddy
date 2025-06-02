@@ -1,4 +1,4 @@
-import ArrowButton from '@/components/ArrowButton';
+import ArrowHeader from '@/components/ArrowHeader';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { Calendar } from 'react-native-calendars';
@@ -18,10 +18,7 @@ export default function Index() {
       }}
     >
       <View style={styles.addTaskContainer}>
-        <View style={styles.headerContainer}>
-          <ArrowButton />
-          <Text style={styles.headerText}>Add Task</Text>
-        </View>
+        <ArrowHeader title="Add Task" />
       </View>
       <TextInput
           onChangeText={setName}
