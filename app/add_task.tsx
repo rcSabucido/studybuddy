@@ -1,3 +1,4 @@
+import ArrowButton from '@/components/ArrowButton';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { Calendar } from 'react-native-calendars';
@@ -16,7 +17,12 @@ export default function Index() {
         flexDirection: 'column',
       }}
     >
-      <View style={{padding: 20}}></View>
+      <View style={styles.addTaskContainer}>
+        <View style={styles.headerContainer}>
+          <ArrowButton />
+          <Text style={styles.headerText}>Add Task</Text>
+        </View>
+      </View>
       <TextInput
           onChangeText={setName}
           value={name}
@@ -97,5 +103,24 @@ const styles = StyleSheet.create({
         marginRight: 'auto',
         marginBottom: 16,
         padding: 16
+    },
+    addTaskContainer: {
+      paddingTop: 30,
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    headerContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      width: '100%',
+      paddingHorizontal: 20,
+      marginBottom: 20,
+      gap: '26%'
+    },
+    headerText: {
+      fontSize: 20,
+      fontFamily: 'Poppins_700Bold',
+      color: '#333',
     }
 })
