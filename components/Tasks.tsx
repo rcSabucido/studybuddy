@@ -21,7 +21,7 @@ export default function Tasks({label, onDelete}: Props) {
 
 const styles = StyleSheet.create({
     buttonContainer: {
-        width: 390,
+        width: '100%',
         height: 87,
         backgroundColor: '#9B41E9',
         borderRadius: 10,

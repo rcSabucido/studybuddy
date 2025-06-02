@@ -25,10 +25,10 @@ export default function Index() {
             </View>
             <View style={styles.allButtonContainer}>
                 <View style={styles.buttonContainer}>
-                    <Button label="All Tasks" bgColor='#9B41E9' />
-                    <Button label="Today's Tasks" textColor="0000" bgColor='#D9D9D9' />
+                    <Button width={'30%'} label="All Tasks" bgColor='#9B41E9' />
+                    <Button width={'50%'} label="Today's Tasks" textColor="0000" bgColor='#D9D9D9' />
                 </View>
-                <Button icon={AdjustmentsHorizontalIcon} bgColor='#9B41E9'></Button>
+                <Button width={'15%'} icon={AdjustmentsHorizontalIcon} bgColor='#9B41E9'></Button>
             </View>
             <View style={styles.tasksContainer}>
                 {tasks.map(task => (
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        width: '100%',
+        width: '90%',
         marginTop: 20,
         gap: 10,
     }

@@ -1,7 +1,9 @@
+import Button from '@/components/Button';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { Calendar } from 'react-native-calendars';
+import { PlusIcon } from 'react-native-heroicons/outline';
     
 function openAddTask() {
   const router = useRouter();
@@ -11,55 +13,15 @@ function openAddTask() {
 export default function Index() {
   const [selected, setSelected] = useState('');
   return (
-    <ScrollView
-      contentContainerStyle={{
-        flex: 1,
-        flexDirection: 'column',
-      }}
-    >
-      <View style={{padding: 20}}></View>
-      <View style={{
-          flex: 1,
-          flexDirection: 'row',
-          paddingTop: 16,
-          paddingBottom: 16,
-          marginLeft: 'auto',
-          marginRight: 'auto',
-          width: '90%',
-          justifyContent: 'space-between',
-          maxHeight: 84,
-        }}>
-        <Text style={{
-          fontSize: 20,
-          fontFamily: 'Poppins_700Bold',
-          padding: 12
-        }}>Calendar</Text>
-        <Pressable
-          onPress={openAddTask}
-          accessibilityLabel='Add a task to your calendar'
-        >
-          <Text style={{
-              fontSize: 20,
-              fontFamily: 'Poppins_300Light',
-              padding: 12,
-              borderRadius: 8,
-              backgroundColor: '#9B41E9',
-              color: '#ffffff'
-            }}>
-            Add Task
-          </Text>
-        </Pressable>
+    <ScrollView contentContainerStyle={styles.innerScrollView}>
+      <View style={styles.spacer}></View>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>Calendar</Text>
+        <Button onPress={openAddTask} icon={PlusIcon} iconWeight={2.0} width={'40%'} bgColor='#9B41E9' label='Add Task'></Button>
       </View>
-      <View style={{width: '100%'}}>
+      <View style={styles.calendarContainer}>
         <Calendar
-          style={{
-            borderWidth: 1,
-            borderColor: 'gray',
-            borderRadius: 16,
-            padding: 32,
-            width: '90%',
-            margin: 'auto',
-          }}
+          style={styles.calendar}
           theme={{
             backgroundColor: '#9B41E9',
             calendarBackground: '#9B41E9',
@@ -79,14 +41,51 @@ export default function Index() {
         />
       </View>
       <View>
-        <Text style={{
-          fontSize: 24,
-          color: '#333',
-          fontFamily: 'Poppins_700Bold',
-          paddingTop: 60,
-          margin: 'auto'
-        }}>No tasks so far...</Text>
+        <Text style={styles.noTasksText}>No tasks so far...</Text>
       </View>
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  spacer: {
+    padding: 20
+  },
+  header: {
+    flexDirection: 'row',
+    paddingTop: 16,
+    paddingBottom: 16,
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    width: '90%',
+    justifyContent: 'space-between',
+    maxHeight: 84,
+  },
+  headerText: {
+    fontSize: 20,
+    fontFamily: 'Poppins_700Bold',
+    padding: 12
+  },
+  calendarContainer: {
+    width: '100%'
+  },
+  calendar: {
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 16,
+    padding: 32,
+    width: '90%',
+    margin: 'auto',
+  },
+  noTasksText: {
+    fontSize: 24,
+    color: '#333',
+    fontFamily: 'Poppins_700Bold',
+    paddingTop: 60,
+    margin: 'auto'
+  },
+  innerScrollView: {
+    flex: 1,
+    flexDirection: 'column'
+  },
+});
