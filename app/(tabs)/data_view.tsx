@@ -1,33 +1,17 @@
+import MinStudyHoursModal from '@/components/MinStudyHoursModal';
 import PieProgress from "@/components/PieProgress";
-import { useCallback, useMemo, useState } from 'react';
-import { Text, View } from "react-native";
-import {
-  SectionsWheelPicker,
-  WheelPickerProps
-} from 'react-native-ui-lib';
+import Feather from '@expo/vector-icons/Feather';
+import { useState } from 'react';
+import { Pressable, ScrollView, Text, View } from "react-native";
 import styles from '../styles';
 
 export default function DataView() {
-  const [selectedMinimumHoursStudy, setMinimumHoursStudy] = useState(1);
-  const hoursStudyChange = useCallback((item: number | string) => {
-    setMinimumHoursStudy(item as number);
-  }, []);
-  const sections: WheelPickerProps<string | number>[] = useMemo(() => {
-    return [
-      {
-        items: Array.from({length: 24}, (_, i) => ({value: i+1, label: `${i+1}`})),
-        onChange: hoursStudyChange,
-        initialValue: selectedMinimumHoursStudy,
-        label: selectedMinimumHoursStudy > 1 ? 'hours' : 'hour'
-      }
-    ]
-  }, [
-    selectedMinimumHoursStudy
-  ])
-
+  const [minimumHoursStudy, setMinimumHoursStudy] = useState(1);
+  const [studyHoursVisible, setStudyHoursVisible] = useState(false);
   return (
-    <View
-      style={{
+    <>
+    <ScrollView
+      contentContainerStyle={{
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
@@ -74,11 +58,45 @@ export default function DataView() {
           fontSize: 20,
           fontFamily: 'Poppins_700Bold',
         }}>Minimum Hours to Study</Text>
-          <SectionsWheelPicker numberOfVisibleRows={2} sections={sections} itemHeight={48} textStyle={{
-          color: "#ddd",
-          fontSize: 20,
-          fontFamily: 'Poppins_700Bold',
-          }} />
+
+        <Pressable
+        onPress={() => {
+          setStudyHoursVisible(!studyHoursVisible)
+        }}
+        accessibilityLabel='Change the minimum hours you need to study'
+        >
+          <View
+            style={{
+              boxShadow: [{
+                inset: true,
+                offsetX: -4,
+                offsetY: 4,
+                blurRadius: 8,
+                color: 'rgba(0, 0, 0, 0.2))'
+              }],
+              padding: 8,
+              margin: 8,
+              borderRadius: 16,
+              backgroundColor: '#6D00CD',
+              width: 192,
+              justifyContent: 'center',
+              alignContent: 'center',
+              flexDirection: 'row',
+            }}>
+              <View style={{backgroundColor: 'white', padding: 16, borderRadius: 16}}>
+                <Feather name="clock" size={20} color="#9B41E9" style={{margin: 'auto'}} />
+              </View>
+              <Text style={{
+                  fontSize: 20,
+                  fontFamily: 'Poppins_300Light',
+                  color: '#ffffff',
+                  width: 'auto',
+                  margin: 'auto',
+                  }}>
+                  {`${minimumHoursStudy} hour${minimumHoursStudy > 1 ? 's' : ''}`}
+              </Text>
+          </View>
+        </Pressable>
       </View>
       <View style={styles.content_container}>
         <Text style={{
@@ -87,6 +105,11 @@ export default function DataView() {
           fontFamily: 'Poppins_700Bold',
         }}>Deficit</Text>
       </View>
-    </View>
+    </ScrollView>
+    { studyHoursVisible && <MinStudyHoursModal onClose={(newValue?: number) => {
+      setStudyHoursVisible(false);
+      setMinimumHoursStudy(newValue ? newValue : minimumHoursStudy);
+    }}/> }
+    </>
   );
 }
