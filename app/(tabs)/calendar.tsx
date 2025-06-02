@@ -17,7 +17,7 @@ export default function Index() {
       <View style={styles.spacer}></View>
       <View style={styles.header}>
         <Text style={styles.headerText}>Calendar</Text>
-        <Button onPress={openAddTask} icon={PlusIcon} bgColor='#9B41E9' label='Add Task'></Button>
+        <Button onPress={openAddTask} icon={PlusIcon} iconWeight={2.0} bgColor='#9B41E9' label='Add Task'></Button>
       </View>
       <View style={styles.calendarContainer}>
         <Calendar
