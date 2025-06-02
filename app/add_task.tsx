@@ -1,7 +1,13 @@
+import ArrowHeader from '@/components/ArrowHeader';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { Calendar } from 'react-native-calendars';
 
+function openCalendar() {
+  const router = useRouter();
+  router.push("/(tabs)/calendar");
+}
 export default function Index() {
   const [selected, setSelected] = useState('');
   const [name, setName] = useState('');
@@ -16,13 +22,18 @@ export default function Index() {
         flexDirection: 'column',
       }}
     >
-      <View style={{padding: 20}}></View>
-      <TextInput
-          onChangeText={setName}
-          value={name}
-          placeholder="Name"
-          style={styles.input}
-        />
+      <View style={styles.addTaskContainer}>
+        <ArrowHeader onPress={openCalendar} title="Add Task" />
+        <View style={styles.inputContainer}>
+          <TextInput
+            onChangeText={setName}
+            value={name}
+            placeholder="Name"
+            style={styles.input}
+          />
+        </View>
+      </View>
+      
       <TextInput
           onChangeText={setPriorityStatus}
           value={priorityStatus}
@@ -41,20 +52,24 @@ export default function Index() {
           placeholder="Select Date"
           style={styles.input}
         />
+
+        {/* Add task view -> no calendar widget initially, user must press select date to show calendar,
+            when calendar pops up, hide create button and let user select a date.
+            After selecting a date, hide calendar widget and show create button and let user create the task.
+        */}
       <View style={{width: '100%'}}>
         <Calendar
           style={{
-            borderWidth: 1,
-            borderColor: 'gray',
             borderRadius: 16,
-            padding: 32,
+            height: 320,
             width: '90%',
-            margin: 'auto',
+            margin: 'auto'
           }}
           theme={{
             todayTextColor: '#000000',
-            todayBackgroundColor: '#4B41E9'
+            todayBackgroundColor: '#4B41E9',
           }}
+
           onDayPress={day => {
             setSelected(day.dateString);
           }}
@@ -89,13 +104,20 @@ export default function Index() {
 const styles = StyleSheet.create({
     input: {
         width: '90%',
-        backgroundColor: '#fffffff',
-        borderColor: 'black',
+        backgroundColor: '#ffffff',
         borderRadius: 16,
-        borderWidth: 1,
         marginLeft: 'auto',
         marginRight: 'auto',
         marginBottom: 16,
         padding: 16
+    },
+    addTaskContainer: {
+      paddingTop: '10%',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    inputContainer: {
+      width: '100%'
     }
 })
