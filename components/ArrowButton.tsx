@@ -18,10 +18,10 @@ export default function ArrowButton({ onPress }: Props) {
 const styles = StyleSheet.create({
     buttonContainer : {
         paddingHorizontal: 12,
-        height: 45,
+        height: 40,
         justifyContent: 'center',
         borderRadius: 10,
-        backgroundColor: '#EBE0E0',
+        backgroundColor: '#ffffff',
         filter: 'drop-shadow(4px 4px 4px rgba(0, 0, 0, 0.35))'
     },
     button: {

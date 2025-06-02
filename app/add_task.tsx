@@ -14,7 +14,6 @@ export default function Index() {
   const [priorityStatus, setPriorityStatus] = useState('');
   const [selectTime, setSelectTime] = useState('');
   const [selectDate, setSelectDate] = useState('');
-  const [focusedInput, setFocusedInput] = useState('');
 
   return (
     <ScrollView
@@ -27,12 +26,10 @@ export default function Index() {
         <ArrowHeader onPress={openCalendar} title="Add Task" />
         <View style={styles.inputContainer}>
           <TextInput
-          onChangeText={setName}
-          value={name}
-          placeholder="Name"
-          style={[styles.input, focusedInput === 'name' && styles.inputFocused]}
-          onFocus={() => setFocusedInput('name')}
-          onBlur={() => setFocusedInput('')}
+            onChangeText={setName}
+            value={name}
+            placeholder="Name"
+            style={styles.input}
           />
         </View>
       </View>
@@ -55,20 +52,24 @@ export default function Index() {
           placeholder="Select Date"
           style={styles.input}
         />
+
+        {/* Add task view -> no calendar widget initially, user must press select date to show calendar,
+            when calendar pops up, hide create button and let user select a date.
+            After selecting a date, hide calendar widget and show create button and let user create the task.
+        */}
       <View style={{width: '100%'}}>
         <Calendar
           style={{
-            borderWidth: 1,
-            borderColor: 'gray',
             borderRadius: 16,
-            padding: 32,
+            height: 320,
             width: '90%',
-            margin: 'auto',
+            margin: 'auto'
           }}
           theme={{
             todayTextColor: '#000000',
-            todayBackgroundColor: '#4B41E9'
+            todayBackgroundColor: '#4B41E9',
           }}
+
           onDayPress={day => {
             setSelected(day.dateString);
           }}
@@ -103,19 +104,15 @@ export default function Index() {
 const styles = StyleSheet.create({
     input: {
         width: '90%',
-        backgroundColor: '#EBE0E0',
+        backgroundColor: '#ffffff',
         borderRadius: 16,
         marginLeft: 'auto',
         marginRight: 'auto',
         marginBottom: 16,
         padding: 16
     },
-    inputFocused: {
-      borderColor: '#9B41E9',
-      borderWidth: 5,
-    },
     addTaskContainer: {
-      paddingTop: 55,
+      paddingTop: '10%',
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',

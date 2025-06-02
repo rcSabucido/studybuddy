@@ -22,10 +22,11 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: 20,
     marginBottom: 20,
-    gap: '26%'
+    gap: '23%'
   },
   headerText: {
     fontSize: 20,
+    paddingTop: '2%',
     fontFamily: 'Poppins_700Bold',
     color: '#333',
   }
