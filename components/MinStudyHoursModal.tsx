@@ -29,7 +29,8 @@ export default function MinStudyHoursModal({onClose, previousValue}: Props) {
     minimumHoursStudy
   ])
     return (
-        <Modal animationType="slide" transparent={true} visible={true}>
+      <>
+        <Modal animationType="fade" transparent={false} visible={true} backdropColor="rgba(0, 0, 0, 0.35))">
             <View style={{
                 width: '60%',
                 height: 'auto',
@@ -69,5 +70,6 @@ export default function MinStudyHoursModal({onClose, previousValue}: Props) {
               </View>
             </View>
         </Modal>
+      </>
     )
 }
