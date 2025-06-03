@@ -1,9 +1,10 @@
 import ArrowHeader from '@/components/ArrowHeader';
+import NotifyTimeModal from '@/components/NotifyTimeModal';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { Calendar } from 'react-native-calendars';
-import { ExclamationCircleIcon } from 'react-native-heroicons/outline';
+import { ClockIcon, ExclamationCircleIcon } from 'react-native-heroicons/outline';
 import Dropdown from 'react-native-input-select';
 
 function openCalendar() {
@@ -14,7 +15,12 @@ export default function Index() {
   const [selected, setSelected] = useState('');
   const [name, setName] = useState('');
   const [priorityStatus, setPriorityStatus] = useState('');
-  const [selectTime, setSelectTime] = useState('');
+  const [timeValue, setTimeValue] = useState({
+    hours: 12,
+    minutes: 0,
+    period: 'AM' as const
+  });
+  const [timeModal, setTimeModal] = useState(false);
   const [selectDate, setSelectDate] = useState('');
 
   return (
@@ -72,15 +78,24 @@ export default function Index() {
             dropdownContainerStyle={{marginBottom: 16, width: '100%'}}
             placeholderStyle={{color: 'dimgray'}}
            />
+           <View style={styles.input}>
+            <Pressable onPress={() => {
+              setTimeModal(!timeModal);
+            }} style={styles.timeButton}>
+              <Text style={{color: 'dimgray'}}>
+                {timeValue.hours}:{timeValue.minutes.toString().padStart(2, '0')} {timeValue.period}
+                </Text>
+              <ClockIcon size={20} color="dimgray"/>
+            </Pressable>
+           </View>
+           {timeModal && (<NotifyTimeModal previousValue={timeValue} onClose={(newValue: any) => {
+            if (newValue) {
+              setTimeValue(newValue);
+            }
+            setTimeModal(false);
+           }}/>)}
         </View>
       </View>
-      
-      <TextInput
-          onChangeText={setSelectTime}
-          value={selectTime}
-          placeholder="Select Time"
-          style={styles.input}
-        />
       <TextInput
           onChangeText={setSelectDate}
           value={selectDate}
@@ -171,5 +186,11 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       gap: '10%',
       paddingLeft: 5
+    },
+    timeButton: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingRight: '2%',
     }
 })
