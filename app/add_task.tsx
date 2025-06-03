@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { Calendar } from 'react-native-calendars';
-import { ClockIcon, ExclamationCircleIcon } from 'react-native-heroicons/outline';
+import { CalendarIcon, ClockIcon, ExclamationCircleIcon } from 'react-native-heroicons/outline';
 import Dropdown from 'react-native-input-select';
 
 function openCalendar() {
@@ -100,6 +100,7 @@ export default function Index() {
               <Text style={{color: 'dimgray'}}>
                 {selectDate ? selectDate : 'Select Date'}
                 </Text>
+              <CalendarIcon size={20} color="dimgray"/>
             </Pressable>
            </View>
            {showCalendar && (
@@ -108,13 +109,14 @@ export default function Index() {
                 style={{
                   borderRadius: 16,
                   width: '90%',
-                  height: 'auto',
+                  height: 370,
                   margin: 'auto'
                 }}
                 theme={{
-                  todayTextColor: '#000000',
-                  todayBackgroundColor: '#4B41E9',
+                  todayTextColor: '#ffffff',
+                  todayBackgroundColor: '#1AE843',
                 }}
+                enableSwipeMonths={true}
                 onDayPress={day => {
                   setSelectDate(day.dateString);
                   setShowCalendar(false); 
@@ -132,7 +134,9 @@ export default function Index() {
           )}        
         </View>
         {!showCalendar && (
-          <Button label='Create' bgColor='#9B41E9' width={'30%'}></Button>
+          <View style={styles.createButtonContainer}>
+            <Button label='Create' bgColor='#9B41E9' width={'30%'}></Button>
+          </View>
         )}
       </View>
     </ScrollView>
@@ -180,5 +184,12 @@ const styles = StyleSheet.create({
       justifyContent: 'space-between',
       alignItems: 'center',
       paddingRight: '2%',
+    },
+    createButtonContainer: {
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: '90%',
+      width: '100%',
     }
 })
