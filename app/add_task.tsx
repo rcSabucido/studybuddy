@@ -1,4 +1,5 @@
 import ArrowHeader from '@/components/ArrowHeader';
+import Button from '@/components/Button';
 import NotifyTimeModal from '@/components/NotifyTimeModal';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -12,7 +13,6 @@ function openCalendar() {
   router.back();
 }
 export default function Index() {
-  const [selected, setSelected] = useState('');
   const [name, setName] = useState('');
   const [priorityStatus, setPriorityStatus] = useState('');
   const [timeValue, setTimeValue] = useState({
@@ -22,6 +22,7 @@ export default function Index() {
   });
   const [timeModal, setTimeModal] = useState(false);
   const [selectDate, setSelectDate] = useState('');
+  const [showCalendar, setShowCalendar] = useState(false);
 
   return (
     <ScrollView
@@ -94,59 +95,46 @@ export default function Index() {
             }
             setTimeModal(false);
            }}/>)}
+           <View style={styles.input}>
+            <Pressable onPress={() => setShowCalendar(!showCalendar)} style={styles.timeButton}>
+              <Text style={{color: 'dimgray'}}>
+                {selectDate ? selectDate : 'Select Date'}
+                </Text>
+            </Pressable>
+           </View>
+           {showCalendar && (
+            <View style={{width: '100%'}}>
+              <Calendar
+                style={{
+                  borderRadius: 16,
+                  width: '90%',
+                  height: 'auto',
+                  margin: 'auto'
+                }}
+                theme={{
+                  todayTextColor: '#000000',
+                  todayBackgroundColor: '#4B41E9',
+                }}
+                onDayPress={day => {
+                  setSelectDate(day.dateString);
+                  setShowCalendar(false); 
+                }}
+                markedDates={{
+                  [selectDate]: {
+                    selected: true, 
+                    disableTouchEvent: true, 
+                    selectedColor: '#9B41E9', 
+                    selectedTextColor: '#ffffff'
+                  }
+                }}
+              />
+            </View>
+          )}        
         </View>
+        {!showCalendar && (
+          <Button label='Create' bgColor='#9B41E9' width={'30%'}></Button>
+        )}
       </View>
-      <TextInput
-          onChangeText={setSelectDate}
-          value={selectDate}
-          placeholder="Select Date"
-          style={styles.input}
-        />
-
-        {/* Add task view -> no calendar widget initially, user must press select date to show calendar,
-            when calendar pops up, hide create button and let user select a date.
-            After selecting a date, hide calendar widget and show create button and let user create the task.
-        */}
-      <View style={{width: '100%'}}>
-        <Calendar
-          style={{
-            borderRadius: 16,
-            height: 320,
-            width: '90%',
-            margin: 'auto'
-          }}
-          theme={{
-            todayTextColor: '#000000',
-            todayBackgroundColor: '#4B41E9',
-          }}
-
-          onDayPress={day => {
-            setSelected(day.dateString);
-          }}
-          markedDates={{
-            [selected]: {selected: true, disableTouchEvent: true, selectedColor: '#9B41E9', selectedTextColor: '#ffffff'}
-          }}
-        />
-      </View>
-        <Pressable
-        onPress={() => {}}
-        accessibilityLabel='Add a task to your calendar'
-        >
-            <Text style={{
-                fontSize: 20,
-                fontFamily: 'Poppins_300Light',
-                padding: 12,
-                borderRadius: 8,
-                backgroundColor: '#9B41E9',
-                color: '#ffffff',
-                width: 'auto',
-                marginTop: 16,
-                marginLeft: 'auto',
-                marginRight: 'auto',
-                }}>
-                Create
-            </Text>
-        </Pressable>
     </ScrollView>
   );
 }
