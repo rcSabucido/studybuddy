@@ -13,6 +13,10 @@ function openVerboseDataView() {
   const router = useRouter();
   router.push("/verbose_data_view")
 }
+function openSetCurrentTimer() {
+  const router = useRouter();
+  router.push("/set_current_timer")
+}
 
 export default function DataView() {
   const [minimumHoursStudy, setMinimumHoursStudy] = useState(1);
@@ -117,42 +121,46 @@ export default function DataView() {
         }}>Deficit</Text>
 
         <View style={{margin: 'auto'}}>
-          <LineChart
-            data={{
-              labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-              datasets: [
-                {
-                  data
+          <Pressable
+            onPress={openVerboseDataView}
+            accessibilityLabel='View detailed statistics'>
+            <LineChart
+              data={{
+                labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+                datasets: [
+                  {
+                    data
+                  }
+                ]
+              }}
+              width={Dimensions.get("window").width * 0.9} // from react-native
+              height={200}
+              yAxisLabel="$"
+              yAxisSuffix="k"
+              yAxisInterval={1} // optional, defaults to 1
+              chartConfig={{
+                backgroundColor: "#9B41E9",
+                backgroundGradientFrom: "#9B41E9",
+                backgroundGradientTo: "#9B41E9",
+                //decimalPlaces: 2, // optional, defaults to 2dp
+                color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                style: {
+                  borderRadius: 16
+                },
+                propsForDots: {
+                  r: "6",
+                  strokeWidth: "2",
+                  stroke: "#714A94",
                 }
-              ]
-            }}
-            width={Dimensions.get("window").width * 0.9} // from react-native
-            height={200}
-            yAxisLabel="$"
-            yAxisSuffix="k"
-            yAxisInterval={1} // optional, defaults to 1
-            chartConfig={{
-              backgroundColor: "#9B41E9",
-              backgroundGradientFrom: "#9B41E9",
-              backgroundGradientTo: "#9B41E9",
-              //decimalPlaces: 2, // optional, defaults to 2dp
-              color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-              style: {
+              }}
+              bezier
+              style={{
+                marginVertical: 8,
                 borderRadius: 16
-              },
-              propsForDots: {
-                r: "6",
-                strokeWidth: "2",
-                stroke: "#714A94",
-              }
-            }}
-            bezier
-            style={{
-              marginVertical: 8,
-              borderRadius: 16
-            }}
-          />
+              }}
+            />
+          </Pressable>
         </View>
       </View>
     </ScrollView>
@@ -170,7 +178,7 @@ export default function DataView() {
         bottom: 12,
         filter: 'drop-shadow(4px 4px 4px rgba(0, 0, 0, 0.35))',
       }}
-      onPress={openVerboseDataView}
+      onPress={openSetCurrentTimer}
       icon={ChartBarIcon}
     />
     </>
