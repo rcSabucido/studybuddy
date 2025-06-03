@@ -46,7 +46,7 @@ export default function Index() {
               {
                 name: (
                   <View style={styles.dropdownItemStyle}>
-                    <Text>Priority 0</Text>
+                    <Text style={{color: 'dimgray'}}>Priority 0</Text>
                     <ExclamationCircleIcon size={17} color="#F81414" />
                   </View>
                 ),
@@ -55,7 +55,7 @@ export default function Index() {
               {
                 name: (
                   <View style={styles.dropdownItemStyle}>
-                    <Text>Priority 1</Text>
+                    <Text style={{color: 'dimgray'}}>Priority 1</Text>
                     <ExclamationCircleIcon size={17} color="#F1E610" />
                   </View>
                 ),
@@ -64,7 +64,7 @@ export default function Index() {
               {
                 name: (
                   <View style={styles.dropdownItemStyle}>
-                    <Text>Priority 2</Text>
+                    <Text style={{color: 'dimgray'}}>Priority 2</Text>
                     <ExclamationCircleIcon size={17} color="#1AE843" />
                   </View>
                 ),
@@ -151,7 +151,8 @@ const styles = StyleSheet.create({
         marginLeft: 'auto',
         marginRight: 'auto',
         marginBottom: 16,
-        padding: 16
+        padding: 16,
+        color: 'dimgray',
     },
     dropDown: {
         width: '90%',

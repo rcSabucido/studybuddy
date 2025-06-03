@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Modal, Pressable, Text, View } from "react-native";
 import {
-    SectionsWheelPicker,
-    WheelPickerProps
+  SectionsWheelPicker,
+  WheelPickerProps
 } from 'react-native-ui-lib';
 
 type TimeValue = {
@@ -54,7 +54,7 @@ export default function MinStudyHoursModal({onClose, previousValue}: Props) {
   }, [selectedTime]);
 
   return (
-    <Modal animationType="slide" transparent={true} visible={true}>
+    <Modal animationType="fade" transparent={false} visible={true} backdropColor="rgba(0, 0, 0, 0.35))">
       <View style={{
         width: '80%',
         height: 'auto',
