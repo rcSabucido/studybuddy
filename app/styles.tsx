@@ -21,4 +21,19 @@ export default StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  container_header_text: {
+    fontSize: 18,
+    color: "#ffffff",
+    fontFamily: 'Poppins_300Light',
+  },
+  container_button_text: {
+    fontSize: 24,
+    color: "#ffffff",
+    fontFamily: 'Poppins_500Bold',
+  },
+  header_text: {
+    fontSize: 24,
+    color: "#000000",
+    fontFamily: 'Poppins_500Bold',
+  }
 });
