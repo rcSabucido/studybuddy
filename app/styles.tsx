@@ -26,6 +26,11 @@ export default StyleSheet.create({
     color: "#ffffff",
     fontFamily: 'Poppins_300Light',
   },
+  container_button_text: {
+    fontSize: 24,
+    color: "#ffffff",
+    fontFamily: 'Poppins_500Bold',
+  },
   header_text: {
     fontSize: 24,
     color: "#000000",

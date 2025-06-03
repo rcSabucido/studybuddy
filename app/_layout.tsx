@@ -7,6 +7,7 @@ export default function RootLayout() {
       <Stack.Screen name="add_task" options={{ headerShown: false }} />
       <Stack.Screen name="verbose_data_view" options={{ headerShown: false }} />
       <Stack.Screen name="set_current_timer" options={{ headerShown: false }} />
+      <Stack.Screen name="setup_manual_timer" options={{ headerShown: false }} />
     </Stack>
   );
 }

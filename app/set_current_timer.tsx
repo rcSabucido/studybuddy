@@ -1,13 +1,13 @@
-import ArrowHeader from "@/components/ArrowHeader";
-import { useRouter } from 'expo-router';
+import BackHeader from "@/components/BackHeader";
+import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Image, ScrollView, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import Dropdown from 'react-native-input-select';
 import styles from './styles';
 
-function goBack() {
+function openManualTimer() {
   const router = useRouter();
-  router.back()
+  router.push("/setup_manual_timer")
 }
 
 export default function SetCurrentTimer() {
@@ -21,9 +21,7 @@ export default function SetCurrentTimer() {
         alignItems: "center",
       }}
     >
-      <View style={[styles.navheader_container]}>
-        <ArrowHeader onPress={goBack} title="" />
-      </View>
+      <BackHeader/>
       <ScrollView style={{
         height: '100%',
         width: '100%',
@@ -62,13 +60,14 @@ export default function SetCurrentTimer() {
               style={{width: 160, height: 160}}
             />
           </View>
-          <View style={[styles.content_container, {marginTop: 32}]}>
+          <Pressable style={[styles.content_container, {marginTop: 32}]}
+            onPress={openManualTimer} accessibilityLabel="Use manual timer">
             <Text style={[styles.container_header_text, {padding: 8}]}>Manually Track</Text>
             <Image
               source={require('@/assets/images/clock-white.png')}
               style={{width: 160, height: 160}}
             />
-          </View>
+          </Pressable>
         </View>
       </ScrollView>
     </View>
