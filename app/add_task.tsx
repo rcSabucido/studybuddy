@@ -9,10 +9,6 @@ import { Calendar } from 'react-native-calendars';
 import { CalendarIcon, ClockIcon, ExclamationCircleIcon } from 'react-native-heroicons/outline';
 import Dropdown from 'react-native-input-select';
 
-function openCalendar() {
-  const router = useRouter();
-  router.back();
-}
 export default function Index() {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const router = useRouter();

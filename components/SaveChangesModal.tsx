@@ -12,7 +12,12 @@ export default function SaveChangesModal({ onClose }: Props) {
         height: 'auto',
         padding: 19,
         borderRadius: 16,
-        filter: 'drop-shadow(4px 4px 4px rgba(0, 0, 0, 0.35))',
+        // filter: 'drop-shadow(4px 4px 4px rgba(0, 0, 0, 0.35))',
+        shadowColor: 'rgba(0, 0, 0, 0.35)',
+        shadowOffset: { width: 4, height: 4 },
+        shadowOpacity: 0.35,
+        shadowRadius: 4,
+        elevation: 4, 
         margin: 'auto',
         backgroundColor: "white",
         position: "relative",
@@ -40,14 +45,14 @@ export default function SaveChangesModal({ onClose }: Props) {
           }}>
             <Pressable 
               style={{
-                backgroundColor: '#fffffff', 
+                backgroundColor: '#ffffff', 
                 paddingHorizontal: 32,
                 height: 50,
                 justifyContent: 'center',
                 borderRadius: 10,
                 borderWidth: 1,
               }} 
-              onPress={() => onClose(true)}
+              onPress={() => onClose(false)}
             >
               <Text style={{
                 fontSize: 14,
@@ -64,7 +69,7 @@ export default function SaveChangesModal({ onClose }: Props) {
                 justifyContent: 'center',
                 borderRadius: 10,
               }} 
-              onPress={() => onClose(false)}
+              onPress={() => onClose(true)}
             >
               <Text style={{
                 fontSize: 14,
