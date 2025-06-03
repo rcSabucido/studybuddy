@@ -1,6 +1,7 @@
 import ArrowHeader from '@/components/ArrowHeader';
 import Button from '@/components/Button';
 import NotifyTimeModal from '@/components/NotifyTimeModal';
+import SaveChangesModal from '@/components/SaveChangesModal';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
@@ -13,6 +14,8 @@ function openCalendar() {
   router.back();
 }
 export default function Index() {
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const router = useRouter();
   const [name, setName] = useState('');
   const [priorityStatus, setPriorityStatus] = useState('');
   const [timeValue, setTimeValue] = useState({
@@ -24,6 +27,39 @@ export default function Index() {
   const [selectDate, setSelectDate] = useState('');
   const [showCalendar, setShowCalendar] = useState(false);
 
+  const hasUnsavedChanges = () => {
+    return name !== '' || priorityStatus !== '' || selectDate !== '' || 
+    (timeValue.hours !== 12 || timeValue.minutes !== 0 || timeValue.period !== 'AM');
+  };
+
+  const handleSave = () => {
+    const taskData = {
+      name,
+      priority: priorityStatus,
+      time: timeValue,
+      date: selectDate
+    };
+
+    console.log('Task Data:', taskData);
+    router.back();
+  }
+
+  const handleBackPress = () => {
+    if (hasUnsavedChanges()) {
+      setShowSaveModal(true);
+    } else {
+      router.back();
+    }
+  };
+
+  const handleSaveModalClose = (shouldSave: boolean) => {
+    if (shouldSave) {
+      handleSave();
+    }
+    setShowSaveModal(false);
+    router.back();
+  }
+
   return (
     <ScrollView
       contentContainerStyle={{
@@ -32,7 +68,7 @@ export default function Index() {
       }}
     >
       <View style={styles.addTaskContainer}>
-        <ArrowHeader onPress={openCalendar} title="Add Task" />
+        <ArrowHeader onPress={handleBackPress} title="Add Task" />
         <View style={styles.inputContainer}>
           <TextInput
             onChangeText={setName}
@@ -135,8 +171,12 @@ export default function Index() {
         </View>
         {!showCalendar && (
           <View style={styles.createButtonContainer}>
-            <Button label='Create' bgColor='#9B41E9' width={'30%'}></Button>
+            <Button label='Create' bgColor='#9B41E9' width={'30%'} onPress={handleSave}></Button>
           </View>
+        )}
+
+        { showSaveModal && (
+          <SaveChangesModal onClose={handleSaveModalClose} />
         )}
       </View>
     </ScrollView>
