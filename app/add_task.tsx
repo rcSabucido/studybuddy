@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { Calendar } from 'react-native-calendars';
+import Dropdown from 'react-native-input-select';
 
 function openCalendar() {
   const router = useRouter();
@@ -31,15 +32,20 @@ export default function Index() {
             placeholder="Name"
             style={styles.input}
           />
+          <Dropdown
+            placeholder='Select Priority'
+            options={[
+              { label: 'Priority 0', value: 'p0' },
+              { label: 'Priority 1', value: 'p1' },
+              { label: 'Priority 2', value: 'p2' },
+            ]}
+            selectedValue={priorityStatus}
+            onValueChange={(value: any) => setPriorityStatus(value)}
+            dropdownStyle={styles.dropDown}
+           />
         </View>
       </View>
       
-      <TextInput
-          onChangeText={setPriorityStatus}
-          value={priorityStatus}
-          placeholder="Priority Status"
-          style={styles.input}
-        />
       <TextInput
           onChangeText={setSelectTime}
           value={selectTime}
@@ -110,6 +116,16 @@ const styles = StyleSheet.create({
         marginRight: 'auto',
         marginBottom: 16,
         padding: 16
+    },
+    dropDown: {
+        width: '90%',
+        minHeight: 30,
+        backgroundColor: '#ffffff',
+        borderRadius: 16,
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        borderWidth: 0,
+        marginBottom: -10
     },
     addTaskContainer: {
       paddingTop: '10%',
