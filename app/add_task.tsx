@@ -3,11 +3,12 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { Calendar } from 'react-native-calendars';
+import { ExclamationCircleIcon } from 'react-native-heroicons/outline';
 import Dropdown from 'react-native-input-select';
 
 function openCalendar() {
   const router = useRouter();
-  router.push("/(tabs)/calendar");
+  router.back();
 }
 export default function Index() {
   const [selected, setSelected] = useState('');
@@ -35,13 +36,41 @@ export default function Index() {
           <Dropdown
             placeholder='Select Priority'
             options={[
-              { label: 'Priority 0', value: 'p0' },
-              { label: 'Priority 1', value: 'p1' },
-              { label: 'Priority 2', value: 'p2' },
+              {
+                name: (
+                  <View style={styles.dropdownItemStyle}>
+                    <Text>Priority 0</Text>
+                    <ExclamationCircleIcon size={17} color="#F81414" />
+                  </View>
+                ),
+                id: 0,
+              },
+              {
+                name: (
+                  <View style={styles.dropdownItemStyle}>
+                    <Text>Priority 1</Text>
+                    <ExclamationCircleIcon size={17} color="#F1E610" />
+                  </View>
+                ),
+                id: 1,
+              },
+              {
+                name: (
+                  <View style={styles.dropdownItemStyle}>
+                    <Text>Priority 2</Text>
+                    <ExclamationCircleIcon size={17} color="#1AE843" />
+                  </View>
+                ),
+                id: 2,
+              },
             ]}
+            optionLabel={'name'}
+            optionValue={'id'}
             selectedValue={priorityStatus}
             onValueChange={(value: any) => setPriorityStatus(value)}
             dropdownStyle={styles.dropDown}
+            dropdownContainerStyle={{marginBottom: 16, width: '100%'}}
+            placeholderStyle={{color: 'dimgray'}}
            />
         </View>
       </View>
@@ -125,7 +154,7 @@ const styles = StyleSheet.create({
         marginLeft: 'auto',
         marginRight: 'auto',
         borderWidth: 0,
-        marginBottom: -10
+        paddingLeft: 12
     },
     addTaskContainer: {
       paddingTop: '10%',
@@ -135,5 +164,12 @@ const styles = StyleSheet.create({
     },
     inputContainer: {
       width: '100%'
+    },
+    dropdownItemStyle: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: '10%',
+      paddingLeft: 5
     }
 })
