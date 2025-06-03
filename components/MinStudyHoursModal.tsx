@@ -1,10 +1,10 @@
-// import Button from "@/components/Button";
 import { useCallback, useMemo, useState } from 'react';
-import { Modal, Pressable, Text, View } from "react-native";
+import { Modal, View } from "react-native";
 import {
   SectionsWheelPicker,
   WheelPickerProps
 } from 'react-native-ui-lib';
+import Button from './Button';
 
 type Props = {
   previousValue: number,
@@ -29,7 +29,8 @@ export default function MinStudyHoursModal({onClose, previousValue}: Props) {
     minimumHoursStudy
   ])
     return (
-        <Modal animationType="slide" transparent={true} visible={true}>
+      <>
+        <Modal animationType="fade" transparent={false} visible={true} backdropColor="rgba(0, 0, 0, 0.35))">
             <View style={{
                 width: '60%',
                 height: 'auto',
@@ -50,24 +51,20 @@ export default function MinStudyHoursModal({onClose, previousValue}: Props) {
                   fontSize: 20,
                   fontFamily: 'Poppins_700Bold',
                 }} />
-                <Pressable style={{backgroundColor: '#9B41E9', 
-                  width: '60%',
-                  paddingHorizontal: 13,
-                  height: 50,
-                  justifyContent: 'center',
-                  borderRadius: 10,}} onPress={() => onClose(minimumHoursStudy)}>
-                    <View style={{
-                      width: '100%',
-                      height: '100%',
-                      alignItems: 'center',
-                      justifyContent: 'center',}}>
-                        <Text style={{
-                          fontSize: 14,
-                          fontFamily: 'Poppins_500Medium', color: 'white'}}>Accept</Text>
-                    </View>
-                </Pressable>
+                <Button
+                  label="Accept"
+                  bgColor="#9B41E9"
+                  width="60%"
+                  style={{
+                              width: '60%',
+                              paddingHorizontal: 13,
+                              height: 50,
+                  }}
+                  onPress={() => onClose(minimumHoursStudy)}
+                />
               </View>
             </View>
         </Modal>
+      </>
     )
 }
