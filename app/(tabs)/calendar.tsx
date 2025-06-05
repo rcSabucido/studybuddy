@@ -1,19 +1,76 @@
 import Button from '@/components/Button';
+import TaskPanel, { Task } from '@/components/TaskPanel';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { Calendar } from 'react-native-calendars';
 import { PlusIcon } from 'react-native-heroicons/outline';
     
+
+const mockTasks: Record<string, Task[]> = {
+  '2025-06-20': [
+    {
+      id: '1',
+      name: 'Study Mathematics',
+      priority: 0,
+      time: { hours: 2, minutes: 30, period: 'PM' },
+      date: '2025-06-20'
+    },
+    {
+      id: '2',
+      name: 'Complete Project Report',
+      priority: 1,
+      time: { hours: 4, minutes: 0, period: 'AM' },
+      date: '2025-06-20'
+    },
+     {
+      id: '3',
+      name: 'Complete Project Report',
+      priority: 1,
+      time: { hours: 4, minutes: 0, period: 'AM' },
+      date: '2025-06-20'
+    },
+     {
+      id: '4',
+      name: 'Complete Project Report',
+      priority: 1,
+      time: { hours: 4, minutes: 0, period: 'AM' },
+      date: '2025-06-20'
+    },
+     {
+      id: '5',
+      name: 'Complete Project Report',
+      priority: 1,
+      time: { hours: 4, minutes: 0, period: 'AM' },
+      date: '2025-06-20'
+    }
+  ]
+}
 function openAddTask() {
   const router = useRouter();
   router.push("/add_task")
 }
 
+// Panel slide and content of panel is fighting, find a way to fix that
+
 export default function Index() {
   const [selected, setSelected] = useState('');
+  const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
+  const [isTaskPanelVisible, setIsTaskPanelVisible] = useState(false);
+
+  const handleDayPress = (day: any) => {
+    setSelected(day.dateString);
+    const tasks = mockTasks[day.dateString] || [];
+    setSelectedTasks(tasks);
+    setIsTaskPanelVisible(tasks.length > 0);
+  }
+
+  const handleCloseTaskPanel = () => {
+    setIsTaskPanelVisible(false);
+  };
   return (
-    <ScrollView contentContainerStyle={styles.innerScrollView}>
+    <View style={{ flex: 1}}>
+      <ScrollView contentContainerStyle={styles.innerScrollView}>
       <View style={styles.spacer}></View>
       <View style={styles.header}>
         <Text style={styles.headerText}>Calendar</Text>
@@ -32,19 +89,25 @@ export default function Index() {
             todayTextColor: '#ffffff',
             todayBackgroundColor: '#1AE843'
           }}
-          onDayPress={day => {
-            setSelected(day.dateString);
-          }}
+          onDayPress={handleDayPress}
           markedDates={{
             [selected]: {selected: true, disableTouchEvent: true, selectedColor: '#1AE843', selectedTextColor: '#ffffff'},
             '2025-06-20': {marked: true, selectedColor:'#1AE843', dotColor: '#1AE843', activeOpacity: 0},
           }}
         />
       </View>
-      <View>
+      {/* <View>
         <Text style={styles.noTasksText}>No tasks so far...</Text>
-      </View>
+      </View> */}
     </ScrollView>
+    {isTaskPanelVisible && (
+      <TaskPanel
+        tasks={selectedTasks}
+        date={selected}
+        onClose={handleCloseTaskPanel}
+      />
+    )}
+    </View>
   );
 }
 
@@ -87,6 +150,7 @@ const styles = StyleSheet.create({
   },
   innerScrollView: {
     flex: 1,
-    flexDirection: 'column'
+    flexDirection: 'column',
+    paddingBottom: 100,
   },
 });
