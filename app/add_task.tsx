@@ -22,6 +22,13 @@ export default function Index() {
   const [timeModal, setTimeModal] = useState(false);
   const [selectDate, setSelectDate] = useState('');
   const [showCalendar, setShowCalendar] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
+
+  const validateInputs = () => {
+    return name.trim() !== '' &&
+            priorityStatus !== '' &&
+            selectDate !== '';
+  }
 
   const hasUnsavedChanges = () => {
     return name !== '' || priorityStatus !== '' || selectDate !== '' || 
@@ -29,6 +36,11 @@ export default function Index() {
   };
 
   const handleSave = () => {
+    if (!validateInputs()) {
+      setShowWarning(true);
+      return;
+    }
+
     const taskData = {
       name,
       priority: priorityStatus,
@@ -67,7 +79,10 @@ export default function Index() {
         <ArrowHeader onPress={handleBackPress} title="Add Task" />
         <View style={styles.inputContainer}>
           <TextInput
-            onChangeText={setName}
+            onChangeText={(text) => {
+              setName(text);
+              setShowWarning(false);
+            }}
             value={name}
             placeholder="Name"
             style={styles.input}
@@ -106,7 +121,10 @@ export default function Index() {
             optionLabel={'name'}
             optionValue={'id'}
             selectedValue={priorityStatus}
-            onValueChange={(value: any) => setPriorityStatus(value)}
+            onValueChange={(value: any) => {
+              setPriorityStatus(value);
+              setShowWarning(false);
+            }}
             dropdownStyle={styles.dropDown}
             dropdownContainerStyle={{marginBottom: 16, width: '100%'}}
             placeholderStyle={{color: 'dimgray'}}
@@ -152,6 +170,7 @@ export default function Index() {
                 onDayPress={day => {
                   setSelectDate(day.dateString);
                   setShowCalendar(false); 
+                  setShowWarning(false);
                 }}
                 markedDates={{
                   [selectDate]: {
@@ -162,6 +181,13 @@ export default function Index() {
                   }
                 }}
               />
+            </View>
+          )}
+          {showWarning && (
+            <View style={styles.warningContainer}>
+              <Text style={styles.warningText}>
+                Please fill in all fields (name, priority, and date)
+              </Text>
             </View>
           )}        
         </View>
@@ -203,11 +229,13 @@ const styles = StyleSheet.create({
     addTaskContainer: {
       paddingTop: '10%',
       flexDirection: 'column',
-      justifyContent: 'center',
+      justifyContent: 'space-between',
+      height: '100%',
       alignItems: 'center',
     },
     inputContainer: {
-      width: '100%'
+      width: '100%',
+      flex: 1,
     },
     dropdownItemStyle: {
       flexDirection: 'row',
@@ -223,10 +251,22 @@ const styles = StyleSheet.create({
       paddingRight: '2%',
     },
     createButtonContainer: {
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginTop: '90%',
       width: '100%',
+      padding: 20,
+      alignItems: 'center',
+      marginBottom: 45,
+    },
+    warningContainer: {
+    width: '90%',
+    backgroundColor: '#FFE5E5',
+    borderRadius: 8,
+    padding: 12,
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    },
+    warningText: {
+      color: '#FF0000',
+      fontSize: 14,
+      textAlign: 'center',
     }
 })
