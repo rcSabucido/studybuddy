@@ -44,7 +44,16 @@ const mockTasks: Record<string, Task[]> = {
       time: { hours: 4, minutes: 0, period: 'AM' },
       date: '2025-06-20'
     }
-  ]
+  ],
+  '2025-06-21': [
+    {
+      id: '6',
+      name: 'Attend Team Meeting',
+      priority: 1,
+      time: { hours: 10, minutes: 0, period: 'AM' },
+      date: '2025-06-21'
+    }
+  ],
 }
 function openAddTask() {
   const router = useRouter();
@@ -56,6 +65,29 @@ export default function Index() {
   const [selected, setSelected] = useState('');
   const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
   const [isTaskPanelVisible, setIsTaskPanelVisible] = useState(false);
+
+  const getMarkedDates = () => {
+    const marked: any = {};
+
+    Object.keys(mockTasks).forEach(date => {
+      marked[date] = {
+        marked: true,
+        dotColor: '#1AE843',
+        activeOpacity: 0,
+      };
+    });
+
+    if (selected) {
+      marked[selected] = {
+        selected: true,
+        disableTouchEvent: true,
+        selectedColor: '#1AE843',
+        selectedTextColor: '#ffffff',
+      };
+    }
+
+    return marked;
+  }
 
   const handleDayPress = (day: any) => {
     setSelected(day.dateString);
@@ -102,10 +134,7 @@ export default function Index() {
             todayBackgroundColor: '#1AE843'
           }}
           onDayPress={handleDayPress}
-          markedDates={{
-            [selected]: {selected: true, disableTouchEvent: true, selectedColor: '#1AE843', selectedTextColor: '#ffffff'},
-            '2025-06-20': {marked: true, selectedColor:'#1AE843', dotColor: '#1AE843', activeOpacity: 0},
-          }}
+          markedDates={getMarkedDates()}
         />
       </View>
       {selected && !isTaskPanelVisible && (
