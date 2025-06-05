@@ -42,6 +42,8 @@ export default function TaskPanel({ tasks, date, onClose }: TaskPanelProps & { o
     const dragHandleRef = useRef(null);
     const isDraggingHandle = useRef(false);
 
+    const sortedTasks = [...tasks].sort((a, b) => a.priority - b.priority);
+
     const resetPositionAnim = Animated.timing(panY, {
         toValue: 0,
         duration: 300,
@@ -107,7 +109,7 @@ export default function TaskPanel({ tasks, date, onClose }: TaskPanelProps & { o
       <ScrollView style={styles.taskList} onTouchStart={() => {
         isDraggingHandle.current = false;
       }}>
-         {tasks.map((task) => (
+         {sortedTasks.map((task) => (
           <View key={task.id} style={styles.taskItem}>
             <View style={[styles.priorityIndicator, { backgroundColor: getPriorityColor(task.priority) }]} />
             <View style={styles.taskContent}>

@@ -12,14 +12,14 @@ const mockTasks: Record<string, Task[]> = {
     {
       id: '1',
       name: 'Study Mathematics',
-      priority: 0,
+      priority: 1,
       time: { hours: 2, minutes: 30, period: 'PM' },
       date: '2025-06-20'
     },
     {
       id: '2',
       name: 'Complete Project Report',
-      priority: 1,
+      priority: 0,
       time: { hours: 4, minutes: 0, period: 'AM' },
       date: '2025-06-20'
     },
