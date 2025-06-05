@@ -95,9 +95,11 @@ export default function Index() {
           }}
         />
       </View>
-      {/* <View>
-        <Text style={styles.noTasksText}>No tasks so far...</Text>
-      </View> */}
+      {selected && !isTaskPanelVisible && (
+        <View>
+          <Text style={styles.noTasksText}>No tasks so far...</Text>
+        </View>
+      )}
     </ScrollView>
     {isTaskPanelVisible && (
       <TaskPanel

@@ -85,21 +85,17 @@ export default function TaskPanel({ tasks, date, onClose }: TaskPanelProps & { o
       <ScrollView style={styles.taskList} onTouchStart={() => {
         isDraggingHandle.current = false;
       }}>
-        {tasks.length > 0 ? (
-          tasks.map((task) => (
-            <View key={task.id} style={styles.taskItem}>
-              <View style={[styles.priorityIndicator, { backgroundColor: getPriorityColor(task.priority) }]} />
-              <View style={styles.taskContent}>
-                <Text style={styles.taskName}>{task.name}</Text>
-                <Text style={styles.taskTime}>
-                  {`${task.time.hours}:${task.time.minutes.toString().padStart(2, '0')} ${task.time.period}`}
-                </Text>
-              </View>
+         {tasks.map((task) => (
+          <View key={task.id} style={styles.taskItem}>
+            <View style={[styles.priorityIndicator, { backgroundColor: getPriorityColor(task.priority) }]} />
+            <View style={styles.taskContent}>
+              <Text style={styles.taskName}>{task.name}</Text>
+              <Text style={styles.taskTime}>
+                {`${task.time.hours}:${task.time.minutes.toString().padStart(2, '0')} ${task.time.period}`}
+              </Text>
             </View>
-          ))
-        ) : (
-          <Text style={styles.noTasksText}>No tasks for this date</Text>
-        )}
+          </View>
+        ))}
       </ScrollView>
     </Animated.View>
   );
