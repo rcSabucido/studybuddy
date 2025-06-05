@@ -67,6 +67,19 @@ export default function Index() {
   const handleCloseTaskPanel = () => {
     setIsTaskPanelVisible(false);
   };
+
+  const handleDeleteTasks = (taskIds: string[]) => {
+    const updatedTasks = selectedTasks.filter(task => !taskIds.includes(task.id));
+    setSelectedTasks(updatedTasks);
+
+    if (selected) {
+      mockTasks[selected] = updatedTasks;
+    }
+
+    if (updatedTasks.length === 0) {
+      setIsTaskPanelVisible(false);
+    }
+  };
   return (
     <View style={{ flex: 1}}>
       <ScrollView contentContainerStyle={styles.innerScrollView}>
@@ -106,6 +119,7 @@ export default function Index() {
         tasks={selectedTasks}
         date={selected}
         onClose={handleCloseTaskPanel}
+        onDeleteTasks={handleDeleteTasks}
       />
     )}
     </View>

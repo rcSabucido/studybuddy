@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { Animated, Dimensions, PanResponder, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Dimensions, PanResponder, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { ArrowLeftIcon, TrashIcon } from 'react-native-heroicons/outline';
 
 export interface Task {
@@ -17,6 +17,7 @@ export interface Task {
 interface TaskPanelProps {
   tasks: Task[];
   date: string;
+  onDeleteTasks?: (taskIds: string[]) => void;
 }
 
 const calculateRemainingDays = (taskDate: string) => {
@@ -36,11 +37,13 @@ const formatDate = (dateString: string) => {
     });
 };
 
-export default function TaskPanel({ tasks, date, onClose }: TaskPanelProps & { onClose: () => void }) {
+export default function TaskPanel({ tasks, date, onClose, onDeleteTasks }: TaskPanelProps & { onClose: () => void }) {
     const panY = new Animated.Value(0);
     const screenHeight = Dimensions.get('window').height;
     const dragHandleRef = useRef(null);
     const isDraggingHandle = useRef(false);
+    const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
+    const [isSelectionMode, setIsSelectionMode] = useState(false);
 
     const sortedTasks = [...tasks].sort((a, b) => a.priority - b.priority);
 
@@ -55,6 +58,29 @@ export default function TaskPanel({ tasks, date, onClose }: TaskPanelProps & { o
         duration: 500,
         useNativeDriver: false,
     });
+
+    const handleTaskLongPress = (taskId: string) => {
+      setIsSelectionMode(true);
+      setSelectedTasks([taskId]);
+    };
+
+    const handleTaskPress = (taskId: string) => {
+      if (isSelectionMode) {
+        setSelectedTasks((prev) => 
+          prev.includes(taskId)
+            ? prev.filter(id => id !== taskId)
+            : [...prev, taskId]
+        );
+      }
+    };
+
+    const handleDelete = () => {
+      if (onDeleteTasks) {
+        onDeleteTasks(selectedTasks);
+        setSelectedTasks([]);
+        setIsSelectionMode(false);
+      }
+    }
 
     const panResponder = PanResponder.create({
         onStartShouldSetPanResponder: (evt, gestureState) => {
@@ -102,26 +128,49 @@ export default function TaskPanel({ tasks, date, onClose }: TaskPanelProps & { o
             <View style={styles.dragIndicator} />
         </View>
         <View style={styles.headerContainer}>
-            <ArrowLeftIcon size={20}></ArrowLeftIcon>
+            <ArrowLeftIcon size={20} onPress={() => {
+              if (isSelectionMode) {
+                setIsSelectionMode(false);
+                setSelectedTasks([]);
+              } else {
+                onClose();
+              }
+            }}></ArrowLeftIcon>
             <Text style={styles.headText}>Tasks</Text>
-            <TrashIcon size={20} />
+             <TrashIcon 
+                  size={20}
+                  color={selectedTasks.length > 0 ? '#F81414' : '#999'}
+                  onPress={() => {
+                      if (selectedTasks.length > 0) {
+                          handleDelete();
+                      }
+                  }}
+              />
         </View>
       <ScrollView style={styles.taskList} onTouchStart={() => {
         isDraggingHandle.current = false;
       }}>
          {sortedTasks.map((task) => (
-          <View key={task.id} style={styles.taskItem}>
-            <View style={[styles.priorityIndicator, { backgroundColor: getPriorityColor(task.priority) }]} />
-            <View style={styles.taskContent}>
-              <Text style={styles.taskName}>{task.name}</Text>
-              <Text style={styles.taskDate}>
-                {formatDate(task.date)} 
-              </Text>
-            </View>
-            <Text style={styles.daysRemaining}>
+            <Pressable
+              key={task.id}
+              style={[
+                styles.taskItem,
+                selectedTasks.includes(task.id) && styles.selectedTask
+              ]}
+              onLongPress={() => handleTaskLongPress(task.id)}
+              onPress={() => handleTaskPress(task.id)}
+            >
+              <View style={[styles.priorityIndicator, { backgroundColor: getPriorityColor(task.priority) }]} />
+              <View style={styles.taskContent}>
+                <Text style={styles.taskName}>{task.name}</Text>
+                <Text style={styles.taskDate}>
+                  {formatDate(task.date)} 
+                </Text>
+              </View>
+              <Text style={styles.daysRemaining}>
                 {calculateRemainingDays(task.date)} days left
-            </Text>
-          </View>
+              </Text>
+            </Pressable>
         ))}
       </ScrollView>
     </Animated.View>
@@ -199,6 +248,9 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#666',
     fontFamily: 'Poppins_400Regular',
+  },
+  selectedTask: {
+    backgroundColor: 'rgba(155, 65, 233, 0.1)',
   },
   noTasksText: {
     textAlign: 'center',
