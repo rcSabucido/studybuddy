@@ -19,6 +19,23 @@ interface TaskPanelProps {
   date: string;
 }
 
+const calculateRemainingDays = (taskDate: string) => {
+    const today = new Date();
+    const task = new Date(taskDate);
+    const diffTime = task.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+}
+
+const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+        month: 'numeric',
+        day: 'numeric',
+        year: 'numeric',
+    });
+};
+
 export default function TaskPanel({ tasks, date, onClose }: TaskPanelProps & { onClose: () => void }) {
     const panY = new Animated.Value(0);
     const screenHeight = Dimensions.get('window').height;
@@ -95,10 +112,13 @@ export default function TaskPanel({ tasks, date, onClose }: TaskPanelProps & { o
             <View style={[styles.priorityIndicator, { backgroundColor: getPriorityColor(task.priority) }]} />
             <View style={styles.taskContent}>
               <Text style={styles.taskName}>{task.name}</Text>
-              <Text style={styles.taskTime}>
-                {`${task.time.hours}:${task.time.minutes.toString().padStart(2, '0')} ${task.time.period}`}
+              <Text style={styles.taskDate}>
+                {formatDate(task.date)} 
               </Text>
             </View>
+            <Text style={styles.daysRemaining}>
+                {calculateRemainingDays(task.date)} days left
+            </Text>
           </View>
         ))}
       </ScrollView>
@@ -155,20 +175,26 @@ const styles = StyleSheet.create({
     borderBottomColor: '#f0f0f0',
   },
   priorityIndicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 17,
+    height: 17,
+    borderRadius: 10,
     marginRight: 12,
   },
   taskContent: {
     flex: 1,
   },
-  taskName: {
-    fontSize: 16,
-    fontFamily: 'Poppins_600SemiBold',
+  daysRemaining: {
+    fontSize: 11,
+    color: '#666',
+    fontFamily: 'Poppins_400Regular',
+    marginLeft: 8,
   },
-  taskTime: {
+  taskName: {
     fontSize: 14,
+    fontFamily: 'Poppins_400Regular',
+  },
+  taskDate: {
+    fontSize: 11,
     color: '#666',
     fontFamily: 'Poppins_400Regular',
   },
