@@ -1,8 +1,16 @@
 import BackHeader from "@/components/BackHeader";
+import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { SectionsWheelPicker, WheelPickerProps } from "react-native-ui-lib";
 import styles from './styles';
+
+function openManualTimer(hours: number, minutes: number, seconds: number) {
+  const router = useRouter();
+  router.push({pathname: "/manual_timer", params: {
+    hours, minutes, seconds
+  }})
+}
 
 export default function SetupManualTimer() {
   const [hours, setHours] = useState(0);
@@ -24,20 +32,20 @@ export default function SetupManualTimer() {
         onChange: hoursChange,
         initialValue: hours,
         style: {paddingRight: 8},
-        label: hours > 1 ? 'hours' : 'hour'
+        label: 'hours'
       },
       {
         items: Array.from({length: 60}, (_, i) => ({value: `${i}_minute`, label: `${i}`})),
         onChange: minutesChange,
         initialValue: minutes,
         style: {paddingRight: 8},
-        label: minutes > 1 ? 'minutes' : 'minute'
+        label: 'minutes'
       },
       {
         items: Array.from({length: 60}, (_, i) => ({value: `${i}_second`, label: `${i}`})),
         onChange: secondsChange,
         initialValue: seconds,
-        label: seconds > 1 ? 'seconds' : 'second'
+        label: 'seconds'
       },
     ]
   }, [
@@ -84,7 +92,7 @@ export default function SetupManualTimer() {
           </View>
           <Pressable onPress={() => 
               {
-                console.log("Hours: " + hours + ", Minutes: " + minutes + ", Seconds: " + seconds)
+                openManualTimer(hours, minutes, seconds)
               }
             } style={[styles.content_container, {height: "30%", width: "75%" /*, marginTop: 52*/}]}>
               <Text style={styles.container_button_text}>Start Tracking</Text>

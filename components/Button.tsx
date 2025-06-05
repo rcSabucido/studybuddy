@@ -1,4 +1,4 @@
-import { DimensionValue, Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { DimensionValue, Pressable, StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
 
 type Props = {
     label?: string
@@ -8,15 +8,16 @@ type Props = {
     iconWeight?: string | number
     width?: DimensionValue
     style?: ViewStyle
+    textStyle? : TextStyle
     onPress?: () => void
 };
 
-export default function Button({ label, bgColor, onPress, style, textColor = '#fff', icon: IconComponent, iconWeight="1.5", width='auto'}: Props) {
+export default function Button({ label, bgColor, onPress, style, textStyle, textColor = '#fff', icon: IconComponent, iconWeight="1.5", width='auto'}: Props) {
     return (
         <View style={[styles.buttonContainer, {backgroundColor: bgColor, width: width}, style]}>
             <Pressable style={styles.button} onPress={onPress}>
                 {IconComponent && <IconComponent size={25} strokeWidth={iconWeight} color="white"/>}
-                { label !== null && label !== undefined ? <Text style={[styles.buttonLabel, {color: textColor}]}>{label}</Text> : null }
+                { label !== null && label !== undefined ? <Text style={[styles.buttonLabel, textStyle, {color: textColor}]}>{label}</Text> : null }
             </Pressable>
         </View>
     );

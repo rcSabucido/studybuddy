@@ -22,7 +22,7 @@ export default function MinStudyHoursModal({onClose, previousValue}: Props) {
         items: Array.from({length: 24}, (_, i) => ({value: i+1, label: `${i+1}`})),
         onChange: hoursStudyChange,
         initialValue: minimumHoursStudy,
-        label: minimumHoursStudy > 1 ? 'hours' : 'hour'
+        label: 'hours'
       }
     ]
   }, [
