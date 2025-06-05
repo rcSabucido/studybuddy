@@ -1,7 +1,7 @@
 import Button from '@/components/Button';
 import Tasks from '@/components/Tasks';
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { AdjustmentsHorizontalIcon } from 'react-native-heroicons/outline';
 
 
@@ -11,6 +11,12 @@ export default function Index() {
         { id: 2, label: 'Task 2' },
         { id: 3, label: 'Task 3' },
         { id: 4, label: 'Task 4' },
+        { id: 5, label: 'Task 4' },
+        { id: 6, label: 'Task 4' },
+        { id: 7, label: 'Task 4' },
+        { id: 8, label: 'Task 4' },
+        { id: 9, label: 'Task 4' },
+        { id: 10, label: 'Task 4' },
     ]);
 
     const handleDeleteTask = (taskId: number) => {
@@ -30,25 +36,25 @@ export default function Index() {
                 </View>
                 <Button width={'15%'} icon={AdjustmentsHorizontalIcon} bgColor='#9B41E9'></Button>
             </View>
-            <View style={styles.tasksContainer}>
+            <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.tasksContainer}>
                 {tasks.map(task => (
-                    <Tasks 
+                    <Tasks
                         key={task.id}
                         label={task.label}
                         onDelete={() => handleDeleteTask(task.id)}
                     />
                 ))}
-            </View>
+            </ScrollView>   
         </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
         flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
         backgroundColor: '#fff',
+        width: '100%',
     },
     smallText: {
         fontSize: 20,
@@ -87,10 +93,15 @@ const styles = StyleSheet.create({
     },
     tasksContainer: {
         flexDirection: 'column',
-        justifyContent: 'center',
         alignItems: 'center',
-        width: '90%',
-        marginTop: 20,
+        width: '100%',
+        paddingHorizontal: 20,
+        paddingVertical: 20,
         gap: 10,
+    },
+    scrollContainer: {
+        width: '100%',
+        height: '65%',
+        marginTop: 10,
     }
 });
