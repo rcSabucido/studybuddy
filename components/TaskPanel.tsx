@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Dimensions, PanResponder, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ArrowLeftIcon, TrashIcon } from 'react-native-heroicons/outline';
 
 export interface Task {
   id: string;
@@ -81,7 +82,11 @@ export default function TaskPanel({ tasks, date, onClose }: TaskPanelProps & { o
             }}>
             <View style={styles.dragIndicator} />
         </View>
-      <Text style={styles.dateText}>{date}</Text>
+        <View style={styles.headerContainer}>
+            <ArrowLeftIcon size={20}></ArrowLeftIcon>
+            <Text style={styles.headText}>Tasks</Text>
+            <TrashIcon size={20} />
+        </View>
       <ScrollView style={styles.taskList} onTouchStart={() => {
         isDraggingHandle.current = false;
       }}>
@@ -129,10 +134,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#DEDEDE',
     borderRadius: 2,
   },
-  dateText: {
+  headerContainer: {
+    flexDirection: 'row',
+    marginBottom: 12,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  headText: {
     fontSize: 18,
     fontFamily: 'Poppins_700Bold',
-    marginBottom: 12,
   },
   taskList: {
     maxHeight: 200,
