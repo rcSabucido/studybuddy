@@ -36,7 +36,8 @@ export default function Index() {
             setSelected(day.dateString);
           }}
           markedDates={{
-            [selected]: {selected: true, disableTouchEvent: true, selectedColor: '#1AE843', selectedTextColor: '#ffffff'}
+            [selected]: {selected: true, disableTouchEvent: true, selectedColor: '#1AE843', selectedTextColor: '#ffffff'},
+            '2025-06-20': {marked: true, selectedColor:'#1AE843', dotColor: '#1AE843', activeOpacity: 0},
           }}
         />
       </View>
