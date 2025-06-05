@@ -51,7 +51,6 @@ function openAddTask() {
   router.push("/add_task")
 }
 
-// Panel slide and content of panel is fighting, find a way to fix that
 
 export default function Index() {
   const [selected, setSelected] = useState('');

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Animated, Dimensions, PanResponder, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 export interface Task {
@@ -21,6 +21,8 @@ interface TaskPanelProps {
 export default function TaskPanel({ tasks, date, onClose }: TaskPanelProps & { onClose: () => void }) {
     const panY = new Animated.Value(0);
     const screenHeight = Dimensions.get('window').height;
+    const dragHandleRef = useRef(null);
+    const isDraggingHandle = useRef(false);
 
     const resetPositionAnim = Animated.timing(panY, {
         toValue: 0,
@@ -35,14 +37,19 @@ export default function TaskPanel({ tasks, date, onClose }: TaskPanelProps & { o
     });
 
     const panResponder = PanResponder.create({
-        onStartShouldSetPanResponder: () => true,
-        onMoveShouldSetPanResponder: () => true,
+        onStartShouldSetPanResponder: (evt, gestureState) => {
+            return isDraggingHandle.current;
+        },
+        onMoveShouldSetPanResponder: (evt, gestureState) => {
+            return isDraggingHandle.current;
+        },
         onPanResponderMove: (_, gestureState) => {
             if (gestureState.dy > 0) {
                 panY.setValue(gestureState.dy);
             }
         },
         onPanResponderRelease: (_, gestureState) => {
+            isDraggingHandle.current = false;
             if (gestureState.dy > screenHeight / 3) {
                 closeAnim.start(() => onClose());
             } else {
@@ -66,9 +73,18 @@ export default function TaskPanel({ tasks, date, onClose }: TaskPanelProps & { o
 
   return (
     <Animated.View style={[styles.container, { transform: [{ translateY: panY }] }]} {...panResponder.panHandlers}>
-      <View style={styles.dragIndicator} />
+        <View
+            ref={dragHandleRef}
+            style={styles.dragIndicatorContainer}
+            onTouchStart={() => {
+                isDraggingHandle.current = true;
+            }}>
+            <View style={styles.dragIndicator} />
+        </View>
       <Text style={styles.dateText}>{date}</Text>
-      <ScrollView style={styles.taskList}>
+      <ScrollView style={styles.taskList} onTouchStart={() => {
+        isDraggingHandle.current = false;
+      }}>
         {tasks.length > 0 ? (
           tasks.map((task) => (
             <View key={task.id} style={styles.taskItem}>
@@ -106,13 +122,16 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     maxHeight: '50%',
   },
+  dragIndicatorContainer: {
+    paddingVertical: 8,
+    alignItems: 'center',
+    width: '100%',
+  },
   dragIndicator: {
     width: 40,
     height: 4,
     backgroundColor: '#DEDEDE',
     borderRadius: 2,
-    alignSelf: 'center',
-    marginBottom: 8,
   },
   dateText: {
     fontSize: 18,
