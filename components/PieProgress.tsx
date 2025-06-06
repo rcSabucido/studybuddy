@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Svg, { G, Path } from 'react-native-svg';
 
-const PieProgress = ({ size = 100, progress = 0.975, color = '#72E2AE', backgroundColor = '#e6e6e6' }) => {
+const PieProgress = ({ size = 84, progress = 0.975, color = '#72E2AE', backgroundColor = '#e6e6e6' }) => {
   const radius = size / 2;
   const angle = progress * 360;
 
