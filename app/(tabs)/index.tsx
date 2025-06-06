@@ -1,4 +1,5 @@
 import Button from '@/components/Button';
+import TaskActions from '@/components/TaskActions';
 import TaskFilter, { FilterType } from '@/components/TaskFilter';
 import Tasks from '@/components/Tasks';
 import { useState } from 'react';
@@ -42,6 +43,18 @@ export default function Index() {
     const [showTodayOnly, setShowTodayOnly] = useState(false);
     const [isFilterVisible, setIsFilterVisible] =useState(false);
     const [activeFilter, setActiveFilter] = useState<FilterType>('dueDate');
+    const [selectedTask, setSelectedTask] = useState<null | {
+        id: number;
+        label: string;
+    }>(null);
+
+    const handleTaskAction = (taskId: number, taskLabel: string) => {
+        setSelectedTask({ id: taskId, label: taskLabel });
+    }
+
+    const handleCloseActions = () => {
+        setSelectedTask(null);
+    }
 
     const handleApplyFilter = (filterType: FilterType) => {
         setActiveFilter(filterType);
@@ -106,6 +119,7 @@ export default function Index() {
                         dueDate={task.dueDate}
                         priority={task.priority}
                         onDelete={() => handleDeleteTask(task.id)}
+                        onActionPress={() => handleTaskAction(task.id, task.label)}
                     />
                 ))}
             </ScrollView>   
@@ -113,6 +127,20 @@ export default function Index() {
                 <TaskFilter 
                     onClose={() => setIsFilterVisible(false)}
                     onApplyFilter={handleApplyFilter}
+                />
+            )}
+            {selectedTask && (
+                <TaskActions
+                    taskLabel={selectedTask.label}
+                    onClose={handleCloseActions}
+                    onEdit={() =>{
+                        console.log('Edit Task');
+                        handleCloseActions();
+                    }}
+                    onDelete={() => {
+                        handleDeleteTask(selectedTask.id);
+                        handleCloseActions();
+                    }}
                 />
             )}
         </View>

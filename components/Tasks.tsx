@@ -9,6 +9,7 @@ type Props = {
     dueDate: string,
     priority: number,
     onDelete: () => void,
+    onActionPress: () => void,
 };
 
 const calculateRemainingDays = (dueDate: string) => {
@@ -41,7 +42,7 @@ const PriorityIcon = ({ priority }: { priority: number }) => {
     }
 };
 
-export default function Tasks({label, dueDate, priority, onDelete}: Props) {
+export default function Tasks({label, dueDate, priority, onDelete, onActionPress}: Props) {
     const daysLeft = calculateRemainingDays(dueDate);
     const isOverdue = daysLeft < 0;
 
@@ -52,12 +53,6 @@ export default function Tasks({label, dueDate, priority, onDelete}: Props) {
                     <Text style={styles.text}>{label}</Text>
                     <PriorityIcon priority={priority} />
                 </View>
-                {/* <View>
-                    <Text style={styles.dateText}>{formatDate(dueDate)}</Text>
-                    <Text style={[styles.daysLeftText, isOverdue && styles.overdueText]}>
-                        {isOverdue ? 'Overdue' : `${daysLeft} days left`}
-                    </Text>
-                </View> */}
                 <View style={styles.bottomRow}>
                     <View>
                         <Text style={styles.dateText}>{formatDate(dueDate)}</Text>
@@ -65,7 +60,7 @@ export default function Tasks({label, dueDate, priority, onDelete}: Props) {
                             {isOverdue ? 'Overdue' : `${daysLeft} days left`}
                         </Text>
                     </View>
-                    <Pressable>
+                    <Pressable onPress={onActionPress}>
                         <EllipsisVerticalIcon size={20} color="#fff" />
                     </Pressable>
                 </View>    
