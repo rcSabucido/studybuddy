@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native"
 export default function PriorityTwo() {
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>P0</Text>
+            <Text style={styles.text}>P2</Text>
         </View>
     )
 }
