@@ -36,14 +36,14 @@ export default function DataView() {
         width: '100%',
       }}>
         <Text style={{
-            fontSize: 24,
+            fontSize: 20,
             color: '#333',
             fontFamily: 'Poppins_700Bold',
             marginLeft: 'auto',
-            marginRight: 'auto'
+            marginRight: 'auto',
           }}>You've studied for</Text>
         <Text style={{
-            fontSize: 24,
+            fontSize: 20,
             color: '#333',
             fontFamily: 'Poppins_700Bold',
             marginLeft: 'auto',
@@ -52,14 +52,14 @@ export default function DataView() {
       </View>
       <View style={{
         width: 'auto',
-        paddingTop: 12,
-        paddingBottom: 12,
+        paddingTop: 4,
+        paddingBottom: 4,
         justifyContent: 'center',
         alignContent: 'center',
         flexDirection: 'row',
       }}>
         <Text style={{
-          fontSize: 24,
+          fontSize: 20,
           color: '#333',
           fontFamily: 'Poppins_700Bold',
           margin: 'auto',
