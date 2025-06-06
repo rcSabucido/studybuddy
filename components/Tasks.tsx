@@ -10,6 +10,7 @@ type Props = {
     priority: number,
     onDelete: () => void,
     onActionPress: () => void,
+    onTaskPress: () => void,
 };
 
 const calculateRemainingDays = (dueDate: string) => {
@@ -42,13 +43,13 @@ const PriorityIcon = ({ priority }: { priority: number }) => {
     }
 };
 
-export default function Tasks({label, dueDate, priority, onDelete, onActionPress}: Props) {
+export default function Tasks({label, dueDate, priority, onDelete, onTaskPress, onActionPress}: Props) {
     const daysLeft = calculateRemainingDays(dueDate);
     const isOverdue = daysLeft < 0;
 
     return (
         <View style={styles.buttonContainer}>
-            <Pressable style={styles.contentContainer}  onPress={() => console.log('Button pressed')}>
+            <Pressable style={styles.contentContainer}  onPress={onTaskPress}>
                 <View style={styles.labelRow}>
                     <Text style={styles.text}>{label}</Text>
                     <PriorityIcon priority={priority} />

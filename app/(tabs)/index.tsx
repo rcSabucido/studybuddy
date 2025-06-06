@@ -2,6 +2,7 @@ import Button from '@/components/Button';
 import TaskActions from '@/components/TaskActions';
 import TaskFilter, { FilterType } from '@/components/TaskFilter';
 import Tasks from '@/components/Tasks';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { AdjustmentsHorizontalIcon } from 'react-native-heroicons/outline';
@@ -120,6 +121,13 @@ export default function Index() {
                         priority={task.priority}
                         onDelete={() => handleDeleteTask(task.id)}
                         onActionPress={() => handleTaskAction(task.id, task.label)}
+                        onTaskPress={() => {
+                            console.log(`Task pressed:`)
+                            console.log(task)
+                            useRouter().push({pathname: "/specific_data_view", params: {
+                                taskId: task.id, taskLabel: task.label
+                            }})
+                        }}
                     />
                 ))}
             </ScrollView>   
