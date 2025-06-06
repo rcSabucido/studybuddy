@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native"
 
-export default function PriorityOne() {
+export default function PriorityTwo() {
     return (
         <View style={styles.container}>
             <Text style={styles.text}>P0</Text>
@@ -12,11 +12,11 @@ const styles = StyleSheet.create({
     container: {
         width: '19%',
         height: 16,
-        backgroundColor: '#27260D',
+        backgroundColor: '#0B2D12',
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#F1E610',
+        borderColor: '#1AE843',
         borderRadius: 5,
     },
     text: {
