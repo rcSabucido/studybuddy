@@ -12,7 +12,7 @@ interface TaskFilterProps {
 
 export default function TaskFilter({ onClose, onApplyFilter, activeFilter }: TaskFilterProps) {
   const [selectedFilter, setSelectedFilter] = useState<FilterType>(activeFilter);
-  const panY = new Animated.Value(0);
+  const panY = useRef(new Animated.Value(0)).current;
   const screenHeight = Dimensions.get('window').height;
   const dragHandleRef = useRef(null);
   const isDraggingHandle = useRef(false);
@@ -49,6 +49,10 @@ export default function TaskFilter({ onClose, onApplyFilter, activeFilter }: Tas
 
   useEffect(() => {
     panY.setValue(0);
+
+    return () => {
+      panY.setValue(0); 
+    }
   }, []);
 
   const handleApply = () => {
