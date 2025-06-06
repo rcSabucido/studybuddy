@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { EllipsisVerticalIcon } from "react-native-heroicons/outline";
 import PriorityOne from "./PriorityOneIcon";
 import PriorityTwo from "./PriorityTwoIcon";
 import PriorityZero from "./PriorityZeroIcon";
@@ -51,12 +52,23 @@ export default function Tasks({label, dueDate, priority, onDelete}: Props) {
                     <Text style={styles.text}>{label}</Text>
                     <PriorityIcon priority={priority} />
                 </View>
-                <View>
+                {/* <View>
                     <Text style={styles.dateText}>{formatDate(dueDate)}</Text>
                     <Text style={[styles.daysLeftText, isOverdue && styles.overdueText]}>
                         {isOverdue ? 'Overdue' : `${daysLeft} days left`}
                     </Text>
-                </View>
+                </View> */}
+                <View style={styles.bottomRow}>
+                    <View>
+                        <Text style={styles.dateText}>{formatDate(dueDate)}</Text>
+                        <Text style={[styles.daysLeftText, isOverdue && styles.overdueText]}>
+                            {isOverdue ? 'Overdue' : `${daysLeft} days left`}
+                        </Text>
+                    </View>
+                    <Pressable>
+                        <EllipsisVerticalIcon size={20} color="#fff" />
+                    </Pressable>
+                </View>    
             </Pressable>
         </View>
     )
@@ -73,6 +85,11 @@ const styles = StyleSheet.create({
     contentContainer: {
         flex: 1,
         justifyContent: 'center',
+    },
+    bottomRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
     },
     labelRow: {
         flexDirection: 'row',
