@@ -9,7 +9,18 @@ import { Calendar } from 'react-native-calendars';
 import { CalendarIcon, ClockIcon, ExclamationCircleIcon } from 'react-native-heroicons/outline';
 import Dropdown from 'react-native-input-select';
 
-export default function Index() {
+type TaskDetails = {
+  name: string;
+  priority: number;
+  time: {
+    hours: number;
+    minutes: number;
+    period: 'AM' | 'PM';
+  };
+  date: string;
+};
+
+export default function EditTask() {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const router = useRouter();
   const [name, setName] = useState('');
@@ -48,7 +59,7 @@ export default function Index() {
       date: selectDate
     };
 
-    console.log('Task Data:', taskData);
+    console.log('Updated Task Data:', taskData);
     router.back();
   }
 
@@ -80,8 +91,8 @@ export default function Index() {
         flexDirection: 'column',
       }}
     >
-      <View style={styles.addTaskContainer}>
-        <ArrowHeader onPress={handleBackPress} title="Add Task" />
+      <View style={styles.editTaskContainer}>
+        <ArrowHeader onPress={handleBackPress} title="Edit Task" />
         <View style={styles.inputContainer}>
           <TextInput
             onChangeText={(text) => {
@@ -197,8 +208,8 @@ export default function Index() {
           )}        
         </View>
         {!showCalendar && (
-          <View style={styles.createButtonContainer}>
-            <Button label='Create' bgColor='#9B41E9' width={'30%'} onPress={handleSave}></Button>
+          <View style={styles.saveButtonContainer}>
+            <Button label='Save' bgColor='#9B41E9' width={'30%'} onPress={handleSave}></Button>
           </View>
         )}
 
@@ -231,7 +242,7 @@ const styles = StyleSheet.create({
         borderWidth: 0,
         paddingLeft: 12
     },
-    addTaskContainer: {
+    editTaskContainer: {
       paddingTop: '10%',
       flexDirection: 'column',
       justifyContent: 'space-between',
@@ -255,23 +266,23 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       paddingRight: '2%',
     },
-    createButtonContainer: {
+    saveButtonContainer: {
       width: '100%',
       padding: 20,
       alignItems: 'center',
       marginBottom: 45,
     },
     warningContainer: {
-    width: '90%',
-    backgroundColor: '#FFE5E5',
-    borderRadius: 8,
-    padding: 12,
-    marginLeft: 'auto',
-    marginRight: 'auto',
+      width: '90%',
+      backgroundColor: '#FFE5E5',
+      borderRadius: 8,
+      padding: 12,
+      marginLeft: 'auto',
+      marginRight: 'auto',
     },
     warningText: {
       color: '#FF0000',
       fontSize: 14,
       textAlign: 'center',
     }
-})
+});
