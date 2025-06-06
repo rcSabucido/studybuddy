@@ -7,10 +7,11 @@ export type FilterType = 'dueDate' | 'priority';
 interface TaskFilterProps {
   onClose: () => void;
   onApplyFilter: (filterType: FilterType) => void;
+  activeFilter: FilterType;
 }
 
-export default function TaskFilter({ onClose, onApplyFilter }: TaskFilterProps) {
-  const [selectedFilter, setSelectedFilter] = useState<FilterType>('dueDate');
+export default function TaskFilter({ onClose, onApplyFilter, activeFilter }: TaskFilterProps) {
+  const [selectedFilter, setSelectedFilter] = useState<FilterType>(activeFilter);
   const panY = new Animated.Value(0);
   const screenHeight = Dimensions.get('window').height;
   const dragHandleRef = useRef(null);

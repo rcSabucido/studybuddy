@@ -127,6 +127,7 @@ export default function Index() {
                 <TaskFilter 
                     onClose={() => setIsFilterVisible(false)}
                     onApplyFilter={handleApplyFilter}
+                    activeFilter={activeFilter}
                 />
             )}
             {selectedTask && (
