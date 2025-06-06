@@ -29,11 +29,21 @@ export default StyleSheet.create({
   container_button_text: {
     fontSize: 24,
     color: "#ffffff",
-    fontFamily: 'Poppins_500Bold',
+    fontFamily: 'Poppins_500Medium',
   },
   header_text: {
     fontSize: 24,
     color: "#000000",
-    fontFamily: 'Poppins_500Bold',
-  }
+    fontFamily: 'Poppins_500Medium',
+  },
+  timer_progress_text: {
+    fontSize: 32,
+    color: "#121212",
+    fontFamily: 'Poppins_400Regular',
+  },
+  timer_progress_text_large: {
+    fontSize: 48,
+    color: "#121212",
+    fontFamily: 'Poppins_400Regular',
+  },
 });
