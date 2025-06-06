@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native"
 
-export default function PriorityZeroComponent() {
+export default function PriorityZero() {
     return (
         <View style={styles.container}>
             <Text style={styles.text}>P0</Text>
