@@ -11,8 +11,8 @@ export default function PriorityZero() {
 const styles = StyleSheet.create({
     container: {
         width: '19%',
-        height: 16,
-        backgroundColor: '#3E0E0E',
+        height: 17,
+        backgroundColor: '#240a0a',
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1,

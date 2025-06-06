@@ -11,7 +11,7 @@ export default function PriorityTwo() {
 const styles = StyleSheet.create({
     container: {
         width: '19%',
-        height: 16,
+        height: 17,
         backgroundColor: '#0B2D12',
         justifyContent: 'center',
         alignItems: 'center',

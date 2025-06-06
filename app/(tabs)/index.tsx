@@ -10,27 +10,32 @@ export default function Index() {
          { 
             id: 1, 
             label: 'Project Proposal', 
-            dueDate: '2025-06-20'
+            dueDate: '2025-06-20',
+            priority: 1,
         },
         { 
             id: 2, 
             label: 'Study for Final Exam', 
-            dueDate: '2025-06-15'
+            dueDate: '2025-06-15',
+            priority: 0,
         },
         { 
             id: 3, 
             label: 'Team Meeting', 
-            dueDate: '2025-06-10'
+            dueDate: '2025-06-10',
+            priority: 1,
         },
         { 
             id: 4, 
             label: 'Submit Assignment', 
-            dueDate: '2025-06-08'
+            dueDate: '2025-06-08',
+            priority: 0,
         },
         {
             id: 5,
             label: 'Grocery Shopping',
-            dueDate: '2025-06-05'
+            dueDate: '2025-06-05',
+            priority: 2,
         }
     ]);
 
@@ -57,6 +62,7 @@ export default function Index() {
                         key={task.id}
                         label={task.label}
                         dueDate={task.dueDate}
+                        priority={task.priority}
                         onDelete={() => handleDeleteTask(task.id)}
                     />
                 ))}

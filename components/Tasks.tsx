@@ -1,8 +1,12 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import PriorityOne from "./PriorityOneIcon";
+import PriorityTwo from "./PriorityTwoIcon";
+import PriorityZero from "./PriorityZeroIcon";
 
 type Props = {
     label: string,
     dueDate: string,
+    priority: number,
     onDelete: () => void,
 };
 
@@ -23,15 +27,31 @@ const formatDate = (dateString: string) => {
     });
 }
 
-export default function Tasks({label, dueDate, onDelete}: Props) {
+const PriorityIcon = ({ priority }: { priority: number }) => {
+    switch (priority) {
+        case 0:
+            return <PriorityZero />;
+        case 1:
+            return <PriorityOne />;
+        case 2:
+            return <PriorityTwo />;
+        default:
+            return null;
+    }
+};
+
+export default function Tasks({label, dueDate, priority, onDelete}: Props) {
     const daysLeft = calculateRemainingDays(dueDate);
     const isOverdue = daysLeft < 0;
 
     return (
         <View style={styles.buttonContainer}>
             <Pressable style={styles.contentContainer}  onPress={() => console.log('Button pressed')}>
-                <View>
+                <View style={styles.labelRow}>
                     <Text style={styles.text}>{label}</Text>
+                    <PriorityIcon priority={priority} />
+                </View>
+                <View>
                     <Text style={styles.dateText}>{formatDate(dueDate)}</Text>
                     <Text style={[styles.daysLeftText, isOverdue && styles.overdueText]}>
                         {isOverdue ? 'Overdue' : `${daysLeft} days left`}
@@ -48,11 +68,16 @@ const styles = StyleSheet.create({
         height: 87,
         backgroundColor: '#9B41E9',
         borderRadius: 10,
-        padding: 17,
+        padding: 12,
     },
     contentContainer: {
         flex: 1,
         justifyContent: 'center',
+    },
+    labelRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
     },
     text: {
         fontSize: 17,
