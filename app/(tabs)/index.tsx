@@ -7,16 +7,31 @@ import { AdjustmentsHorizontalIcon } from 'react-native-heroicons/outline';
 
 export default function Index() {
      const [tasks, setTasks] = useState([
-        { id: 1, label: 'Task 1' },
-        { id: 2, label: 'Task 2' },
-        { id: 3, label: 'Task 3' },
-        { id: 4, label: 'Task 4' },
-        { id: 5, label: 'Task 4' },
-        { id: 6, label: 'Task 4' },
-        { id: 7, label: 'Task 4' },
-        { id: 8, label: 'Task 4' },
-        { id: 9, label: 'Task 4' },
-        { id: 10, label: 'Task 4' },
+         { 
+            id: 1, 
+            label: 'Project Proposal', 
+            dueDate: '2025-06-20'
+        },
+        { 
+            id: 2, 
+            label: 'Study for Final Exam', 
+            dueDate: '2025-06-15'
+        },
+        { 
+            id: 3, 
+            label: 'Team Meeting', 
+            dueDate: '2025-06-10'
+        },
+        { 
+            id: 4, 
+            label: 'Submit Assignment', 
+            dueDate: '2025-06-08'
+        },
+        {
+            id: 5,
+            label: 'Grocery Shopping',
+            dueDate: '2025-06-05'
+        }
     ]);
 
     const handleDeleteTask = (taskId: number) => {
@@ -41,6 +56,7 @@ export default function Index() {
                     <Tasks
                         key={task.id}
                         label={task.label}
+                        dueDate={task.dueDate}
                         onDelete={() => handleDeleteTask(task.id)}
                     />
                 ))}
