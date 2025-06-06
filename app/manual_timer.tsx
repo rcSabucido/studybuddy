@@ -1,9 +1,11 @@
 import BackHeader from "@/components/BackHeader";
 import Button from "@/components/Button";
+import ConfirmationModal from "@/components/ConfirmationModal";
 import RadialChart from "@/components/RadialChart";
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from "react";
 import { Dimensions, Pressable, Text, View } from "react-native";
+import { ExclamationTriangleIcon } from 'react-native-heroicons/outline';
 import styles from './styles';
 
 type Props = {
@@ -29,6 +31,7 @@ function getPercentageRemaining(
 
 export default function ManualTimer() {
   const [ timerStarted, setTimerStarted ] = useState(false)
+  const [ confirmationVisible, setConfirmationVisible ] = useState(false)
   let { hours, minutes, seconds } = useLocalSearchParams();
   let [ hoursNum, minutesNum, secondsNum ] = [ Number(hours), Number(minutes), Number(seconds) ]
   const intervalRef = useRef<number | null>(null);
@@ -109,7 +112,13 @@ export default function ManualTimer() {
         paddingTop: 8,
       }}
     >
-      <BackHeader/>
+      <BackHeader onBack={() => {
+        if (timerStarted) {
+          setConfirmationVisible(true)
+        } else {
+          useRouter().back()
+        }
+      }}/>
       <Text style={[styles.header_text]}>Manual Timer</Text>
       <View style={{
         height: '75%',
@@ -125,11 +134,17 @@ export default function ManualTimer() {
             percentage={percentage}
           />
           }
-          {/*<Text>{currentTime.seconds}</Text>*/}
           <Pressable onPress={() => 
               {
                 if (!timerStarted) {
                   setTimerStarted(true)
+                  // Reset radial chart percentage if start time = current time
+                  if (currentTime.hours == startTime.hours &&
+                      currentTime.minutes == startTime.minutes &&
+                      currentTime.seconds == startTime.seconds
+                  ) {
+                    setPercentage(100)
+                  }
                   console.log("Starting timer")
                 } else {
                   stopTimer()
@@ -165,6 +180,14 @@ export default function ManualTimer() {
       textStyle={styles.container_button_text}
       /*onPress={openSetCurrentTimer}*/
     />
+    {
+      confirmationVisible &&
+        <ConfirmationModal message="Are you sure you want to leave? This will stop the timer."
+          onYes={() => {useRouter().back()}}
+          onNo={() => {setConfirmationVisible(false)}}
+          icon={ExclamationTriangleIcon}
+        />
+    }
     </>
   );
 }
