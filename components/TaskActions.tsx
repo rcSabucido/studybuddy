@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import React, { useEffect, useRef } from 'react';
 import { Animated, Dimensions, PanResponder, StyleSheet, Text, View } from 'react-native';
 import Button from './Button';
@@ -14,6 +15,12 @@ export default function TaskActions({ taskLabel, onClose, onEdit, onDelete }: Ta
   const screenHeight = Dimensions.get('window').height;
   const dragHandleRef = useRef(null);
   const isDraggingHandle = useRef(false);
+  const router = useRouter();
+
+  const handleEdit = () => {
+    onEdit();
+    router.push('/edit_task');
+  }
 
   const resetPositionAnim = Animated.timing(panY, {
     toValue: 0,
@@ -68,7 +75,7 @@ export default function TaskActions({ taskLabel, onClose, onEdit, onDelete }: Ta
           label="Edit" 
           bgColor="#9B41E9"
           textColor="#FFFFFF"
-          onPress={onEdit}
+          onPress={handleEdit}
         />
         <Button 
           width="100%" 
