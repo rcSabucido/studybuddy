@@ -1,9 +1,9 @@
 import Button from '@/components/Button';
+import TaskFilter, { FilterType } from '@/components/TaskFilter';
 import Tasks from '@/components/Tasks';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { AdjustmentsHorizontalIcon } from 'react-native-heroicons/outline';
-
 
 export default function Index() {
      const [tasks, setTasks] = useState([
@@ -40,6 +40,20 @@ export default function Index() {
     ]);
 
     const [showTodayOnly, setShowTodayOnly] = useState(false);
+    const [isFilterVisible, setIsFilterVisible] =useState(false);
+    const [activeFilter, setActiveFilter] = useState<FilterType>('dueDate');
+
+    const handleApplyFilter = (filterType: FilterType) => {
+        setActiveFilter(filterType);
+        const sortedTasks = [...tasks].sort((a, b) => {
+            if (filterType === 'dueDate') {
+                return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+            } else {
+                return a.priority - b.priority; 
+            }
+        });
+        setTasks(sortedTasks);
+    }
 
     const handleDeleteTask = (taskId: number) => {
         setTasks(tasks.filter(task => task.id !== taskId));
@@ -76,7 +90,13 @@ export default function Index() {
                     onPress={() => setShowTodayOnly(true)} 
                     />
                 </View>
-                <Button width={'15%'} icon={AdjustmentsHorizontalIcon} bgColor='#9B41E9'></Button>
+                <Button 
+                    width={'15%'} 
+                    icon={AdjustmentsHorizontalIcon} 
+                    bgColor='#9B41E9'
+                    onPress={() => setIsFilterVisible(true)}         
+                >
+                </Button>
             </View>
             <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.tasksContainer}>
                 {getFilteredTasks().map(task => (
@@ -89,6 +109,12 @@ export default function Index() {
                     />
                 ))}
             </ScrollView>   
+            {isFilterVisible && (
+                <TaskFilter 
+                    onClose={() => setIsFilterVisible(false)}
+                    onApplyFilter={handleApplyFilter}
+                />
+            )}
         </View>
     );
 }

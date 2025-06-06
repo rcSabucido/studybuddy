@@ -9,11 +9,12 @@ type Props = {
     width?: DimensionValue
     style?: ViewStyle
     onPress?: () => void
+    borderWidth?: number
 };
 
-export default function Button({ label, bgColor, onPress, style, textColor = '#fff', icon: IconComponent, iconWeight="1.5", width='auto'}: Props) {
+export default function Button({ label, bgColor, borderWidth, onPress, style, textColor = '#fff', icon: IconComponent, iconWeight="1.5", width='auto'}: Props) {
     return (
-        <View style={[styles.buttonContainer, {backgroundColor: bgColor, width: width}, style]}>
+        <View style={[styles.buttonContainer, {backgroundColor: bgColor, width: width, borderWidth: borderWidth}, style]}>
             <Pressable style={styles.button} onPress={onPress}>
                 {IconComponent && <IconComponent size={25} strokeWidth={iconWeight} color="white"/>}
                 { label !== null && label !== undefined ? <Text style={[styles.buttonLabel, {color: textColor}]}>{label}</Text> : null }
