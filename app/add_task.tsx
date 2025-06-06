@@ -62,6 +62,11 @@ export default function Index() {
 
   const handleSaveModalClose = (shouldSave: boolean) => {
     if (shouldSave) {
+      if (!validateInputs()) {
+        setShowWarning(true);
+        setShowSaveModal(false);
+        return;
+      }
       handleSave();
     }
     setShowSaveModal(false);
