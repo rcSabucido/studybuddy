@@ -70,7 +70,6 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontFamily: 'Poppins_300Light',
         opacity: 0.8,
-        marginBottom: 12,
     },
     overdueText: {
         color: '#0AFC3B',
