@@ -12,40 +12,67 @@ type Props = {
   seconds: number,
 }
 
+function getPercentageRemaining(
+  start: { hours: number; minutes: number; seconds: number },
+  current: { hours: number; minutes: number; seconds: number }
+): number {
+  const toSeconds = ({ hours, minutes, seconds }: typeof start) =>
+    hours * 3600 + minutes * 60 + seconds;
+
+  const startSeconds = toSeconds(start);
+  const currentSeconds = toSeconds(current);
+
+  if (startSeconds === 0) return 0;
+
+  return (currentSeconds / startSeconds) * 100;
+}
+
 export default function ManualTimer() {
   const [ timerStarted, setTimerStarted ] = useState(false)
   let { hours, minutes, seconds } = useLocalSearchParams();
   let [ hoursNum, minutesNum, secondsNum ] = [ Number(hours), Number(minutes), Number(seconds) ]
   const intervalRef = useRef<number | null>(null);
+  const [ percentage, setPercentage ] = useState(100);
 
+  const startTime = {
+    hours: hoursNum, minutes: minutesNum, seconds: secondsNum
+  }
   const [ currentTime, setCurrentTime ] = useState({
     hours: hoursNum, minutes: minutesNum, seconds: secondsNum
   })
   useEffect(() => {
     if (timerStarted) {
       intervalRef.current = setInterval(() => {
-        let time = currentTime
-        time.seconds--
-        if (time.seconds < 0) {
-          if (time.minutes > 0) {
-            time.seconds = 59
-            time.minutes--
-            if (time.minutes < 0) {
-              time.hours--
+        setCurrentTime(time => {
+          let newSeconds = time.seconds;
+          let newMinutes = time.minutes;
+          let newHours = time.hours;
+          let done = false;
+          newSeconds--
+          if (newSeconds == 0 && newMinutes == 0 && newHours == 0)  {
+            resetTimer()
+            done = true
+          } else if (newSeconds < 0) {
+            if (newMinutes > 0) {
+              newSeconds = 59
+              newMinutes--
+              if (newMinutes < 0) {
+                newHours--
+              }
+            } else {
+              newSeconds = 0
+              resetTimer()
             }
-          } else {
-            time.seconds = 0
-            // done
-            intervalRef.current = null;
-            setTimerStarted(false);
           }
-        }
-        setCurrentTime(time)
-        console.log(time)
+          let newTime = { hours: newHours, minutes: newMinutes, seconds: newSeconds }
+          setPercentage(done ? 0 : getPercentageRemaining(startTime, newTime))
+          console.log(newTime)
+          return newTime
+        })
       }, 1000);
     }
   },
-  [timerStarted, currentTime, intervalRef])
+  [timerStarted])
 
   const stopTimer = () => {
     setTimerStarted(false)
@@ -54,6 +81,13 @@ export default function ManualTimer() {
       intervalRef.current = null;
     }
   };
+  
+  const resetTimer = () => {
+    stopTimer()
+    setCurrentTime({
+      hours: hoursNum, minutes: minutesNum, seconds: secondsNum
+    })
+  }
 
   useEffect(() => {
     return () => {
@@ -82,13 +116,16 @@ export default function ManualTimer() {
         width: '100%'
       }}>
         <View style={{justifyContent: "center", alignItems: "center"}}>
+          {
           <RadialChart
             size={Dimensions.get("window").width * 0.61}
             strokeWidth={20}
             text={`${currentTime.minutes.toString().padStart(2, "0")}:${currentTime.seconds.toString().padStart(2, "0")}`}
             largeText={hoursNum < 1}
-            percentage={75}
+            percentage={percentage}
           />
+          }
+          {/*<Text>{currentTime.seconds}</Text>*/}
           <Pressable onPress={() => 
               {
                 if (!timerStarted) {
@@ -104,9 +141,8 @@ export default function ManualTimer() {
           </Pressable>
           <Pressable onPress={() => 
               {
-                setCurrentTime({
-                  hours: hoursNum, minutes: minutesNum, seconds: secondsNum
-                })
+                resetTimer()
+                setPercentage(100)
               }
             } style={[styles.content_container,
                 {height: "15%", backgroundColor: "#F81414", width: "85%"}]}>

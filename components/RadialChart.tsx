@@ -33,16 +33,19 @@ const RadialChart = ({ size = 100, strokeWidth = 10,
             strokeWidth={strokeWidth}
             fill="none"
           />
-          <Circle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
-            stroke={activeColor}
-            strokeDasharray={`${progress}, ${circumference - progress}`}
-            strokeWidth={strokeWidth}
-            fill="none"
-            strokeLinecap="round"
-          />
+          {
+            percentage > 0 &&
+            <Circle
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              stroke={activeColor}
+              strokeDasharray={`${progress}, ${circumference - progress}`}
+              strokeWidth={strokeWidth}
+              fill="none"
+              strokeLinecap="round"
+            />
+          }
         </G>
       </Svg>
       <Text style={[largeText ? styles.timer_progress_text_large : styles.timer_progress_text, textStyle, { position: 'absolute' }]}>
