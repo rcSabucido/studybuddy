@@ -10,6 +10,11 @@ function openManualTimer() {
   router.push("/setup_manual_timer")
 }
 
+function openPomodoroTimer() {
+  const router = useRouter();
+  router.push("/pomodoro_timer")
+}
+
 export default function SetCurrentTimer() {
   const [currentWork, setCurrentWork] = useState('EI');
   return (
@@ -53,13 +58,14 @@ export default function SetCurrentTimer() {
               }}
             />
           </View>
-          <View style={[styles.content_container, {backgroundColor: "#F81414"}]}>
+          <Pressable style={[styles.content_container, {backgroundColor: "#F81414"}]}
+            onPress={openPomodoroTimer} accessibilityLabel="Use pomodoro timer">
             <Text style={[styles.container_header_text, {padding: 8}]}>Use Pomodoro Timer</Text>
             <Image
               source={require('@/assets/images/pomodoro-white.png')}
               style={{width: 160, height: 160}}
             />
-          </View>
+          </Pressable>
           <Pressable style={[styles.content_container, {marginTop: 32}]}
             onPress={openManualTimer} accessibilityLabel="Use manual timer">
             <Text style={[styles.container_header_text, {padding: 8}]}>Manually Track</Text>
