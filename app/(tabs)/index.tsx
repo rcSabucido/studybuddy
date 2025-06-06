@@ -22,13 +22,13 @@ export default function Index() {
         { 
             id: 3, 
             label: 'Team Meeting', 
-            dueDate: '2025-06-10',
+            dueDate: '2025-06-06',
             priority: 1,
         },
         { 
             id: 4, 
             label: 'Submit Assignment', 
-            dueDate: '2025-06-08',
+            dueDate: '2025-06-06',
             priority: 0,
         },
         {
@@ -39,25 +39,47 @@ export default function Index() {
         }
     ]);
 
+    const [showTodayOnly, setShowTodayOnly] = useState(false);
+
     const handleDeleteTask = (taskId: number) => {
         setTasks(tasks.filter(task => task.id !== taskId));
     };
+
+    const getFilteredTasks = () => {
+        if (!showTodayOnly) return tasks;
+
+        const today = new Date().toISOString().split('T')[0];
+        return tasks.filter(task => task.dueDate === today);
+    }
+
+    const todayTasksCount = getFilteredTasks().length;
+
     return (
         <View style={styles.container}>
             <View style={styles.headerContainer}>
                 <Text style={styles.smallText}>Hello,</Text>
                 <Text style={styles.bigText}>You've got</Text>
-                <Text style={styles.purpleText}> x tasks today</Text>
+                <Text style={styles.purpleText}>
+                    {todayTasksCount} tasks{showTodayOnly ? ' today' : ' in total'}
+                    </Text>
             </View>
             <View style={styles.allButtonContainer}>
                 <View style={styles.buttonContainer}>
-                    <Button width={'30%'} label="All Tasks" bgColor='#9B41E9' />
-                    <Button width={'50%'} label="Today's Tasks" textColor="0000" bgColor='#D9D9D9' />
+                    <Button width={'30%'} label="All Tasks" 
+                    bgColor={!showTodayOnly ? '#9B41E9' : '#D9D9D9'}
+                    textColor={!showTodayOnly ? '#FFFFFF' : '#000000'}
+                    onPress={() => setShowTodayOnly(false)}
+                    />
+                    <Button width={'50%'} label="Today's Tasks" 
+                    textColor={showTodayOnly ? '#FFFFFF' : '#000000'} 
+                    bgColor={showTodayOnly ? '#9B41E9' : '#D9D9D9'}
+                    onPress={() => setShowTodayOnly(true)} 
+                    />
                 </View>
                 <Button width={'15%'} icon={AdjustmentsHorizontalIcon} bgColor='#9B41E9'></Button>
             </View>
             <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.tasksContainer}>
-                {tasks.map(task => (
+                {getFilteredTasks().map(task => (
                     <Tasks
                         key={task.id}
                         label={task.label}
