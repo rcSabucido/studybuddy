@@ -2,7 +2,7 @@ import { DimensionValue, Pressable, StyleSheet, Text, TextStyle, View, ViewStyle
 
 type Props = {
     label?: string
-    bgColor: string
+    bgColor?: string
     textColor?: string
     icon?: any
     iconWeight?: string | number
@@ -12,7 +12,7 @@ type Props = {
     onPress?: () => void
 };
 
-export default function Button({ label, bgColor, onPress, style, textStyle, textColor = '#fff', icon: IconComponent, iconWeight="1.5", width='auto'}: Props) {
+export default function Button({ label, bgColor = "#ffffff", onPress, style, textStyle, textColor = '#fff', icon: IconComponent, iconWeight="1.5", width='auto'}: Props) {
     return (
         <View style={[styles.buttonContainer, {backgroundColor: bgColor, width: width}, style]}>
             <Pressable style={styles.button} onPress={onPress}>
