@@ -2,25 +2,20 @@ import ArrowHeader from '@/components/ArrowHeader';
 import Button from '@/components/Button';
 import NotifyTimeModal from '@/components/NotifyTimeModal';
 import SaveChangesModal from '@/components/SaveChangesModal';
-import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { Calendar } from 'react-native-calendars';
 import { CalendarIcon, ClockIcon, ExclamationCircleIcon } from 'react-native-heroicons/outline';
 import Dropdown from 'react-native-input-select';
 
-type TaskDetails = {
-  name: string;
-  priority: number;
-  time: {
-    hours: number;
-    minutes: number;
-    period: 'AM' | 'PM';
-  };
-  date: string;
-};
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
 
 export default function EditTask() {
+  const [isFreshData, setIsFreshData] = useState(true);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const router = useRouter();
   const [name, setName] = useState('');
@@ -28,12 +23,20 @@ export default function EditTask() {
   const [timeValue, setTimeValue] = useState({
     hours: 12,
     minutes: 0,
-    period: 'AM' as const
+    period: 'AM'
   });
   const [timeModal, setTimeModal] = useState(false);
   const [selectDate, setSelectDate] = useState('');
   const [showCalendar, setShowCalendar] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
+  const params = useLocalSearchParams();
+  const taskId = typeof params.taskId === 'string' ? parseInt(params.taskId) : 0;
+
+  const taskData = params.taskData ? JSON.parse(params.taskData as string) : null;
+  console.log("Current raw task data")
+  console.log(params.taskData)
+  console.log("current time value")
+  console.log(timeValue)
 
   const validateInputs = () => {
     return name.trim() !== '' &&
@@ -46,21 +49,58 @@ export default function EditTask() {
     (timeValue.hours !== 12 || timeValue.minutes !== 0 || timeValue.period !== 'AM');
   };
 
-  const handleSave = () => {
+  const convertTimeStringToObject = (timeString: string) => {
+    const [hours24, minutes] = timeString.split(':');
+    const hoursNum = parseInt(hours24);
+    
+    let period: 'AM' | 'PM' = hoursNum >= 12 ? 'PM' : 'AM';
+    let hours12 = hoursNum % 12;
+    
+    hours12 = hours12 === 0 ? 12 : hours12;
+    
+    return {
+      hours: hours12,
+      minutes: parseInt(minutes),
+      period
+    };
+  };
+
+  useEffect(() => {
+    if (taskData && isFreshData) {
+      setIsFreshData(false);
+      setName(taskData.label || '');
+      setPriorityStatus(taskData.priority);
+      setSelectDate(taskData.date || '');
+      setTimeValue(convertTimeStringToObject(taskData.time));
+    }
+  }, [taskData]);
+
+  const handleSave = async () => {
     if (!validateInputs()) {
       setShowWarning(true);
       return;
     }
 
-    const taskData = {
-      name,
-      priority: priorityStatus,
-      time: timeValue,
-      date: selectDate
-    };
+    try {
+      const { error } = await supabase
+        .from('Tasks')
+        .update({
+          label: name,
+          priority: Number(priorityStatus),
+          date: selectDate,
+          time: timeValue
+        })
+        .eq('id', taskId);
+      
+      if (error) {
+        throw error;
+      }
 
-    console.log('Updated Task Data:', taskData);
-    router.back();
+      router.back();
+    } catch (err) {
+      console.error('Error updating task:', err);
+      setShowWarning(true);
+    }
   }
 
   const handleBackPress = () => {
@@ -150,8 +190,8 @@ export default function EditTask() {
               setTimeModal(!timeModal);
             }} style={styles.timeButton}>
               <Text style={{color: 'dimgray'}}>
-                {timeValue.hours}:{timeValue.minutes.toString().padStart(2, '0')} {timeValue.period}
-                </Text>
+                {timeValue.hours}:{`${timeValue.minutes}`.padStart(2, '0')} {timeValue.period}
+              </Text>
               <ClockIcon size={20} color="dimgray"/>
             </Pressable>
            </View>

@@ -3,7 +3,7 @@ import TaskActions from '@/components/TaskActions';
 import TaskFilter, { FilterType } from '@/components/TaskFilter';
 import Tasks from '@/components/Tasks';
 import { createClient } from '@supabase/supabase-js';
-import { useRouter } from 'expo-router';
+import { router, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { AdjustmentsHorizontalIcon } from 'react-native-heroicons/outline';
@@ -22,6 +22,7 @@ type Task = {
 
 export default function Index() {
     const [tasks, setTasks] = useState<Task[]>([]);
+    const [taskDetails, setTaskDetails] = useState<Task | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [showTodayOnly, setShowTodayOnly] = useState(false);
@@ -81,6 +82,32 @@ export default function Index() {
             }
         });
         setTasks(sortedTasks);
+    }
+
+    const handleEditTask = async (taskId: number) => {
+        try {
+            const { data, error } = await supabase
+                .from('Tasks')
+                .select()
+                .eq('id', taskId)
+                .single();
+
+            if (error) {
+                throw error;
+            }
+
+            if (data) {
+                router.push({
+                    pathname: '../edit_task',
+                    params: {
+                        taskId: data.id,
+                        taskData: JSON.stringify(data)
+                    }
+                });
+            }
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Error fetching task');
+        }
     }
 
     const handleDeleteTask = async (taskId: number) => {
@@ -184,7 +211,7 @@ export default function Index() {
                     taskLabel={selectedTask.label}
                     onClose={handleCloseActions}
                     onEdit={() =>{
-                        console.log('Edit Task');
+                        handleEditTask(selectedTask.id);
                         handleCloseActions();
                     }}
                     onDelete={() => {
