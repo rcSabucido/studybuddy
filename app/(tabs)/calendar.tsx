@@ -2,7 +2,7 @@ import Button from '@/components/Button';
 import TaskPanel, { Task } from '@/components/TaskPanel';
 import { createClient } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { Calendar } from 'react-native-calendars';
 import { PlusIcon } from 'react-native-heroicons/outline';
@@ -10,70 +10,67 @@ import { PlusIcon } from 'react-native-heroicons/outline';
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
-    
-const mockTasks: Record<string, Task[]> = {
-  '2025-06-20': [
-    {
-      id: '1',
-      name: 'Study Mathematics',
-      priority: 1,
-      time: { hours: 2, minutes: 30, period: 'PM' },
-      date: '2025-06-20'
-    },
-    {
-      id: '2',
-      name: 'Complete Project Report',
-      priority: 0,
-      time: { hours: 4, minutes: 0, period: 'AM' },
-      date: '2025-06-20'
-    },
-     {
-      id: '3',
-      name: 'Complete Project Report',
-      priority: 2,
-      time: { hours: 4, minutes: 0, period: 'AM' },
-      date: '2025-06-20'
-    },
-     {
-      id: '4',
-      name: 'Complete Project Report',
-      priority: 0,
-      time: { hours: 4, minutes: 0, period: 'AM' },
-      date: '2025-06-20'
-    },
-     {
-      id: '5',
-      name: 'Complete Project Report',
-      priority: 1,
-      time: { hours: 4, minutes: 0, period: 'AM' },
-      date: '2025-06-20'
-    }
-  ],
-  '2025-06-21': [
-    {
-      id: '6',
-      name: 'Attend Team Meeting',
-      priority: 1,
-      time: { hours: 10, minutes: 0, period: 'AM' },
-      date: '2025-06-21'
-    }
-  ],
-}
+
+type TasksByDate = Record<string, Task[]>;
+
 function openAddTask() {
   const router = useRouter();
   router.push("/add_task")
 }
 
-
 export default function Index() {
   const [selected, setSelected] = useState('');
   const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
   const [isTaskPanelVisible, setIsTaskPanelVisible] = useState(false);
+  const [tasks, setTasks] = useState<TasksByDate>({});
+  const [isLoading, setIsLoading] = useState(true);
+
+
+  const fetchTasks = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('Tasks')
+        .select('*')
+        .eq('isActive', true);
+
+      if (error) throw error;
+
+      if (data) {
+        const tasksByDate = data.reduce((acc: TasksByDate, task) => {
+          const date = new Date(task.date).toISOString().split('T')[0];
+          if (!acc[date]) {
+            acc[date] = [];
+          }
+          acc[date].push({
+            id: task.id.toString(),
+            name: task.label,
+            priority: task.priority,
+            time: {
+              hours: parseInt(task.time.split(':')[0]),
+              minutes: parseInt(task.time.split(':')[1]),
+              period: parseInt(task.time.split(':')[0]) >= 12 ? 'PM' : 'AM'
+            },
+            date: date
+          });
+          return acc;
+        }, {});
+        setTasks(tasksByDate);
+      }
+    } catch (err) {
+      console.error('Error fetching tasks:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
 
   const getMarkedDates = () => {
     const marked: any = {};
 
-    Object.keys(mockTasks).forEach(date => {
+    Object.keys(tasks).forEach(date => {
       marked[date] = {
         marked: true,
         dotColor: '#1AE843',
@@ -95,27 +92,42 @@ export default function Index() {
 
   const handleDayPress = (day: any) => {
     setSelected(day.dateString);
-    const tasks = mockTasks[day.dateString] || [];
-    setSelectedTasks(tasks);
-    setIsTaskPanelVisible(tasks.length > 0);
+    const dayTasks = tasks[day.dateString] || [];
+    setSelectedTasks(dayTasks);
+    setIsTaskPanelVisible(dayTasks.length > 0);
   }
 
   const handleCloseTaskPanel = () => {
     setIsTaskPanelVisible(false);
   };
 
-  const handleDeleteTasks = (taskIds: string[]) => {
-    const updatedTasks = selectedTasks.filter(task => !taskIds.includes(task.id));
-    setSelectedTasks(updatedTasks);
+  const handleDeleteTasks = async (taskIds: string[]) => {
+    try {
+      const { error } = await supabase
+        .from('Tasks')
+        .update({ isActive: false })
+        .in('id', taskIds.map(id => parseInt(id)));
 
-    if (selected) {
-      mockTasks[selected] = updatedTasks;
-    }
+      if (error) throw error;
 
-    if (updatedTasks.length === 0) {
-      setIsTaskPanelVisible(false);
+      const updatedTasks = selectedTasks.filter(task => !taskIds.includes(task.id));
+      setSelectedTasks(updatedTasks);
+
+      if (selected) {
+        setTasks(prev => ({
+          ...prev,
+          [selected]: updatedTasks
+        }));
+      }
+
+      if (updatedTasks.length === 0) {
+        setIsTaskPanelVisible(false);
+      }
+    } catch (err) {
+      console.error('Error deleting tasks:', err);
     }
   };
+
   return (
     <View style={{ flex: 1}}>
       <ScrollView contentContainerStyle={styles.innerScrollView}>
