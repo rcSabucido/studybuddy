@@ -2,9 +2,10 @@ import Button from '@/components/Button';
 import TaskActions from '@/components/TaskActions';
 import TaskFilter, { FilterType } from '@/components/TaskFilter';
 import Tasks from '@/components/Tasks';
+import { useFocusEffect } from '@react-navigation/native';
 import { createClient } from '@supabase/supabase-js';
 import { router, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { AdjustmentsHorizontalIcon } from 'react-native-heroicons/outline';
 
@@ -33,35 +34,69 @@ export default function Index() {
         label: string;
     }>(null);
 
-    useEffect(() => {
-        async function fetchTasks() {
-            try {
-                const { data, error } = await supabase
-                    .from('activeTasksView')
-                    .select()
+    // useEffect(() => {
+    //     async function fetchTasks() {
+    //         try {
+    //             const { data, error } = await supabase
+    //                 .from('activeTasksView')
+    //                 .select()
 
-                if (error) {
-                    throw error;
-                }
+    //             if (error) {
+    //                 throw error;
+    //             }
 
-                if (data) {
-                    let displayData = data
-                    .map(task => ({
-                        'id': task.id,
-                        'label': task.label,
-                        'dueDate': task.date ? new Date(task.date).toISOString().split('T')[0] : '',
-                        'priority': task.priority
-                    }));
-                    setTasks(displayData);
-                }
-            } catch (err) {
-                setError(err instanceof Error ? err.message : 'An error occured');
-            } finally {
-                setIsLoading(false);
+    //             if (data) {
+    //                 let displayData = data
+    //                 .map(task => ({
+    //                     'id': task.id,
+    //                     'label': task.label,
+    //                     'dueDate': task.date ? new Date(task.date).toISOString().split('T')[0] : '',
+    //                     'priority': task.priority
+    //                 }));
+    //                 setTasks(displayData);
+    //             }
+    //         } catch (err) {
+    //             setError(err instanceof Error ? err.message : 'An error occured');
+    //         } finally {
+    //             setIsLoading(false);
+    //         }
+    //     }
+    //     fetchTasks();
+    // }, []);
+
+    const fetchTasks = async () => {
+        setIsLoading(true);
+        try {
+            const { data, error } = await supabase
+                .from('activeTasksView')
+                .select()
+
+            if (error) {
+                throw error;
             }
+
+            if (data) {
+                let displayData = data
+                .map(task => ({
+                    'id': task.id,
+                    'label': task.label,
+                    'dueDate': task.date ? new Date(task.date).toISOString().split('T')[0] : '',
+                    'priority': task.priority
+                }));
+                setTasks(displayData);
+            }
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'An error occured');
+        } finally {
+            setIsLoading(false);
         }
-        fetchTasks();
-    }, []);
+    }
+
+    useFocusEffect(
+        React.useCallback(() => {
+            fetchTasks();
+        }, [])
+    );
 
 
     const handleTaskAction = (taskId: number, taskLabel: string) => {
