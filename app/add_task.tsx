@@ -2,12 +2,17 @@ import ArrowHeader from '@/components/ArrowHeader';
 import Button from '@/components/Button';
 import NotifyTimeModal from '@/components/NotifyTimeModal';
 import SaveChangesModal from '@/components/SaveChangesModal';
+import { createClient } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { Calendar } from 'react-native-calendars';
 import { CalendarIcon, ClockIcon, ExclamationCircleIcon } from 'react-native-heroicons/outline';
 import Dropdown from 'react-native-input-select';
+
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
 
 export default function Index() {
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -35,22 +40,41 @@ export default function Index() {
     (timeValue.hours !== 12 || timeValue.minutes !== 0 || timeValue.period !== 'AM');
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!validateInputs()) {
       setShowWarning(true);
       return;
     }
 
-    const taskData = {
-      name,
-      priority: priorityStatus,
-      time: timeValue,
-      date: selectDate
+    const convertTo24HourFormat = (time: { hours: number, minutes: number, period: string }) => {
+      let hours = time.hours;
+      if (time.period === 'PM' && hours !== 12) {
+        hours += 12;
+      } else if (time.period === 'AM' && hours === 12) {
+        hours = 0;
+      }
+      return `${hours.toString().padStart(2, '0')}:${time.minutes.toString().padStart(2, '0')}:00`;
     };
 
-    console.log('Task Data:', taskData);
-    router.back();
-  }
+    try {
+      const { error } = await supabase
+        .from('Tasks')
+        .insert({
+          label: name,
+          priority: Number(priorityStatus),
+          date: selectDate,
+          time: convertTo24HourFormat(timeValue),
+          isActive: true
+        });
+
+      if (error) throw error;
+
+      router.back();
+    } catch (err) {
+      console.error('Error adding task:', err);
+      setShowWarning(true);
+    }
+};
 
   const handleBackPress = () => {
     if (hasUnsavedChanges()) {

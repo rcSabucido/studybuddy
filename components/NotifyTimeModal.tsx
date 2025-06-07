@@ -8,7 +8,7 @@ import {
 type TimeValue = {
   hours: number;
   minutes: number;
-  period: 'AM' | 'PM';
+  period: string;
 };
 
 type Props = {
