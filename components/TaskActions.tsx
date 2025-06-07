@@ -19,7 +19,6 @@ export default function TaskActions({ taskLabel, onClose, onEdit, onDelete }: Ta
 
   const handleEdit = () => {
     onEdit();
-    router.push('/edit_task');
   }
 
   const resetPositionAnim = Animated.timing(panY, {
