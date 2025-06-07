@@ -8,6 +8,8 @@ import { Dimensions, Pressable, Text, View } from "react-native";
 import { ExclamationTriangleIcon } from 'react-native-heroicons/outline';
 import styles from './styles';
 
+import * as Notifications from 'expo-notifications';
+
 type Props = {
   hours: number,
   minutes: number,
@@ -178,7 +180,18 @@ export default function ManualTimer() {
         filter: 'drop-shadow(4px 4px 4px rgba(0, 0, 0, 0.35))',
       }}
       textStyle={styles.container_button_text}
-      /*onPress={openSetCurrentTimer}*/
+      onPress={() => {
+        Notifications.scheduleNotificationAsync({
+          content: {
+            title: 'Manual Timer Task Done',
+            body: "The task for the manual timer is done!",
+          },
+          trigger: {
+            type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+            seconds: 1,
+          },
+        });
+      }}
     />
     {
       confirmationVisible &&

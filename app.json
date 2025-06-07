@@ -16,7 +16,8 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.anonymous.studybuddy"
     },
     "web": {
       "bundler": "metro",
@@ -36,13 +37,17 @@
       ],
       [
         "expo-font",
-        {
-                    
-        }
+        {}
       ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "d8b25316-4b3e-43ca-bf19-cb47c17f18e8"
+      }
     }
   }
 }
