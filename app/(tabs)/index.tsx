@@ -124,7 +124,7 @@ export default function Index() {
                         onTaskPress={() => {
                             console.log(`Task pressed:`)
                             console.log(task)
-                            useRouter().push({pathname: "/specific_data_view", params: {
+                            useRouter().push({pathname: "./specific_data_view", params: {
                                 taskId: task.id, taskLabel: task.label
                             }})
                         }}
