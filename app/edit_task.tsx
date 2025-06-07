@@ -81,6 +81,18 @@ export default function EditTask() {
       return;
     }
 
+    const convertTo24HourFormat = (time: { hours: number, minutes: number, period: string }) => {
+      let hours = time.hours;
+      if (time.period === 'PM' && hours !== 12) {
+        hours += 12;
+      } else if (time.period === 'AM' && hours === 12) {
+        hours = 0;
+      }
+      return `${hours.toString().padStart(2, '0')}:${time.minutes.toString().padStart(2, '0')}:00`;
+    };
+
+    const formattedTime = convertTo24HourFormat(timeValue);
+
     try {
       const { error } = await supabase
         .from('Tasks')
@@ -88,7 +100,7 @@ export default function EditTask() {
           label: name,
           priority: Number(priorityStatus),
           date: selectDate,
-          time: timeValue
+          time: formattedTime
         })
         .eq('id', taskId);
       
