@@ -1,6 +1,11 @@
+import { createClient } from '@supabase/supabase-js';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, PanResponder, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { ArrowLeftIcon, TrashIcon } from 'react-native-heroicons/outline';
+
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
 
 export interface Task {
   id: string;
@@ -74,13 +79,27 @@ export default function TaskPanel({ tasks, date, onClose, onDeleteTasks }: TaskP
       }
     };
 
-    const handleDelete = () => {
+    const handleDelete = async () => {
+    try {
+      if (selectedTasks.length === 0) return;
+
+      const { error } = await supabase
+        .from('Tasks')
+        .update({ isActive: false })
+        .in('id', selectedTasks.map(id => parseInt(id)));
+
+      if (error) throw error;
+
       if (onDeleteTasks) {
         onDeleteTasks(selectedTasks);
-        setSelectedTasks([]);
-        setIsSelectionMode(false);
       }
+
+      setSelectedTasks([]);
+      setIsSelectionMode(false);
+    } catch (err) {
+      console.error('Error deleting tasks:', err);
     }
+  };
 
     const panResponder = PanResponder.create({
         onStartShouldSetPanResponder: (evt, gestureState) => {
