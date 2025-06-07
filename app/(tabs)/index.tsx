@@ -4,7 +4,7 @@ import TaskFilter, { FilterType } from '@/components/TaskFilter';
 import Tasks from '@/components/Tasks';
 import { createClient } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { AdjustmentsHorizontalIcon } from 'react-native-heroicons/outline';
 
@@ -13,40 +13,17 @@ const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
 const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
 
-export default function Index() {
-     const [tasks, setTasks] = useState([
-         { 
-            id: 1, 
-            label: 'Project Proposal', 
-            dueDate: '2025-06-20',
-            priority: 1,
-        },
-        { 
-            id: 2, 
-            label: 'Study for Final Exam', 
-            dueDate: '2025-06-15',
-            priority: 0,
-        },
-        { 
-            id: 3, 
-            label: 'Team Meeting', 
-            dueDate: '2025-06-06',
-            priority: 1,
-        },
-        { 
-            id: 4, 
-            label: 'Submit Assignment', 
-            dueDate: '2025-06-06',
-            priority: 0,
-        },
-        {
-            id: 5,
-            label: 'Grocery Shopping',
-            dueDate: '2025-06-05',
-            priority: 2,
-        }
-    ]);
+type Task = {
+    id: number;
+    label: string;
+    dueDate: string;
+    priority: number;
+};
 
+export default function Index() {
+    const [tasks, setTasks] = useState<Task[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [showTodayOnly, setShowTodayOnly] = useState(false);
     const [isFilterVisible, setIsFilterVisible] =useState(false);
     const [activeFilter, setActiveFilter] = useState<FilterType>('dueDate');
@@ -54,6 +31,37 @@ export default function Index() {
         id: number;
         label: string;
     }>(null);
+
+    useEffect(() => {
+        async function fetchTasks() {
+            try {
+                const { data, error } = await supabase
+                    .from('Tasks')
+                    .select('id, label, date, priority')
+
+                if (error) {
+                    throw error;
+                }
+
+                if (data) {
+                    let displayData = data
+                    .map(task => ({
+                        'id': task.id,
+                        'label': task.label,
+                        'dueDate': task.date ? new Date(task.date).toISOString().split('T')[0] : '',
+                        'priority': task.priority
+                    }));
+                    setTasks(displayData);
+                }
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'An error occured');
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        fetchTasks();
+    }, []);
+
 
     const handleTaskAction = (taskId: number, taskLabel: string) => {
         setSelectedTask({ id: taskId, label: taskLabel });
@@ -119,24 +127,38 @@ export default function Index() {
                 </Button>
             </View>
             <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.tasksContainer}>
-                {getFilteredTasks().map(task => (
-                    <Tasks
-                        key={task.id}
-                        label={task.label}
-                        dueDate={task.dueDate}
-                        priority={task.priority}
-                        onDelete={() => handleDeleteTask(task.id)}
-                        onActionPress={() => handleTaskAction(task.id, task.label)}
-                        onTaskPress={() => {
-                            console.log(`Task pressed:`)
-                            console.log(task)
-                            useRouter().push({pathname: "./specific_data_view", params: {
-                                taskId: task.id, taskLabel: task.label
-                            }})
-                        }}
-                    />
-                ))}
-            </ScrollView>   
+                {isLoading ? (
+                    <View style={styles.messageContainer}>
+                        <Text style={styles.messageText}>Loading tasks...</Text>
+                    </View>
+                ) : error ? (
+                    <View style={styles.messageContainer}>
+                        <Text style={styles.errorText}>{error}</Text>
+                    </View>
+                ) : getFilteredTasks().length === 0 ? (
+                    <View style={styles.messageContainer}>
+                        <Text style={styles.messageText}>No tasks found</Text>
+                    </View>
+                ) : (
+                    getFilteredTasks().map(task => (
+                        <Tasks
+                            key={task.id}
+                            label={task.label}
+                            dueDate={task.dueDate}
+                            priority={task.priority}
+                            onDelete={() => handleDeleteTask(task.id)}
+                            onActionPress={() => handleTaskAction(task.id, task.label)}
+                            onTaskPress={() => {
+                                console.log(`Task pressed:`)
+                                console.log(task)
+                                useRouter().push({pathname: "./specific_data_view", params: {
+                                    taskId: task.id, taskLabel: task.label
+                                }})
+                            }}
+                        />
+                    ))
+                )}
+            </ScrollView>
             {isFilterVisible && (
                 <TaskFilter 
                     onClose={() => setIsFilterVisible(false)}
@@ -216,5 +238,21 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '65%',
         marginTop: 10,
-    }
+    },
+    messageContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingTop: 20,
+    },
+    messageText: {
+        fontSize: 16,
+        color: '#666',
+        fontFamily: 'Poppins_400Regular',
+    },
+    errorText: {
+        fontSize: 16,
+        color: '#FF4444',
+        fontFamily: 'Poppins_400Regular',
+    },
 });
