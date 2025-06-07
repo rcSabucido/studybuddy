@@ -33,10 +33,6 @@ export default function EditTask() {
   const taskId = typeof params.taskId === 'string' ? parseInt(params.taskId) : 0;
 
   const taskData = params.taskData ? JSON.parse(params.taskData as string) : null;
-  console.log("Current raw task data")
-  console.log(params.taskData)
-  console.log("current time value")
-  console.log(timeValue)
 
   const validateInputs = () => {
     return name.trim() !== '' &&

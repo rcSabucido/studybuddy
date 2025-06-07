@@ -224,8 +224,6 @@ export default function Index() {
                             onDelete={() => handleDeleteTask(task.id)}
                             onActionPress={() => handleTaskAction(task.id, task.label)}
                             onTaskPress={() => {
-                                console.log(`Task pressed:`)
-                                console.log(task)
                                 useRouter().push({pathname: "./specific_data_view", params: {
                                     taskId: task.id, taskLabel: task.label
                                 }})
