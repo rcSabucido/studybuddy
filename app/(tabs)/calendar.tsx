@@ -1,12 +1,16 @@
 import Button from '@/components/Button';
 import TaskPanel, { Task } from '@/components/TaskPanel';
+import { createClient } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { Calendar } from 'react-native-calendars';
 import { PlusIcon } from 'react-native-heroicons/outline';
-    
 
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
+    
 const mockTasks: Record<string, Task[]> = {
   '2025-06-20': [
     {
