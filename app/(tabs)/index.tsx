@@ -2,10 +2,16 @@ import Button from '@/components/Button';
 import TaskActions from '@/components/TaskActions';
 import TaskFilter, { FilterType } from '@/components/TaskFilter';
 import Tasks from '@/components/Tasks';
+import { createClient } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { AdjustmentsHorizontalIcon } from 'react-native-heroicons/outline';
+
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+
+const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
 
 export default function Index() {
      const [tasks, setTasks] = useState([
