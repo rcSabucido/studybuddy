@@ -23,7 +23,6 @@ type Task = {
 
 export default function Index() {
     const [tasks, setTasks] = useState<Task[]>([]);
-    const [taskDetails, setTaskDetails] = useState<Task | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [showTodayOnly, setShowTodayOnly] = useState(false);
@@ -33,36 +32,6 @@ export default function Index() {
         id: number;
         label: string;
     }>(null);
-
-    // useEffect(() => {
-    //     async function fetchTasks() {
-    //         try {
-    //             const { data, error } = await supabase
-    //                 .from('activeTasksView')
-    //                 .select()
-
-    //             if (error) {
-    //                 throw error;
-    //             }
-
-    //             if (data) {
-    //                 let displayData = data
-    //                 .map(task => ({
-    //                     'id': task.id,
-    //                     'label': task.label,
-    //                     'dueDate': task.date ? new Date(task.date).toISOString().split('T')[0] : '',
-    //                     'priority': task.priority
-    //                 }));
-    //                 setTasks(displayData);
-    //             }
-    //         } catch (err) {
-    //             setError(err instanceof Error ? err.message : 'An error occured');
-    //         } finally {
-    //             setIsLoading(false);
-    //         }
-    //     }
-    //     fetchTasks();
-    // }, []);
 
     const fetchTasks = async () => {
         setIsLoading(true);
