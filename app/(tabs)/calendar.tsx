@@ -1,8 +1,9 @@
 import Button from '@/components/Button';
 import TaskPanel, { Task } from '@/components/TaskPanel';
+import { useFocusEffect } from '@react-navigation/native';
 import { createClient } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { Calendar } from 'react-native-calendars';
 import { PlusIcon } from 'react-native-heroicons/outline';
@@ -23,7 +24,6 @@ export default function Index() {
   const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
   const [isTaskPanelVisible, setIsTaskPanelVisible] = useState(false);
   const [tasks, setTasks] = useState<TasksByDate>({});
-  const [isLoading, setIsLoading] = useState(true);
 
 
   const fetchTasks = async () => {
@@ -58,14 +58,14 @@ export default function Index() {
       }
     } catch (err) {
       console.error('Error fetching tasks:', err);
-    } finally {
-      setIsLoading(false);
-    }
+    } 
   };
 
-  useEffect(() => {
-    fetchTasks();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchTasks();
+    }, [])
+  );
 
   const getMarkedDates = () => {
     const marked: any = {};
@@ -114,11 +114,19 @@ export default function Index() {
       setSelectedTasks(updatedTasks);
 
       if (selected) {
+      if (updatedTasks.length === 0) {
+        setTasks(prev => {
+          const newTasks = { ...prev };
+          delete newTasks[selected];
+          return newTasks;
+        });
+      } else {
         setTasks(prev => ({
           ...prev,
           [selected]: updatedTasks
         }));
       }
+    }
 
       if (updatedTasks.length === 0) {
         setIsTaskPanelVisible(false);
