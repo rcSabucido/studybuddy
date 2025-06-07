@@ -36,8 +36,8 @@ export default function Index() {
         async function fetchTasks() {
             try {
                 const { data, error } = await supabase
-                    .from('Tasks')
-                    .select('id, label, date, priority')
+                    .from('activeTasksView')
+                    .select()
 
                 if (error) {
                     throw error;
@@ -83,8 +83,21 @@ export default function Index() {
         setTasks(sortedTasks);
     }
 
-    const handleDeleteTask = (taskId: number) => {
-        setTasks(tasks.filter(task => task.id !== taskId));
+    const handleDeleteTask = async (taskId: number) => {
+        try {
+            const { error } = await supabase
+                .from('Tasks')
+                .update({ isActive: false})
+                .eq('id', taskId);
+
+            if (error) {
+                throw error;
+            }
+
+            setTasks(tasks.filter(task => task.id !== taskId));
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Error deleting task');
+        }
     };
 
     const getFilteredTasks = () => {
