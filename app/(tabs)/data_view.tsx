@@ -1,13 +1,34 @@
 import Button from '@/components/Button';
 import MinStudyHoursModal from '@/components/MinStudyHoursModal';
 import PieProgress from "@/components/PieProgress";
+import { useStore } from '@/store/GlobalState';
 import Feather from '@expo/vector-icons/Feather';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useCallback, useState } from 'react';
 import { Dimensions, Pressable, ScrollView, Text, View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { ChartBarIcon } from 'react-native-heroicons/solid';
 import styles from '../styles';
+
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+
+const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
+
+function getCurrentWeekBounds() {
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const sunday = new Date(today);
+  sunday.setDate(today.getDate() - dayOfWeek);
+  const saturday = new Date(today);
+  saturday.setDate(today.getDate() + (6 - dayOfWeek));
+  const format = (date: Date) => date.toISOString().slice(0, 10);
+  return {
+    sunday: format(sunday),
+    saturday: format(saturday),
+  };
+}
 
 function openVerboseDataView() {
   const router = useRouter();
@@ -19,31 +40,95 @@ function openSetCurrentTimer() {
 }
 
 export default function DataView() {
-  const [minimumHoursStudy, setMinimumHoursStudy] = useState(1);
+  const minimumStudyHours = useStore((state) => state.minimumStudyHours);
+  const setMinimumStudyHours = useStore((state) => state.setMinimumStudyHours);
   const [studyHoursVisible, setStudyHoursVisible] = useState(false);
-  const data = [42, 32, 2, 23, 5, 35, 53];
+  const [dataFetched, setDataFetched] = useState(false);
+  const [data, setData] = useState([0, 0, 0, 0, 0, 0, 0]);
+  const [deficitData, setDeficitData] = useState([0, 0, 0, 0, 0, 0, 0]);
+
+  const fetchData = async () => {
+    if (!dataFetched) {
+      console.log("Fetching deficit")
+      let weekBounds = getCurrentWeekBounds()
+      const { data, error } = await supabase
+        .from('TaskProgress')
+        .select('*')
+        .gte('date', weekBounds.sunday)
+        .lte('date', weekBounds.saturday)
+      let newData: number[] = [0, 0, 0, 0, 0, 0, 0];
+
+      if (error) {
+        console.error('Error fetching data:', error)
+      } else {
+        data.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        setDataFetched(true);
+        console.log('Raw data:', data)
+        let previousDate = "";
+        let deficitIndex = -1;
+        for (let i = 0; i < data.length; i++) {
+          if (previousDate != data[i].date) {
+            deficitIndex++;
+            previousDate = data[i].date
+          }
+
+          newData[deficitIndex] += data[i].interval / 3600
+        }
+        setData(newData)
+        console.log(newData)
+        console.log("New data above")
+        updateDeficitData(newData);
+      }
+    } else {
+      updateDeficitData();
+    }
+  }
+
+  const updateDeficitData = (newData?: any[]) => {
+    let dataArr = newData ? newData : data
+    if (dataArr != null && dataArr.length > 0) {
+      let newDeficitData = [0, 0, 0, 0, 0, 0, 0];
+      for (let i = 0; i < dataArr.length; i++) {
+        if (dataArr[i] == 0) {
+          newDeficitData[i] = 0
+        } else {
+          newDeficitData[i] = dataArr[i] - minimumStudyHours
+        }
+      }
+      setDeficitData(newDeficitData)
+      console.log(newDeficitData)
+      console.log("New deficit data above")
+    }
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [])
+  );
 
   return (
     <>
+    <View style={{flex: 1}}>
     <ScrollView
       contentContainerStyle={{
-        flex: 1,
         justifyContent: "center",
         alignItems: "center",
       }}
     >
       <View style={{
         width: '100%',
+        paddingTop: 56,
       }}>
         <Text style={{
-            fontSize: 20,
+            fontSize: 24,
             color: '#333',
             fontFamily: 'Poppins_700Bold',
             marginLeft: 'auto',
             marginRight: 'auto',
           }}>You've studied for</Text>
         <Text style={{
-            fontSize: 20,
+            fontSize: 24,
             color: '#333',
             fontFamily: 'Poppins_700Bold',
             marginLeft: 'auto',
@@ -52,14 +137,14 @@ export default function DataView() {
       </View>
       <View style={{
         width: 'auto',
-        paddingTop: 4,
-        paddingBottom: 4,
+        paddingTop: 8,
+        paddingBottom: 8,
         justifyContent: 'center',
         alignContent: 'center',
         flexDirection: 'row',
       }}>
         <Text style={{
-          fontSize: 20,
+          fontSize: 24,
           color: '#333',
           fontFamily: 'Poppins_700Bold',
           margin: 'auto',
@@ -108,7 +193,7 @@ export default function DataView() {
                   width: 'auto',
                   margin: 'auto',
                   }}>
-                  {`${minimumHoursStudy} hour${minimumHoursStudy > 1 ? 's' : ''}`}
+                  {`${minimumStudyHours} hour${minimumStudyHours > 1 ? 's' : ''}`}
               </Text>
           </View>
         </Pressable>
@@ -129,20 +214,19 @@ export default function DataView() {
                 labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
                 datasets: [
                   {
-                    data
+                    data: deficitData
                   }
                 ]
               }}
-              width={Dimensions.get("window").width * 0.9} // from react-native
+              width={Dimensions.get("window").width * 0.9}
               height={200}
-              yAxisLabel="$"
-              yAxisSuffix="k"
-              yAxisInterval={1} // optional, defaults to 1
+              yAxisSuffix=" h"
+              yAxisInterval={1}
               chartConfig={{
                 backgroundColor: "#9B41E9",
                 backgroundGradientFrom: "#9B41E9",
                 backgroundGradientTo: "#9B41E9",
-                //decimalPlaces: 2, // optional, defaults to 2dp
+                decimalPlaces: 1,
                 color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                 labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                 style: {
@@ -164,9 +248,10 @@ export default function DataView() {
         </View>
       </View>
     </ScrollView>
-    { studyHoursVisible && <MinStudyHoursModal previousValue={minimumHoursStudy} onClose={(newValue?: number) => {
+    { studyHoursVisible && <MinStudyHoursModal previousValue={minimumStudyHours} onClose={(newDeficit?: number) => {
       setStudyHoursVisible(false);
-      setMinimumHoursStudy(newValue ? newValue : minimumHoursStudy);
+      updateDeficitData();
+      setMinimumStudyHours(newDeficit ? newDeficit : minimumStudyHours);
     }}/> }
     <Button
       label="Track Progress"
@@ -181,6 +266,7 @@ export default function DataView() {
       onPress={openSetCurrentTimer}
       icon={ChartBarIcon}
     />
+    </View>
     </>
   );
 }
