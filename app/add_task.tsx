@@ -114,6 +114,7 @@ export default function Index() {
             }}
             value={name}
             placeholder="Name"
+            placeholderTextColor={'dimgray'}
             style={styles.input}
           />
           <Dropdown
@@ -163,7 +164,9 @@ export default function Index() {
               setTimeModal(!timeModal);
             }} style={styles.timeButton}>
               <Text style={{color: 'dimgray'}}>
-                {timeValue.hours}:{timeValue.minutes.toString().padStart(2, '0')} {timeValue.period}
+                 {(timeValue.hours !== 12 || timeValue.minutes !== 0 || timeValue.period !== 'AM') 
+                    ? `${timeValue.hours}:${timeValue.minutes.toString().padStart(2, '0')} ${timeValue.period}`
+                    : 'Set Time Notification'}
                 </Text>
               <ClockIcon size={20} color="dimgray"/>
             </Pressable>
