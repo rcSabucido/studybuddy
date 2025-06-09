@@ -33,6 +33,7 @@ export default function DataView() {
   const [dataFetched, setDataFetched] = useState(false);
   const [data, setData] = useState([0, 0, 0, 0, 0, 0, 0]);
   const [deficitData, setDeficitData] = useState([0, 0, 0, 0, 0, 0, 0]);
+  const [totalHour, setTotalHour] = useState(-1);
 
   const fetchData = async () => {
     //if (!dataFetched) {
@@ -53,15 +54,22 @@ export default function DataView() {
         console.log('Raw data:', data)
         let previousDate = "";
         let deficitIndex = -1;
+        let newTotalHours = 0;
+        let currentDate = new Date().toISOString().slice(0, 10);
         for (let i = 0; i < data.length; i++) {
           if (previousDate != data[i].date) {
             deficitIndex++;
             previousDate = data[i].date
           }
 
+          if (currentDate == data[i].date) {
+            newTotalHours = data[i].interval / 3600
+          }
+
           newData[deficitIndex] += data[i].interval / 3600
         }
         setData(newData)
+        setTotalHour(Math.round(newTotalHours * 10) / 10)
         console.log(newData)
         console.log("New data above")
         initDeficitData(newData);
@@ -126,14 +134,14 @@ export default function DataView() {
             fontFamily: 'Poppins_700Bold',
             marginLeft: 'auto',
             marginRight: 'auto',
-          }}>You've studied for</Text>
+          }}>{ totalHour > -1 ? "You've studied for" : "Loading your current" }</Text>
         <Text style={{
             fontSize: 24,
             color: '#333',
             fontFamily: 'Poppins_700Bold',
             marginLeft: 'auto',
             marginRight: 'auto',
-          }}>4 hours today.</Text>
+          }}>{ totalHour > -1 ? `${totalHour} hours today.` : "study data..." }</Text>
       </View>
       <View style={{
         width: 'auto',
@@ -150,7 +158,7 @@ export default function DataView() {
           margin: 'auto',
           marginRight: 24
         }}>Score: </Text>
-        <PieProgress></PieProgress>
+        <PieProgress progress={totalHour > -1 ? totalHour / minimumStudyHours : 0}></PieProgress>
       </View>
       <View style={styles.content_container}>
         <Text style={{
