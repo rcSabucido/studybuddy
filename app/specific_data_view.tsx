@@ -225,7 +225,7 @@ export default function DataView() {
                   labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
                   datasets: [
                     {
-                      data
+                      data: deficitData
                     }
                   ]
                 }}
