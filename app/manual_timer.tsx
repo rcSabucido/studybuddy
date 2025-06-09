@@ -181,6 +181,7 @@ export default function ManualTimer() {
       }}
       textStyle={styles.container_button_text}
       onPress={() => {
+        console.log("Test notif button")
         Notifications.scheduleNotificationAsync({
           content: {
             title: 'Manual Timer Task Done',

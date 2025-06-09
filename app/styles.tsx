@@ -15,7 +15,7 @@ export default StyleSheet.create({
     alignItems: "center",
   },
   navheader_container: {
-    paddingTop: '10%',
+    paddingTop: 40,
     width: '100%',
     flexDirection: 'column',
     justifyContent: 'center',
