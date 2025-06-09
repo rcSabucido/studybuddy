@@ -1,6 +1,7 @@
 import Button from '@/components/Button';
 import MinStudyHoursModal from '@/components/MinStudyHoursModal';
 import PieProgress from "@/components/PieProgress";
+import { getCurrentWeekBounds } from '@/shared/DataHelpers';
 import { useStore } from '@/store/GlobalState';
 import Feather from '@expo/vector-icons/Feather';
 import { createClient } from '@supabase/supabase-js';
@@ -15,20 +16,6 @@ const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
 const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
-
-function getCurrentWeekBounds() {
-  const today = new Date();
-  const dayOfWeek = today.getDay();
-  const sunday = new Date(today);
-  sunday.setDate(today.getDate() - dayOfWeek);
-  const saturday = new Date(today);
-  saturday.setDate(today.getDate() + (6 - dayOfWeek));
-  const format = (date: Date) => date.toISOString().slice(0, 10);
-  return {
-    sunday: format(sunday),
-    saturday: format(saturday),
-  };
-}
 
 function openVerboseDataView() {
   const router = useRouter();

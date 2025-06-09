@@ -1,9 +1,17 @@
 import ArrowHeader from "@/components/ArrowHeader";
+import { getCurrentWeekBounds } from "@/shared/DataHelpers";
+import { useStore } from "@/store/GlobalState";
+import { createClient } from "@supabase/supabase-js";
 import { useFocusEffect, useRouter } from 'expo-router';
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { Dimensions, ScrollView, Text, View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import styles from './styles';
+
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+
+const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
 
 function goBack() {
   const router = useRouter();
@@ -11,10 +19,54 @@ function goBack() {
 }
 
 export default function VerboseDataView() {
-  const data = [0, 0, 0, 0, 0, 0, 0];
+  const minimumStudyHours = useStore((state) => state.minimumStudyHours);
+  const [totalHoursPerDay, setTotalHoursPerDay] = useState([0, 0, 0, 0, 0, 0, 0]);
+  const [scoreData, setScoreData] = useState([0, 0, 0, 0, 0, 0, 0]);
+  const [longestDurationPerDay, setLongestDurationPerDay] = useState([0, 0, 0, 0, 0, 0, 0]);
 
-  const fetchData = () => {
-    
+  const fetchData = async () => {
+    let weekBounds = getCurrentWeekBounds()
+    const { data, error } = await supabase
+      .from('TaskProgress')
+      .select('*')
+      .gte('date', weekBounds.sunday)
+      .lte('date', weekBounds.saturday)
+    let newTotalHoursPerDay: number[] = [0, 0, 0, 0, 0, 0, 0];
+
+    if (error) {
+      console.error('Error fetching data:', error)
+    } else {
+      data.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      let previousDate = "";
+      let deficitIndex = -1;
+      let newLongestDurationPerDay = [0, 0, 0, 0, 0, 0, 0];
+      for (let i = 0; i < data.length; i++) {
+        if (previousDate != data[i].date) {
+          deficitIndex++;
+          previousDate = data[i].date
+        }
+
+        if (data[i].interval > newLongestDurationPerDay[deficitIndex]) {
+          newLongestDurationPerDay[deficitIndex] = data[i].interval
+          console.log(`New longest duration: ${data[i].interval}`)
+        }
+
+        newTotalHoursPerDay[deficitIndex] += data[i].interval / 3600
+      }
+      setTotalHoursPerDay(newTotalHoursPerDay);
+
+      let newScoreData = [0, 0, 0, 0, 0, 0, 0];
+      for (let i = 0; i < 7; i++) {
+        newScoreData[i] = Math.floor(
+            Math.min(minimumStudyHours, newTotalHoursPerDay[i]) / minimumStudyHours * 100)
+      }
+      setScoreData(newScoreData);
+
+      for (let i = 0; i < 7; i++) {
+        newLongestDurationPerDay[i] /= 3600
+      }
+      setLongestDurationPerDay(newLongestDurationPerDay)
+    }
   }
 
   useFocusEffect(
@@ -53,20 +105,19 @@ export default function VerboseDataView() {
               labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
               datasets: [
                 {
-                  data
+                  data: scoreData
                 }
               ]
             }}
             width={Dimensions.get("window").width * 0.9} // from react-native
             height={200}
-            //yAxisLabel="$"
-            //yAxisSuffix="k"
+            yAxisSuffix="%"
             yAxisInterval={1} // optional, defaults to 1
             chartConfig={{
               backgroundColor: "#9B41E9",
               backgroundGradientFrom: "#9B41E9",
               backgroundGradientTo: "#9B41E9",
-              //decimalPlaces: 2, // optional, defaults to 2dp
+              decimalPlaces: 0,
               color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
               labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
               style: {
@@ -99,20 +150,19 @@ export default function VerboseDataView() {
               labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
               datasets: [
                 {
-                  data
+                  data: totalHoursPerDay
                 }
               ]
             }}
-            width={Dimensions.get("window").width * 0.9} // from react-native
+            width={Dimensions.get("window").width * 0.9}
             height={200}
-            //yAxisLabel="$"
-            //yAxisSuffix="k"
-            yAxisInterval={1} // optional, defaults to 1
+            yAxisInterval={1}
+            yAxisSuffix=" h"
             chartConfig={{
               backgroundColor: "#9B41E9",
               backgroundGradientFrom: "#9B41E9",
               backgroundGradientTo: "#9B41E9",
-              //decimalPlaces: 2, // optional, defaults to 2dp
+              decimalPlaces: 1,
               color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
               labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
               style: {
@@ -145,20 +195,20 @@ export default function VerboseDataView() {
               labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
               datasets: [
                 {
-                  data
+                  data: longestDurationPerDay
                 }
               ]
             }}
             width={Dimensions.get("window").width * 0.9} // from react-native
             height={200}
             //yAxisLabel="$"
-            //yAxisSuffix="k"
+            yAxisSuffix=" h"
             yAxisInterval={1} // optional, defaults to 1
             chartConfig={{
               backgroundColor: "#9B41E9",
               backgroundGradientFrom: "#9B41E9",
               backgroundGradientTo: "#9B41E9",
-              //decimalPlaces: 2, // optional, defaults to 2dp
+              decimalPlaces: 1,
               color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
               labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
               style: {
