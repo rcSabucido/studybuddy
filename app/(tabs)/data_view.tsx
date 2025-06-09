@@ -48,7 +48,7 @@ export default function DataView() {
   const [deficitData, setDeficitData] = useState([0, 0, 0, 0, 0, 0, 0]);
 
   const fetchData = async () => {
-    if (!dataFetched) {
+    //if (!dataFetched) {
       console.log("Fetching deficit")
       let weekBounds = getCurrentWeekBounds()
       const { data, error } = await supabase
@@ -77,28 +77,41 @@ export default function DataView() {
         setData(newData)
         console.log(newData)
         console.log("New data above")
-        updateDeficitData(newData);
+        initDeficitData(newData);
       }
-    } else {
-      updateDeficitData();
-    }
+    //} else {
+    //  initDeficitData();
+    //}
   }
 
-  const updateDeficitData = (newData?: any[]) => {
-    let dataArr = newData ? newData : data
-    if (dataArr != null && dataArr.length > 0) {
-      let newDeficitData = [0, 0, 0, 0, 0, 0, 0];
-      for (let i = 0; i < dataArr.length; i++) {
-        if (dataArr[i] == 0) {
-          newDeficitData[i] = 0
-        } else {
-          newDeficitData[i] = dataArr[i] - minimumStudyHours
-        }
+  const initDeficitData = (newData?: number[]) => {
+    let studyData = newData ? newData : data
+    console.log(studyData)
+    let newDeficitData = [0, 0, 0, 0, 0, 0, 0]
+    for (let i = 0; i < newDeficitData.length; i++) {
+      if (studyData[i] != 0) {
+        newDeficitData[i] = studyData[i] - minimumStudyHours
       }
-      setDeficitData(newDeficitData)
-      console.log(newDeficitData)
-      console.log("New deficit data above")
     }
+    setDeficitData(newDeficitData)
+  }
+
+  const updateDeficitData = (newHoursValue: number, oldHoursValue: number) => {
+    let oldDeficitData = deficitData;
+    console.log(oldDeficitData)
+    console.log("Old deficit data above")
+    let diff = newHoursValue - oldHoursValue;
+    let newDeficitData = [0, 0, 0, 0, 0, 0, 0];
+    for (let i = 0; i < newDeficitData.length; i++) {
+      if (oldDeficitData[i] == 0) {
+        newDeficitData[i] = 0
+      } else {
+        newDeficitData[i] = oldDeficitData[i] + diff
+      }
+    }
+    setDeficitData(newDeficitData)
+    console.log(newDeficitData)
+    console.log("New deficit data above")
   }
 
   useFocusEffect(
@@ -248,10 +261,12 @@ export default function DataView() {
         </View>
       </View>
     </ScrollView>
-    { studyHoursVisible && <MinStudyHoursModal previousValue={minimumStudyHours} onClose={(newDeficit?: number) => {
+    { studyHoursVisible && <MinStudyHoursModal previousValue={minimumStudyHours} onClose={(newValue?: number) => {
       setStudyHoursVisible(false);
-      updateDeficitData();
-      setMinimumStudyHours(newDeficit ? newDeficit : minimumStudyHours);
+      if (newValue !== undefined) {
+        updateDeficitData(minimumStudyHours, newValue);
+      }
+      setMinimumStudyHours(newValue ? newValue : minimumStudyHours);
     }}/> }
     <Button
       label="Track Progress"

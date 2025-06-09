@@ -1,5 +1,6 @@
 import ArrowHeader from "@/components/ArrowHeader";
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useCallback } from "react";
 import { Dimensions, ScrollView, Text, View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import styles from './styles';
@@ -10,7 +11,18 @@ function goBack() {
 }
 
 export default function VerboseDataView() {
-  const data = [42, 32, 2, 23, 5, 35, 53];
+  const data = [0, 0, 0, 0, 0, 0, 0];
+
+  const fetchData = () => {
+    
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [])
+  );
+
 
   return (
     <>
