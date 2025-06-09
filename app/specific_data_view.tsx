@@ -2,18 +2,25 @@ import BackHeader from '@/components/BackHeader';
 import Button from '@/components/Button';
 import MinStudyHoursModal from '@/components/MinStudyHoursModal';
 import PieProgress from "@/components/PieProgress";
+import { getCurrentWeekBounds } from '@/shared/DataHelpers';
 import { useStore } from '@/store/GlobalState';
 import Feather from '@expo/vector-icons/Feather';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import { useCallback, useState } from 'react';
 import { Dimensions, Pressable, ScrollView, Text, View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { ChartBarIcon } from 'react-native-heroicons/solid';
 import styles from './styles';
 
-function openVerboseDataView() {
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+
+const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
+
+function openVerboseDataView(taskId: string | string[], taskLabel: string | string[]) {
   const router = useRouter();
-  router.push("/verbose_data_view")
+  router.push({pathname: "/verbose_data_view", params: { taskId, taskLabel }})
 }
 function openSetCurrentTimer(taskId: string | string[], taskLabel: string | string[]) {
   const router = useRouter();
@@ -25,7 +32,85 @@ export default function DataView() {
   const setMinimumStudyHours = useStore((state) => state.setMinimumStudyHours);
   const [studyHoursVisible, setStudyHoursVisible] = useState(false);
   let { taskId, taskLabel } = useLocalSearchParams();
-  const data = [42, 32, 2, 23, 5, 35, 53];
+  const [data, setData] = useState([0, 0, 0, 0, 0, 0, 0]);
+  const [deficitData, setDeficitData] = useState([0, 0, 0, 0, 0, 0, 0]);
+  const [totalHour, setTotalHour] = useState(-1);
+
+  const fetchData = async () => {
+    console.log("Fetching deficit")
+    let weekBounds = getCurrentWeekBounds()
+    const { data, error } = await supabase
+      .from('TaskProgress')
+      .select('*')
+      .eq('taskId', taskId)
+      .gte('date', weekBounds.sunday)
+      .lte('date', weekBounds.saturday)
+    let newData: number[] = [0, 0, 0, 0, 0, 0, 0];
+
+
+    if (error) {
+      console.error('Error fetching data:', error)
+    } else {
+      data.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      let previousDate = "";
+      let deficitIndex = -1;
+      let newTotalHours = 0;
+      let currentDate = new Date().toISOString().slice(0, 10);
+      for (let i = 0; i < data.length; i++) {
+        if (previousDate != data[i].date) {
+          deficitIndex++;
+          previousDate = data[i].date
+        }
+
+        if (currentDate == data[i].date) {
+          newTotalHours = data[i].interval / 3600
+          console.log(`New total hours: ${newTotalHours}`)
+        }
+
+        newData[deficitIndex] += data[i].interval / 3600
+      }
+      setData(newData)
+      setTotalHour(Math.round(newTotalHours * 10) / 10)
+      console.log(`Total hour: ${Math.round(newTotalHours * 10) / 10}`)
+      initDeficitData(newData)
+    }
+  }
+
+  const initDeficitData = (newData?: number[]) => {
+    let studyData = newData ? newData : data
+    console.log(studyData)
+    let newDeficitData = [0, 0, 0, 0, 0, 0, 0]
+    for (let i = 0; i < newDeficitData.length; i++) {
+      if (studyData[i] != 0) {
+        newDeficitData[i] = studyData[i] - minimumStudyHours
+      }
+    }
+    setDeficitData(newDeficitData)
+  }
+
+  const updateDeficitData = (newHoursValue: number, oldHoursValue: number) => {
+    let oldDeficitData = deficitData;
+    console.log(oldDeficitData)
+    console.log("Old deficit data above")
+    let diff = newHoursValue - oldHoursValue;
+    let newDeficitData = [0, 0, 0, 0, 0, 0, 0];
+    for (let i = 0; i < newDeficitData.length; i++) {
+      if (oldDeficitData[i] == 0) {
+        newDeficitData[i] = 0
+      } else {
+        newDeficitData[i] = oldDeficitData[i] + diff
+      }
+    }
+    setDeficitData(newDeficitData)
+    console.log(newDeficitData)
+    console.log("New deficit data above")
+  }
+  
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [])
+  );
 
   return (
     <>
@@ -45,21 +130,21 @@ export default function DataView() {
               fontFamily: 'Poppins_700Bold',
               marginLeft: 'auto',
               marginRight: 'auto',
-            }}>You've studied the task</Text>
+            }}>{ totalHour > -1 ? totalHour == 0 ? "You haven't studied the task" : "You've studied the task" : "Loading study data" }</Text>
           <Text style={{
               fontSize: 16,
               color: '#333',
               fontFamily: 'Poppins_700Bold',
               marginLeft: 'auto',
               marginRight: 'auto',
-            }}>{taskLabel}</Text>
+            }}>{ totalHour <= -1 ? "for" : ""} {taskLabel}{ totalHour <= -1 ? "..." : ""}</Text>
           <Text style={{
               fontSize: 16,
               color: '#333',
               fontFamily: 'Poppins_700Bold',
               marginLeft: 'auto',
               marginRight: 'auto',
-            }}>4 hours today.</Text>
+            }}>{totalHour != -1 ? `${ totalHour > -1 ? `for ${totalHour > 1 ? `${totalHour} ` : ""}${totalHour == 1 ? "hour" : totalHour > 1 ? "hours" : ""}${totalHour > 1 ? "and" : ""}${totalHour % 1.0 != 0 ? `${Math.floor(totalHour % 1 * 60)} ${Math.floor(totalHour % 1 * 60) == 1 ? "minute" : "minutes"}` : ""} today.` : ""}` : "" }</Text>
         </View>
         <View style={{
           width: 'auto',
@@ -76,7 +161,7 @@ export default function DataView() {
             margin: 'auto',
             marginRight: 24
           }}>Score: </Text>
-          <PieProgress></PieProgress>
+          <PieProgress progress={totalHour > -1 ? totalHour / minimumStudyHours : 0}></PieProgress>
         </View>
         <View style={styles.content_container}>
           <Text style={{
@@ -133,7 +218,7 @@ export default function DataView() {
 
           <View style={{margin: 'auto'}}>
             <Pressable
-              onPress={openVerboseDataView}
+              onPress={() => openVerboseDataView(taskId, taskLabel)}
               accessibilityLabel='View detailed statistics'>
               <LineChart
                 data={{
@@ -146,14 +231,13 @@ export default function DataView() {
                 }}
                 width={Dimensions.get("window").width * 0.9} // from react-native
                 height={200}
-                yAxisLabel="$"
-                yAxisSuffix="k"
+                yAxisSuffix=" h"
                 yAxisInterval={1} // optional, defaults to 1
                 chartConfig={{
                   backgroundColor: "#9B41E9",
                   backgroundGradientFrom: "#9B41E9",
                   backgroundGradientTo: "#9B41E9",
-                  //decimalPlaces: 2, // optional, defaults to 2dp
+                  decimalPlaces: 1,
                   color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                   labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                   style: {
@@ -177,6 +261,9 @@ export default function DataView() {
       </ScrollView>
       { studyHoursVisible && <MinStudyHoursModal previousValue={minimumStudyHours} onClose={(newValue?: number) => {
         setStudyHoursVisible(false);
+        if (newValue !== undefined) {
+          updateDeficitData(minimumStudyHours, newValue);
+        }
         setMinimumStudyHours(newValue ? newValue : minimumStudyHours);
       }}/> }
       <Button

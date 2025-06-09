@@ -2,7 +2,7 @@ import ArrowHeader from "@/components/ArrowHeader";
 import { getCurrentWeekBounds } from "@/shared/DataHelpers";
 import { useStore } from "@/store/GlobalState";
 import { createClient } from "@supabase/supabase-js";
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useState } from "react";
 import { Dimensions, ScrollView, Text, View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
@@ -23,14 +23,26 @@ export default function VerboseDataView() {
   const [totalHoursPerDay, setTotalHoursPerDay] = useState([0, 0, 0, 0, 0, 0, 0]);
   const [scoreData, setScoreData] = useState([0, 0, 0, 0, 0, 0, 0]);
   const [longestDurationPerDay, setLongestDurationPerDay] = useState([0, 0, 0, 0, 0, 0, 0]);
+  let params = useLocalSearchParams();
+  let taskId = ""
+  if (params !== null && Object.keys(params).length > 1) {
+    if (typeof params.taskId == 'string') {
+      taskId = params.taskId
+    }
+  }
 
   const fetchData = async () => {
     let weekBounds = getCurrentWeekBounds()
-    const { data, error } = await supabase
+    const { data, error } = taskId.length > 0 ? await supabase
+      .from('TaskProgress')
+      .select('*')
+      .eq("taskId", taskId)
+      .gte('date', weekBounds.sunday)
+      .lte('date', weekBounds.saturday) : await supabase
       .from('TaskProgress')
       .select('*')
       .gte('date', weekBounds.sunday)
-      .lte('date', weekBounds.saturday)
+      .lte('date', weekBounds.saturday) 
     let newTotalHoursPerDay: number[] = [0, 0, 0, 0, 0, 0, 0];
 
     if (error) {

@@ -36,47 +36,43 @@ export default function DataView() {
   const [totalHour, setTotalHour] = useState(-1);
 
   const fetchData = async () => {
-    //if (!dataFetched) {
-      console.log("Fetching deficit")
-      let weekBounds = getCurrentWeekBounds()
-      const { data, error } = await supabase
-        .from('TaskProgress')
-        .select('*')
-        .gte('date', weekBounds.sunday)
-        .lte('date', weekBounds.saturday)
-      let newData: number[] = [0, 0, 0, 0, 0, 0, 0];
+    console.log("Fetching deficit")
+    let weekBounds = getCurrentWeekBounds()
+    const { data, error } = await supabase
+      .from('TaskProgress')
+      .select('*')
+      .gte('date', weekBounds.sunday)
+      .lte('date', weekBounds.saturday)
+    let newData: number[] = [0, 0, 0, 0, 0, 0, 0];
 
-      if (error) {
-        console.error('Error fetching data:', error)
-      } else {
-        data.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-        setDataFetched(true);
-        console.log('Raw data:', data)
-        let previousDate = "";
-        let deficitIndex = -1;
-        let newTotalHours = 0;
-        let currentDate = new Date().toISOString().slice(0, 10);
-        for (let i = 0; i < data.length; i++) {
-          if (previousDate != data[i].date) {
-            deficitIndex++;
-            previousDate = data[i].date
-          }
-
-          if (currentDate == data[i].date) {
-            newTotalHours = data[i].interval / 3600
-          }
-
-          newData[deficitIndex] += data[i].interval / 3600
+    if (error) {
+      console.error('Error fetching data:', error)
+    } else {
+      data.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      setDataFetched(true);
+      console.log('Raw data:', data)
+      let previousDate = "";
+      let deficitIndex = -1;
+      let newTotalHours = 0;
+      let currentDate = new Date().toISOString().slice(0, 10);
+      for (let i = 0; i < data.length; i++) {
+        if (previousDate != data[i].date) {
+          deficitIndex++;
+          previousDate = data[i].date
         }
-        setData(newData)
-        setTotalHour(Math.round(newTotalHours * 10) / 10)
-        console.log(newData)
-        console.log("New data above")
-        initDeficitData(newData);
+
+        if (currentDate == data[i].date) {
+          newTotalHours = data[i].interval / 3600
+        }
+
+        newData[deficitIndex] += data[i].interval / 3600
       }
-    //} else {
-    //  initDeficitData();
-    //}
+      setData(newData)
+      setTotalHour(Math.round(newTotalHours * 10) / 10)
+      console.log(newData)
+      console.log("New data above")
+      initDeficitData(newData);
+    }
   }
 
   const initDeficitData = (newData?: number[]) => {
@@ -128,20 +124,43 @@ export default function DataView() {
         width: '100%',
         paddingTop: 56,
       }}>
-        <Text style={{
-            fontSize: 24,
-            color: '#333',
-            fontFamily: 'Poppins_700Bold',
-            marginLeft: 'auto',
-            marginRight: 'auto',
-          }}>{ totalHour > -1 ? "You've studied for" : "Loading your current" }</Text>
-        <Text style={{
-            fontSize: 24,
-            color: '#333',
-            fontFamily: 'Poppins_700Bold',
-            marginLeft: 'auto',
-            marginRight: 'auto',
-          }}>{ totalHour > -1 ? `${totalHour} hours today.` : "study data..." }</Text>
+        { totalHour != 0 ?
+          <>
+            <Text style={{
+                fontSize: 24,
+                color: '#333',
+                fontFamily: 'Poppins_700Bold',
+                marginLeft: 'auto',
+                marginRight: 'auto',
+              }}>{ totalHour > -1 ? "You've studied for" : "Loading your current" }</Text>
+            <Text style={{
+                fontSize: 24,
+                color: '#333',
+                fontFamily: 'Poppins_700Bold',
+                marginLeft: 'auto',
+                marginRight: 'auto',
+              }}>{totalHour != -1 ? `${ totalHour > -1 ? `for ${totalHour > 1 ? `${totalHour} ` : ""}${totalHour == 1 ? "hour" : totalHour > 1 ? "hours" : ""}${totalHour > 1 ? "and" : ""}${totalHour % 1.0 != 0 ? `${Math.floor(totalHour % 1 * 60)} ${Math.floor(totalHour % 1 * 60) == 1 ? "minute" : "minutes"}` : ""} today.` : ""}` : "study data..." }</Text>
+          </>
+          :
+          <>
+            <Text style={{
+                fontSize: 24,
+                color: '#333',
+                fontFamily: 'Poppins_700Bold',
+                marginLeft: 'auto',
+                marginRight: 'auto'}}>
+                You haven't studied
+            </Text>
+            <Text style={{
+                fontSize: 24,
+                color: '#333',
+                fontFamily: 'Poppins_700Bold',
+                marginLeft: 'auto',
+                marginRight: 'auto'}}>
+                for today.
+            </Text>
+          </>
+        }
       </View>
       <View style={{
         width: 'auto',
