@@ -1,3 +1,4 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 
 export const getCurrentWeekBounds = () => {
   const today = new Date();
@@ -12,3 +13,28 @@ export const getCurrentWeekBounds = () => {
     saturday: format(saturday),
   };
 } 
+
+
+export const storeTaskProgress = async (supabase: SupabaseClient<any, "public", any>, taskId: string | string[], interval: number) => {
+  let now = new Date()
+  let date = now.toISOString().slice(0, 10)
+  let time = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}:${now.getSeconds().toString().padStart(2, "0")}`
+
+  console.log(`Storing task progress: interval: ${interval}, taskId: ${taskId}`)
+  console.log(`End time: ${time}`)
+
+  const { error } = await supabase
+    .from('TaskProgress')
+    .insert({
+      date,
+      interval,
+      taskId,
+      endTime: time
+    });
+
+  if (error) {
+    console.log("Error storing task progress!")
+    console.log(error)
+    throw error;
+  }
+}

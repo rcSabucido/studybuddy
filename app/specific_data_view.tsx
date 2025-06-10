@@ -63,15 +63,15 @@ export default function DataView() {
         }
 
         if (currentDate == data[i].date) {
-          newTotalHours = data[i].interval / 3600
+          newTotalHours += data[i].interval / 3600
           console.log(`New total hours: ${newTotalHours}`)
         }
 
         newData[deficitIndex] += data[i].interval / 3600
       }
       setData(newData)
-      setTotalHour(Math.round(newTotalHours * 10) / 10)
-      console.log(`Total hour: ${Math.round(newTotalHours * 10) / 10}`)
+      setTotalHour(newTotalHours)
+      console.log(`Total hour: ${newTotalHours}`)
       initDeficitData(newData)
     }
   }
@@ -144,7 +144,7 @@ export default function DataView() {
               fontFamily: 'Poppins_700Bold',
               marginLeft: 'auto',
               marginRight: 'auto',
-            }}>{totalHour != -1 ? `${ totalHour > -1 ? `for ${totalHour > 1 ? `${totalHour} ` : ""}${totalHour == 1 ? "hour" : totalHour > 1 ? "hours" : ""}${totalHour > 1 ? "and" : ""}${totalHour % 1.0 != 0 ? `${Math.floor(totalHour % 1 * 60)} ${Math.floor(totalHour % 1 * 60) == 1 ? "minute" : "minutes"}` : ""} today.` : ""}` : "" }</Text>
+            }}>{totalHour != -1 ? `${ totalHour > -1 ? `for ${totalHour > 1 ? `${totalHour} ` : ""}${totalHour == 1 ? "hour" : totalHour > 1 ? "hours" : ""}${totalHour > 1 ? "and" : ""}${totalHour % 1.0 != 0 ? `${Math.ceil(totalHour % 1 * 60)} ${Math.ceil(totalHour % 1 * 60) == 1 ? "minute" : "minutes"}` : ""} today.` : ""}` : "" }</Text>
         </View>
         <View style={{
           width: 'auto',

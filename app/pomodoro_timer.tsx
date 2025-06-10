@@ -2,11 +2,18 @@ import BackHeader from "@/components/BackHeader";
 import Button from "@/components/Button";
 import ConfirmationModal from "@/components/ConfirmationModal";
 import RadialChart from "@/components/RadialChart";
-import { useRouter } from 'expo-router';
+import { storeTaskProgress } from "@/shared/DataHelpers";
+import { createClient } from "@supabase/supabase-js";
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from "react";
 import { Dimensions, Pressable, Text, View } from "react-native";
 import { ExclamationTriangleIcon } from 'react-native-heroicons/outline';
 import styles from './styles';
+
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+
+const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
 
 const WORK_TIME_MINUTES = 2;
 const BREAK_TIME_MINUTES = 1;
@@ -46,12 +53,33 @@ export default function PomodoroTimer() {
   const [timerStarted, setTimerStarted] = useState(false);
   const [confirmationVisible, setConfirmationVisible] = useState(false);
   const intervalRef = useRef<number | null>(null);
+  const params = useLocalSearchParams();
+  const { taskId, taskLabel } = params;
+  const studyIntervalRef = useRef<number>(0);
 
   const [workTime, setWorkTime] = useState({ minutes: WORK_TIME_MINUTES, seconds: 0 });
   const [breakTime, setBreakTime] = useState({ minutes: BREAK_TIME_MINUTES, seconds: 0 });
 
+  const updateStudyInterval = () => {
+    console.log("updateStudyInterval")
+    console.log(`studyIntervalRef.current = ${studyIntervalRef.current}`)
+    if (studyIntervalRef.current <= 1) {
+      return
+    }
+    console.log("OKOK")
+    try {
+      console.log(`Task id: ${taskId}`)
+      storeTaskProgress(supabase, taskId, studyIntervalRef.current - 1)
+    } catch (err) {
+      console.log(err instanceof Error ? err.message : 'Error uploading progress');
+    }
+    console.log(`Uploading study interval: ${studyIntervalRef.current}`)
+    studyIntervalRef.current = 0
+  }
+
   const stopTimer = () => {
     setTimerStarted(false);
+    updateStudyInterval();
     if (intervalRef.current !== null) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
@@ -64,6 +92,7 @@ export default function PomodoroTimer() {
     if (switchingToWork) {
       setWorkTime({ minutes: WORK_TIME_MINUTES, seconds: 0 });
     } else {
+      updateStudyInterval();
       setBreakTime({ minutes: BREAK_TIME_MINUTES, seconds: 0 });
     }
   };
@@ -79,6 +108,7 @@ export default function PomodoroTimer() {
         if (isWork) {
           setWorkTime(time => {
             console.log("Tick Work");
+            studyIntervalRef.current++;
             return deductTime(time.minutes, time.seconds, switchTimerModes);
           });
         } else {
@@ -178,7 +208,7 @@ export default function PomodoroTimer() {
               style={[styles.content_container, { height: 69, width: "85%", marginTop: 32 }]}
             >
               <Text style={styles.container_button_text}>
-                {timerStarted ? "Take a Break?" : "Start"}
+                {timerStarted ? "Pause" : "Start"}
               </Text>
             </Pressable>
           </View>
@@ -197,13 +227,16 @@ export default function PomodoroTimer() {
           filter: 'drop-shadow(4px 4px 4px rgba(0, 0, 0, 0.35))',
         }}
         textStyle={styles.container_button_text}
-        // onPress={openSetCurrentTimer}
+        onPress={() => {
+          updateStudyInterval();
+          router.back();
+        }}
       />
 
       {confirmationVisible && (
         <ConfirmationModal
           message="Are you sure you want to leave? This will stop the timer."
-          onYes={() => router.back()}
+          onYes={() => {updateStudyInterval(); router.back()}}
           onNo={() => setConfirmationVisible(false)}
           icon={ExclamationTriangleIcon}
         />

@@ -1,18 +1,19 @@
 import BackHeader from "@/components/BackHeader";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { SectionsWheelPicker, WheelPickerProps } from "react-native-ui-lib";
 import styles from './styles';
 
-function openManualTimer(hours: number, minutes: number, seconds: number) {
+function openManualTimer(hours: number, minutes: number, seconds: number, taskId: string | string[], taskLabel: string | string[]) {
   const router = useRouter();
   router.push({pathname: "/manual_timer", params: {
-    hours, minutes, seconds
+    hours, minutes, seconds, taskId, taskLabel
   }})
 }
 
 export default function SetupManualTimer() {
+  let { taskId, taskLabel } = useLocalSearchParams();
   const [hours, setHours] = useState(0);
   const hoursChange = useCallback((item: number | string) => {
     setHours((item + "").split("_")[0] as unknown as number);
@@ -92,7 +93,7 @@ export default function SetupManualTimer() {
           </View>
           <Pressable onPress={() => 
               {
-                openManualTimer(hours, minutes, seconds)
+                openManualTimer(hours, minutes, seconds, taskId, taskLabel)
               }
             } style={[styles.content_container, {height: "30%", width: "75%" /*, marginTop: 52*/}]}>
               <Text style={styles.container_button_text}>Start Tracking</Text>
