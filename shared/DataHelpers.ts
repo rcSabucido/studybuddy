@@ -1,7 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 
-export const getCurrentWeekBounds = () => {
-  const today = new Date();
+export const getWeekBounds = (today: Date) => {
   const dayOfWeek = today.getDay();
   const sunday = new Date(today);
   sunday.setDate(today.getDate() - dayOfWeek);
@@ -14,6 +13,9 @@ export const getCurrentWeekBounds = () => {
   };
 } 
 
+export const getCurrentWeekBounds = () => {
+  return getWeekBounds(new Date())
+}
 
 export const storeTaskProgress = async (supabase: SupabaseClient<any, "public", any>, taskId: string | string[], interval: number) => {
   let now = new Date()

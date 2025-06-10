@@ -4,8 +4,9 @@ import { useStore } from "@/store/GlobalState";
 import { createClient } from "@supabase/supabase-js";
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useState } from "react";
-import { Dimensions, ScrollView, Text, View } from "react-native";
+import { Dimensions, Pressable, ScrollView, Text, View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
+import { ArrowLeftIcon, ArrowRightIcon } from 'react-native-heroicons/outline';
 import styles from './styles';
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
@@ -99,6 +100,19 @@ export default function VerboseDataView() {
     >
       <View style={[styles.navheader_container]}>
         <ArrowHeader onPress={goBack} title="Statistics" />
+        <View style={[{flexDirection: 'row', justifyContent: 'space-around', width: '100%', height: 56}]}>
+          <View style={styles.button_container}>
+              <Pressable style={styles.button} onPress={() => {}}>
+                  <ArrowLeftIcon size={25} color="black"/>
+              </Pressable>
+          </View>
+          <Text style={[styles.header_text, {fontSize: 20, fontFamily: 'Poppins_500Medium'}]}>Week view</Text>
+          <View style={styles.button_container}>
+              <Pressable style={styles.button} onPress={() => {}}>
+                  <ArrowRightIcon size={25} color="black"/>
+              </Pressable>
+          </View>
+        </View>
       </View>
       <ScrollView style={{
         height: '100%'
