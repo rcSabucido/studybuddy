@@ -46,4 +46,18 @@ export default StyleSheet.create({
     color: "#121212",
     fontFamily: 'Poppins_400Regular',
   },
+  button_container : {
+      paddingHorizontal: 12,
+      height: 40,
+      justifyContent: 'center',
+      borderRadius: 10,
+      backgroundColor: '#ffffff',
+      filter: 'drop-shadow(4px 4px 4px rgba(0, 0, 0, 0.35))'
+  },
+  button: {
+      width: '100%',
+      height: '100%',
+      alignItems: 'center',
+      justifyContent: 'center',
+  }
 });
