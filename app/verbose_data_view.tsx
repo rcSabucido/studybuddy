@@ -1,5 +1,5 @@
 import ArrowHeader from "@/components/ArrowHeader";
-import { getCurrentWeekBounds } from "@/shared/DataHelpers";
+import { getWeekBounds, getWeekBoundsDate } from "@/shared/DataHelpers";
 import { useStore } from "@/store/GlobalState";
 import { createClient } from "@supabase/supabase-js";
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
@@ -24,6 +24,15 @@ export default function VerboseDataView() {
   const [totalHoursPerDay, setTotalHoursPerDay] = useState([0, 0, 0, 0, 0, 0, 0]);
   const [scoreData, setScoreData] = useState([0, 0, 0, 0, 0, 0, 0]);
   const [longestDurationPerDay, setLongestDurationPerDay] = useState([0, 0, 0, 0, 0, 0, 0]);
+  const [currentWeekBounds, setCurrentWeekBounds] = useState(getWeekBoundsDate(new Date()));
+  const [currentWeekDate, setCurrentWeekDate] = useState(new Date())
+
+  const formatDate = (date: Date) => date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+
   let params = useLocalSearchParams();
   let taskId = ""
   if (params !== null && Object.keys(params).length > 1) {
@@ -32,8 +41,12 @@ export default function VerboseDataView() {
     }
   }
 
-  const fetchData = async () => {
-    let weekBounds = getCurrentWeekBounds()
+  const fetchData = async (newWeekDate?: Date) => {
+    let weekBounds = getWeekBounds(newWeekDate ? newWeekDate : currentWeekDate)
+    console.log("Current new week bounds:")
+    console.log(weekBounds)
+    console.log("Current week date:")
+    console.log(currentWeekDate)
     const { data, error } = taskId.length > 0 ? await supabase
       .from('TaskProgress')
       .select('*')
@@ -102,15 +115,30 @@ export default function VerboseDataView() {
         <ArrowHeader onPress={goBack} title="Statistics" />
         <View style={[{flexDirection: 'row', justifyContent: 'space-around', width: '100%', height: 56}]}>
           <View style={styles.button_container}>
-              <Pressable style={styles.button} onPress={() => {}}>
-                  <ArrowLeftIcon size={25} color="black"/>
-              </Pressable>
+            <Pressable style={styles.button} onPress={() => {
+              let newDate = new Date(currentWeekDate.getTime() - 7 * 24 * 60 * 60 * 1000)
+              console.log(`new date: ${formatDate(newDate)}`)
+              setCurrentWeekDate(newDate)
+              setCurrentWeekBounds(getWeekBoundsDate(newDate))
+              fetchData(newDate)
+            }}>
+              <ArrowLeftIcon size={25} color="black"/>
+            </Pressable>
           </View>
-          <Text style={[styles.header_text, {fontSize: 20, fontFamily: 'Poppins_500Medium'}]}>Week view</Text>
+          <Text style={[styles.header_text, {fontSize: 16, fontFamily: 'Poppins_500Medium', lineHeight: 32}]}>
+            {formatDate(currentWeekBounds.sunday)} - {formatDate(currentWeekBounds.saturday)}
+          </Text>
           <View style={styles.button_container}>
-              <Pressable style={styles.button} onPress={() => {}}>
-                  <ArrowRightIcon size={25} color="black"/>
-              </Pressable>
+            <Pressable style={styles.button} onPress={() => {
+              if (formatDate(currentWeekDate) == formatDate(new Date())) return
+              let newDate = new Date(currentWeekDate.getTime() + 7 * 24 * 60 * 60 * 1000)
+              console.log(`new date: ${formatDate(newDate)}`)
+              setCurrentWeekDate(newDate)
+              setCurrentWeekBounds(getWeekBoundsDate(newDate))
+              fetchData(newDate)
+            }}>
+              <ArrowRightIcon size={25} color={formatDate(currentWeekDate) == formatDate(new Date()) ? "grey" : "black"}/>
+            </Pressable>
           </View>
         </View>
       </View>
