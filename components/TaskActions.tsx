@@ -66,7 +66,7 @@ export default function TaskActions({ taskLabel, onClose, onEdit, onDelete }: Ta
         <View style={styles.dragIndicator} />
       </View>
       
-      <Text style={styles.title}>{taskLabel}</Text>
+      <Text style={styles.title} numberOfLines={1} ellipsizeMode='tail'>{taskLabel}</Text>
 
       <View style={styles.buttonContainer}>
         <Button 
