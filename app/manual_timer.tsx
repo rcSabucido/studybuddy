@@ -40,8 +40,9 @@ function getPercentageRemaining(
 
 
 export default function ManualTimer() {
-  const [ timerStarted, setTimerStarted ] = useState(false)
-  const [ confirmationVisible, setConfirmationVisible ] = useState(false)
+  const router = useRouter();
+  const [ timerStarted, setTimerStarted ] = useState(false);
+  const [ confirmationVisible, setConfirmationVisible ] = useState(false);
   let { hours, minutes, seconds, taskId, taskLabel } = useLocalSearchParams();
   let [ hoursNum, minutesNum, secondsNum ] = [ Number(hours), Number(minutes), Number(seconds) ]
   const intervalRef = useRef<number | null>(null);
@@ -214,7 +215,6 @@ export default function ManualTimer() {
       }}
       textStyle={styles.container_button_text}
       onPress={() => {
-        console.log("Test notif button")
         Notifications.scheduleNotificationAsync({
           content: {
             title: 'Manual Timer Task Done',
@@ -225,12 +225,14 @@ export default function ManualTimer() {
             seconds: 1,
           },
         });
+        updateStudyInterval();
+        router.back();
       }}
     />
     {
       confirmationVisible &&
         <ConfirmationModal message="Are you sure you want to leave? This will stop the timer."
-          onYes={() => {useRouter().back()}}
+          onYes={() => {updateStudyInterval(); useRouter().back()}}
           onNo={() => {setConfirmationVisible(false)}}
           icon={ExclamationTriangleIcon}
         />

@@ -227,13 +227,16 @@ export default function PomodoroTimer() {
           filter: 'drop-shadow(4px 4px 4px rgba(0, 0, 0, 0.35))',
         }}
         textStyle={styles.container_button_text}
-        // onPress={openSetCurrentTimer}
+        onPress={() => {
+          updateStudyInterval();
+          router.back();
+        }}
       />
 
       {confirmationVisible && (
         <ConfirmationModal
           message="Are you sure you want to leave? This will stop the timer."
-          onYes={() => router.back()}
+          onYes={() => {updateStudyInterval(); router.back()}}
           onNo={() => setConfirmationVisible(false)}
           icon={ExclamationTriangleIcon}
         />
