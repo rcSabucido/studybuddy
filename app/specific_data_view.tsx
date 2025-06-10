@@ -63,7 +63,7 @@ export default function DataView() {
         }
 
         if (currentDate == data[i].date) {
-          newTotalHours = data[i].interval / 3600
+          newTotalHours += data[i].interval / 3600
           console.log(`New total hours: ${newTotalHours}`)
         }
 

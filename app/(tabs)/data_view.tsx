@@ -62,7 +62,7 @@ export default function DataView() {
         }
 
         if (currentDate == data[i].date) {
-          newTotalHours = data[i].interval / 3600
+          newTotalHours += data[i].interval / 3600
         }
 
         newData[deficitIndex] += data[i].interval / 3600

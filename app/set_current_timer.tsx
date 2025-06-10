@@ -22,8 +22,9 @@ function openPomodoroTimer(taskId: string | string[], taskLabel: string | string
 }
 
 export default function SetCurrentTimer() {
-  const [currentWork, setCurrentWork] = useState('');
-  let { taskId, taskLabel } = useLocalSearchParams();
+  const [currentWork, setCurrentWork] = useState<string | null>(null);
+  let params = useLocalSearchParams();
+  let { taskId, taskLabel } = params;
   const [taskChoices, setTaskChoices] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -101,7 +102,7 @@ export default function SetCurrentTimer() {
                 label=" "
                 placeholder="Select an option..."
                 options={taskChoices}
-                selectedValue={currentWork}
+                selectedValue={currentWork ? currentWork : undefined}
                 onValueChange={(value: any) => {setCurrentWork(value)}}
                 dropdownStyle={{
                   backgroundColor: "#D9D9D9",
@@ -120,7 +121,11 @@ export default function SetCurrentTimer() {
             (taskId != null || (taskId == null && !isLoading)) &&
             <>
               <Pressable style={[styles.content_container, {backgroundColor: "#F81414"}]}
-                onPress={() => openPomodoroTimer(taskId, taskLabel)} accessibilityLabel="Use pomodoro timer">
+                onPress={() => {
+                  let fetchTaskId = taskId != null ? taskId : currentWork
+                  if (fetchTaskId == null) return
+                  openPomodoroTimer(fetchTaskId, taskLabel)
+                }} accessibilityLabel="Use pomodoro timer">
                 <Text style={[styles.container_header_text, {padding: 8}]}>Use Pomodoro Timer</Text>
                 <Image
                   source={require('@/assets/images/pomodoro-white.png')}
@@ -128,7 +133,11 @@ export default function SetCurrentTimer() {
                 />
               </Pressable>
               <Pressable style={[styles.content_container, {marginTop: 32}]}
-                onPress={() => openManualTimer(taskId, taskLabel)} accessibilityLabel="Use manual timer">
+                onPress={() => {
+                  let fetchTaskId = taskId != null ? taskId : currentWork
+                  if (fetchTaskId == null) return
+                  openManualTimer(fetchTaskId, taskLabel)
+                }} accessibilityLabel="Use manual timer">
                 <Text style={[styles.container_header_text, {padding: 8}]}>Manually Track</Text>
                 <Image
                   source={require('@/assets/images/clock-white.png')}
