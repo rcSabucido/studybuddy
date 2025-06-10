@@ -43,6 +43,11 @@ const PriorityIcon = ({ priority }: { priority: number }) => {
     }
 };
 
+const truncateText = (text: string, maxLength: number = 23) => {
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength) + '...'; 
+}
+
 export default function Tasks({label, dueDate, priority, onDelete, onTaskPress, onActionPress}: Props) {
     const daysLeft = calculateRemainingDays(dueDate);
     const isOverdue = daysLeft < 0;
@@ -51,7 +56,9 @@ export default function Tasks({label, dueDate, priority, onDelete, onTaskPress, 
         <View style={styles.buttonContainer}>
             <Pressable style={styles.contentContainer}  onPress={onTaskPress}>
                 <View style={styles.labelRow}>
-                    <Text style={styles.text}>{label}</Text>
+                    <Text style={styles.text}>
+                        {truncateText(label)}
+                        </Text>
                     <PriorityIcon priority={priority} />
                 </View>
                 <View style={styles.bottomRow}>

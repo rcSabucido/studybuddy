@@ -42,6 +42,11 @@ const formatDate = (dateString: string) => {
     });
 };
 
+const truncateText = (text: string, maxLength: number = 23) => {
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength) + '...'; 
+}
+
 export default function TaskPanel({ tasks, date, onClose, onDeleteTasks }: TaskPanelProps & { onClose: () => void }) {
     const panY = new Animated.Value(0);
     const screenHeight = Dimensions.get('window').height;
@@ -181,7 +186,7 @@ export default function TaskPanel({ tasks, date, onClose, onDeleteTasks }: TaskP
             >
               <View style={[styles.priorityIndicator, { backgroundColor: getPriorityColor(task.priority) }]} />
               <View style={styles.taskContent}>
-                <Text style={styles.taskName}>{task.name}</Text>
+                <Text style={styles.taskName}>{truncateText(task.name)}</Text>
                 <Text style={styles.taskDate}>
                   {formatDate(task.date)} 
                 </Text>
