@@ -27,7 +27,7 @@ export const storeTaskProgress = async (supabase: SupabaseClient<any, "public", 
     .from('TaskProgress')
     .insert({
       date,
-      interval,
+      interval: interval + 1,
       taskId,
       endTime: time
     });
