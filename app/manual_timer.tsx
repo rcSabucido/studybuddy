@@ -4,11 +4,18 @@ import ConfirmationModal from "@/components/ConfirmationModal";
 import RadialChart from "@/components/RadialChart";
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from "react";
-import { Dimensions, Pressable, Text, View } from "react-native";
+import { Dimensions, Pressable, Text, Vibration, View } from "react-native";
 import { ExclamationTriangleIcon } from 'react-native-heroicons/outline';
 import styles from './styles';
 
+import { storeTaskProgress } from "@/shared/DataHelpers";
+import { createClient } from "@supabase/supabase-js";
 import * as Notifications from 'expo-notifications';
+
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+
+const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
 
 type Props = {
   hours: number,
@@ -31,13 +38,15 @@ function getPercentageRemaining(
   return (currentSeconds / startSeconds) * 100;
 }
 
+
 export default function ManualTimer() {
   const [ timerStarted, setTimerStarted ] = useState(false)
   const [ confirmationVisible, setConfirmationVisible ] = useState(false)
-  let { hours, minutes, seconds } = useLocalSearchParams();
+  let { hours, minutes, seconds, taskId, taskLabel } = useLocalSearchParams();
   let [ hoursNum, minutesNum, secondsNum ] = [ Number(hours), Number(minutes), Number(seconds) ]
   const intervalRef = useRef<number | null>(null);
   const [ percentage, setPercentage ] = useState(100);
+  const studyIntervalRef = useRef<number>(0);
 
   const startTime = {
     hours: hoursNum, minutes: minutesNum, seconds: secondsNum
@@ -45,6 +54,23 @@ export default function ManualTimer() {
   const [ currentTime, setCurrentTime ] = useState({
     hours: hoursNum, minutes: minutesNum, seconds: secondsNum
   })
+  const updateStudyInterval = () => {
+    console.log("updateStudyInterval")
+    console.log(`studyIntervalRef.current = ${studyIntervalRef.current}`)
+    if (studyIntervalRef.current <= 1) {
+      return
+    }
+    console.log("OKOK")
+    try {
+      console.log(`Task id: ${taskId}`)
+      storeTaskProgress(supabase, taskId, studyIntervalRef.current)
+    } catch (err) {
+      console.log(err instanceof Error ? err.message : 'Error uploading progress');
+    }
+    console.log(`Uploading study interval: ${studyIntervalRef.current}`)
+    studyIntervalRef.current = 0
+  }
+
   useEffect(() => {
     if (timerStarted) {
       intervalRef.current = setInterval(() => {
@@ -71,7 +97,12 @@ export default function ManualTimer() {
           }
           let newTime = { hours: newHours, minutes: newMinutes, seconds: newSeconds }
           setPercentage(done ? 0 : getPercentageRemaining(startTime, newTime))
+          if (done) {
+            Vibration.vibrate(1000);
+          }
           console.log(newTime)
+          studyIntervalRef.current++
+          console.log(`inc studyIntervalRef.current = ${studyIntervalRef.current}`)
           return newTime
         })
       }, 1000);
@@ -85,6 +116,7 @@ export default function ManualTimer() {
       clearInterval(intervalRef.current)
       intervalRef.current = null;
     }
+    updateStudyInterval();
   };
   
   const resetTimer = () => {
@@ -122,6 +154,7 @@ export default function ManualTimer() {
         }
       }}/>
       <Text style={[styles.header_text]}>Manual Timer</Text>
+      <Text style={[styles.header_text]}>{taskLabel}</Text>
       <View style={{
         height: '75%',
         width: '100%'
