@@ -17,6 +17,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
+      "permissions": ["RECEIVE_BOOT_COMPLETED"],
       "package": "com.anonymous.studybuddy"
     },
     "web": {
@@ -38,7 +39,7 @@
       [
         "expo-font",
         {}
-      ]
+      ],
     ],
     "experiments": {
       "typedRoutes": true

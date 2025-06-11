@@ -10,11 +10,11 @@ export const useStore = create<GlobalState>()(
   devtools(
     persist(
       (set) => ({
-        minimumStudyHours: 3,
+        minimumStudyHours: 1,
         setMinimumStudyHours: (by) => set((state) => ({ minimumStudyHours: by })),
       }),
       {
-        name: "global-state-storage",
+        name: "studybuddy-global-state-storage",
       }
     )
   )
