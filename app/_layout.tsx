@@ -12,11 +12,11 @@ const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
 const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
 
-function getCurrentDateString() {
+const getCurrentDateString = () => {
   return new Date().toISOString().split('T')[0];
 }
 
-function getClippedTimeRangeAroundNow() {
+const getClippedTimeRangeAroundNow = () => {
   const now = new Date();
   const minutesBefore = 10 * 60 * 1000;
   const minutesAfter = 10 * 60 * 1000;
@@ -45,11 +45,32 @@ function getClippedTimeRangeAroundNow() {
   };
 }
 
+const getStudyDaysRange = (isP2?: boolean) => {
+  const format = (date: Date) => date.toISOString().split('T')[0];
+  const end = new Date();
+  const begin = new Date(end);
+  begin.setDate(end.getDate() - (isP2 ? 3 : 7));
+  return { from: format(begin), to: format(end) };
+} 
+
 const notifyTaskPriority = async (taskLabel: string | string[]) => {
   await Notifications.scheduleNotificationAsync({
     content: {
       title: 'Hi! Its your StudyBuddy.',
       body: `${taskLabel} is due x days left, start working already!`,
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+      seconds: 1,
+    },
+  });
+}
+
+const notifyTaskUrgent = async (taskLabel: string | string[]) => {
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: `${taskLabel} needs attention!`,
+      body: "You've been putting this off. You don't have to finish it but you need to begin as it needs your attention today.",
     },
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
@@ -78,6 +99,33 @@ const updateLastNotificationSentAt = async (
   }
 }
 
+const checkTaskProcrastination = async (
+  taskId: string | string[],
+  taskLabel: string | string[],
+  taskPriority: number,
+): Promise<boolean> => {
+  let isP2 = taskPriority == 2;
+  let dateRange = getStudyDaysRange(isP2);
+  
+  let { count, error } = await supabase
+    .from('TaskProgress')
+    .select('*', { count: 'exact' })
+    .eq('taskId', taskId)
+    .gte('date', dateRange.from)
+    .lte('date', dateRange.to)
+
+  if (count == null) {
+    console.error(`Error getting task progress count of ${taskLabel}.`);
+  } else if (error) {
+    console.error(`Error getting task progress count of ${taskLabel}:`, error);
+  }
+
+  if (isP2) {
+    return count == 0
+  }
+  return count ? count <= 2 : false
+}
+
 const backgroundTask = async (taskDataArguments: any) => {
   await new Promise( async (resolve) => {
     for (let i = 0; BackgroundService.isRunning(); i++) {
@@ -89,10 +137,14 @@ const backgroundTask = async (taskDataArguments: any) => {
         .lte('time', timeRange.to)
         .neq('lastNotificationSentAt', getCurrentDateString());
 
-      data?.forEach(element => {
-        notifyTaskPriority(element.label);
-        updateLastNotificationSentAt(element.id, element.label);
-      });
+      if (data != undefined) {
+        for (let j = 0; j < data.length; j++) {
+          let element = data[j];
+          let isProcrastination = await checkTaskProcrastination(element.id, element.label, element.priority);
+          isProcrastination ? notifyTaskUrgent(element.label) : notifyTaskPriority(element.label);
+          updateLastNotificationSentAt(element.id, element.label);
+        };
+      }
 
       await sleep(taskDataArguments?.delay ?? 60000 * 5);
     }
