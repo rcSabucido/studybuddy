@@ -23,6 +23,12 @@ export const getCurrentWeekBounds = () => {
   return getWeekBounds(new Date())
 }
 
+export const getCurrentPreviousWeekBounds = () => {
+  const date = new Date();
+  date.setDate(date.getDate() - 7);
+  return getWeekBounds(date);
+}
+
 export const storeTaskProgress = async (supabase: SupabaseClient<any, "public", any>, taskId: string | string[], interval: number) => {
   let now = new Date()
   let date = now.toISOString().slice(0, 10)
