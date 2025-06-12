@@ -6,7 +6,7 @@ import { storeTaskProgress } from "@/shared/DataHelpers";
 import { createClient } from "@supabase/supabase-js";
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from "react";
-import { Dimensions, Pressable, Text, View } from "react-native";
+import { Dimensions, Pressable, Text, Vibration, View } from "react-native";
 import { ExclamationTriangleIcon } from 'react-native-heroicons/outline';
 import styles from './styles';
 
@@ -95,6 +95,7 @@ export default function PomodoroTimer() {
       updateStudyInterval();
       setBreakTime({ minutes: BREAK_TIME_MINUTES, seconds: 0 });
     }
+    Vibration.vibrate(1000);
   };
 
   useEffect(() => {
