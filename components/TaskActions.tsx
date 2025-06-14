@@ -1,4 +1,3 @@
-import { useRouter } from 'expo-router';
 import React, { useEffect, useRef } from 'react';
 import { Animated, Dimensions, PanResponder, StyleSheet, Text, View } from 'react-native';
 import Button from './Button';
@@ -15,7 +14,6 @@ export default function TaskActions({ taskLabel, onClose, onEdit, onDelete }: Ta
   const screenHeight = Dimensions.get('window').height;
   const dragHandleRef = useRef(null);
   const isDraggingHandle = useRef(false);
-  const router = useRouter();
 
   const handleEdit = () => {
     onEdit();
@@ -55,8 +53,8 @@ export default function TaskActions({ taskLabel, onClose, onEdit, onDelete }: Ta
     Animated.spring(panY, {
       toValue: 0,
       useNativeDriver: true,
-      tension: 50,
-      friction: 8,
+      tension: 40,
+      friction: 20,
     }).start();
 
     return () => {

@@ -87,6 +87,7 @@ export default function Tasks({label, dueDate, priority, onDelete, onTaskPress, 
     }
 
     const handleEllipsisPress = () => {
+        onActionPress();
         Animated.parallel([
             Animated.sequence([
                 Animated.spring(ellipsisAnim, {
@@ -104,11 +105,6 @@ export default function Tasks({label, dueDate, priority, onDelete, onTaskPress, 
                     duration: 100,
                     useNativeDriver: true,
                 }),
-                Animated.timing(rotateAnim, {
-                    toValue: 1,
-                    duration: 0,
-                    useNativeDriver: true,
-                }),
                 Animated.spring(rotateAnim, {
                     toValue: 0,
                     tension: 40,
@@ -116,9 +112,7 @@ export default function Tasks({label, dueDate, priority, onDelete, onTaskPress, 
                     useNativeDriver: true,
                 })
             ])
-        ]).start(() => {
-            onActionPress();
-        });
+        ]).start();
     };
 
     const spin = rotateAnim.interpolate({
