@@ -11,7 +11,7 @@ interface TaskActionsProps {
 }
 
 export default function TaskActions({ taskLabel, onClose, onEdit, onDelete }: TaskActionsProps) {
-  const panY = new Animated.Value(0);
+  const panY = useRef(new Animated.Value(Dimensions.get('window').height)).current;
   const screenHeight = Dimensions.get('window').height;
   const dragHandleRef = useRef(null);
   const isDraggingHandle = useRef(false);
@@ -24,13 +24,13 @@ export default function TaskActions({ taskLabel, onClose, onEdit, onDelete }: Ta
   const resetPositionAnim = Animated.timing(panY, {
     toValue: 0,
     duration: 300,
-    useNativeDriver: false,
+    useNativeDriver: true,
   });
 
   const closeAnim = Animated.timing(panY, {
     toValue: screenHeight,
     duration: 500,
-    useNativeDriver: false,
+    useNativeDriver: true,
   });
 
   const panResponder = PanResponder.create({
@@ -52,11 +52,26 @@ export default function TaskActions({ taskLabel, onClose, onEdit, onDelete }: Ta
   });
 
   useEffect(() => {
-    panY.setValue(0);
+    Animated.spring(panY, {
+      toValue: 0,
+      useNativeDriver: true,
+      tension: 50,
+      friction: 8,
+    }).start();
+
+    return () => {
+      panY.setValue(screenHeight);
+    };
   }, []);
 
+  const translateY = panY.interpolate({
+    inputRange: [0, screenHeight],
+    outputRange: [0, screenHeight],
+    extrapolate: 'clamp'
+  });
+
   return (
-    <Animated.View style={[styles.container, { transform: [{ translateY: panY }] }]} {...panResponder.panHandlers}>
+    <Animated.View style={[styles.container, { transform: [{ translateY: translateY }] }]} {...panResponder.panHandlers}>
       <View
         ref={dragHandleRef}
         style={styles.dragIndicatorContainer}
