@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View, Animated } from "react-native";
+import { useRef } from "react";
 import { EllipsisVerticalIcon } from "react-native-heroicons/outline";
 import PriorityOne from "./PriorityOneIcon";
 import PriorityTwo from "./PriorityTwoIcon";
@@ -52,9 +53,82 @@ export default function Tasks({label, dueDate, priority, onDelete, onTaskPress, 
     const daysLeft = calculateRemainingDays(dueDate);
     const isOverdue = daysLeft < 0;
 
+    const scaleAnim = useRef(new Animated.Value(1)).current;
+    const opacityAnim = useRef(new Animated.Value(1)).current;
+    const ellipsisAnim = useRef(new Animated.Value(1)).current;
+    const rotateAnim = useRef(new Animated.Value(0)).current;
+
+    const handlePressIn = () => {
+        Animated.parallel([
+            Animated.spring(scaleAnim, {
+                toValue: 0.98,
+                useNativeDriver: true,
+            }),
+            Animated.timing(opacityAnim, {
+                toValue: 0.8,
+                duration: 100,
+                useNativeDriver: true,
+            })
+        ]).start();
+    };
+
+    const handlePressOut = () => {
+        Animated.parallel([
+            Animated.spring(scaleAnim, {
+                toValue: 1,
+                useNativeDriver: true,
+            }),
+            Animated.timing(opacityAnim, {
+                toValue: 1,
+                duration: 100,
+                useNativeDriver: true,
+            })
+        ]).start();
+    }
+
+    const handleEllipsisPress = () => {
+        Animated.parallel([
+            Animated.sequence([
+                Animated.spring(ellipsisAnim, {
+                    toValue: 0.8,
+                    useNativeDriver: true,
+                }),
+                Animated.spring(ellipsisAnim, {
+                    toValue: 1,
+                    useNativeDriver: true,
+                })
+            ]),
+            Animated.sequence([
+                Animated.timing(rotateAnim, {
+                    toValue: 1,
+                    duration: 100,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(rotateAnim, {
+                    toValue: 1,
+                    duration: 0,
+                    useNativeDriver: true,
+                }),
+                Animated.spring(rotateAnim, {
+                    toValue: 0,
+                    tension: 40,
+                    friction: 7,
+                    useNativeDriver: true,
+                })
+            ])
+        ]).start(() => {
+            onActionPress();
+        });
+    };
+
+    const spin = rotateAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0deg', '90deg']
+    });
+
     return (
-        <View style={styles.buttonContainer}>
-            <Pressable style={styles.contentContainer}  onPress={onTaskPress}>
+        <Animated.View style={[styles.buttonContainer, { transform: [{ scale: scaleAnim }], opacity: opacityAnim }]}>
+            <Pressable style={styles.contentContainer}  onPress={onTaskPress} onPressIn={handlePressIn} onPressOut={handlePressOut}>
                 <View style={styles.labelRow}>
                     <Text style={styles.text}>
                         {truncateText(label)}
@@ -68,12 +142,14 @@ export default function Tasks({label, dueDate, priority, onDelete, onTaskPress, 
                             {isOverdue ? 'Overdue' : `${daysLeft} days left`}
                         </Text>
                     </View>
-                    <Pressable onPress={onActionPress}>
-                        <EllipsisVerticalIcon size={20} color="#fff" />
-                    </Pressable>
+                     <Animated.View style={{ transform: [{ scale: ellipsisAnim }, { rotate: spin }] }}>
+                        <Pressable onPress={handleEllipsisPress}>
+                            <EllipsisVerticalIcon size={20} color="#fff" />
+                        </Pressable>
+                    </Animated.View>
                 </View>    
             </Pressable>
-        </View>
+        </Animated.View>
     )
 }
 
