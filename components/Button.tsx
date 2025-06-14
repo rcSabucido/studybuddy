@@ -1,5 +1,5 @@
-import { DimensionValue, Pressable, StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
-
+import { DimensionValue, Pressable, StyleSheet, Text, TextStyle, View, ViewStyle, Animated } from 'react-native';
+import { useRef, useEffect } from 'react';
 type Props = {
     label?: string
     bgColor?: string
@@ -14,13 +14,28 @@ type Props = {
 };
 
 export default function Button({ label, bgColor = "#ffffff", borderWidth, onPress, style, textStyle, textColor = '#fff', icon: IconComponent, iconWeight="1.5", width='auto'}: Props) {
+    const scaleAnim = useRef(new Animated.Value(1)).current;
+
+    const handlePressIn = () => {
+        Animated.spring(scaleAnim, {
+            toValue: 0.95,
+            useNativeDriver: true,
+        }).start();
+    }
+
+    const handlePressOut = () => {
+        Animated.spring(scaleAnim, {
+            toValue: 1,
+            useNativeDriver: true,
+        }).start();
+    }
     return (
-        <View style={[styles.buttonContainer, {backgroundColor: bgColor, width: width, borderWidth: borderWidth}, style]}>
-            <Pressable style={styles.button} onPress={onPress}>
+        <Animated.View style={[styles.buttonContainer, {backgroundColor: bgColor, width: width, borderWidth: borderWidth, transform: [{ scale: scaleAnim }]}, style]}>
+            <Pressable style={styles.button} onPress={onPress} onPressIn={handlePressIn} onPressOut={handlePressOut}>
                 {IconComponent && <IconComponent size={25} strokeWidth={iconWeight} color="white"/>}
                 { label !== null && label !== undefined ? <Text style={[styles.buttonLabel, textStyle, {color: textColor}]}>{label}</Text> : null }
             </Pressable>
-        </View>
+        </Animated.View>
     );
 }
 
