@@ -8,7 +8,7 @@ import Feather from '@expo/vector-icons/Feather';
 import { createClient } from '@supabase/supabase-js';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Dimensions, Pressable, ScrollView, Text, View } from "react-native";
+import { Dimensions, ScrollView, Text, View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { ChartBarIcon } from 'react-native-heroicons/solid';
 import styles from '../styles';
@@ -234,7 +234,7 @@ export default function DataView() {
         }}>Deficit</Text>
 
         <View style={{margin: 'auto'}}>
-          <Pressable
+          <AnimatedPressable
             onPress={openVerboseDataView}
             accessibilityLabel='View detailed statistics'>
             <LineChart
@@ -272,7 +272,7 @@ export default function DataView() {
                 borderRadius: 16
               }}
             />
-          </Pressable>
+          </AnimatedPressable>
         </View>
       </View>
     </ScrollView>
