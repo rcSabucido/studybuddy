@@ -7,10 +7,13 @@ import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { Calendar } from 'react-native-calendars';
 import { PlusIcon } from 'react-native-heroicons/outline';
+import { useAudioPlayer } from 'expo-audio';
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
+
+const buttonSound = require('@/assets/audio/ui_tap-variant-01.wav');
 
 type TasksByDate = Record<string, Task[]>;
 
@@ -24,7 +27,12 @@ export default function Index() {
   const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
   const [isTaskPanelVisible, setIsTaskPanelVisible] = useState(false);
   const [tasks, setTasks] = useState<TasksByDate>({});
+  const playButtonSound = useAudioPlayer(buttonSound);
 
+  const handleButtonPress = () => {
+    playButtonSound.seekTo(0);
+    playButtonSound.play();
+  };
 
   const fetchTasks = async () => {
     try {
@@ -91,6 +99,7 @@ export default function Index() {
   }
 
   const handleDayPress = (day: any) => {
+    handleButtonPress();
     setSelected(day.dateString);
     const dayTasks = tasks[day.dateString] || [];
     setSelectedTasks(dayTasks);
@@ -142,7 +151,10 @@ export default function Index() {
       <View style={styles.spacer}></View>
       <View style={styles.header}>
         <Text style={styles.headerText}>Calendar</Text>
-        <Button onPress={openAddTask} icon={PlusIcon} iconWeight={2.0} width={'40%'} bgColor='#9B41E9' label='Add Task'></Button>
+        <Button onPress={() => {
+          handleButtonPress();
+          openAddTask();
+        }} icon={PlusIcon} iconWeight={2.0} width={'40%'} bgColor='#9B41E9' label='Add Task'></Button>
       </View>
       <View style={styles.calendarContainer}>
         <Calendar

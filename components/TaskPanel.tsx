@@ -2,10 +2,16 @@ import { createClient } from '@supabase/supabase-js';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, PanResponder, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { ArrowLeftIcon, TrashIcon } from 'react-native-heroicons/outline';
+import { useAudioPlayer } from 'expo-audio';
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
+
+const selectSound = require('@/assets/audio/navigation_hover-tap.wav');
+const buttonSound = require('@/assets/audio/ui_tap-variant-01.wav');
+const deleteSound = require('@/assets/audio/delete_sound.wav');
+
 
 export interface Task {
   id: string;
@@ -56,8 +62,27 @@ export default function TaskPanel({ tasks, date, onClose, onDeleteTasks }: TaskP
     const [isSelectionMode, setIsSelectionMode] = useState(false);
     const arrowScale = useRef(new Animated.Value(1)).current;
     const trashScale = useRef(new Animated.Value(1)).current;
+    const playSelectSound = useAudioPlayer(selectSound);
+    const playButtonSound = useAudioPlayer(buttonSound);
+    const playDeleteSound = useAudioPlayer(deleteSound);
 
     const sortedTasks = [...tasks].sort((a, b) => a.priority - b.priority);
+
+    const handleSelectPress = () => {
+      playSelectSound.seekTo(0);
+      playSelectSound.play();
+    };
+
+    const handleButtonPress = () => {
+      playButtonSound.seekTo(0);
+      playButtonSound.play();
+    };
+
+    const handleDeleteSound = () => {
+      playDeleteSound.seekTo(0);
+      playDeleteSound.play();
+    }
+
 
     const handlePressIn = (animatedValue: Animated.Value) => {
         Animated.spring(animatedValue, {
@@ -75,10 +100,12 @@ export default function TaskPanel({ tasks, date, onClose, onDeleteTasks }: TaskP
 
     const handleTaskLongPress = (taskId: string) => {
       setIsSelectionMode(true);
+      handleSelectPress();
       setSelectedTasks([taskId]);
     };
 
     const handleTaskPress = (taskId: string) => {
+      handleSelectPress();
       if (isSelectionMode) {
         setSelectedTasks((prev) => 
           prev.includes(taskId)
@@ -175,31 +202,12 @@ export default function TaskPanel({ tasks, date, onClose, onDeleteTasks }: TaskP
             }}>
             <View style={styles.dragIndicator} />
         </View>
-        {/* <View style={styles.headerContainer}>
-            <ArrowLeftIcon size={20} onPress={() => {
-              if (isSelectionMode) {
-                setIsSelectionMode(false);
-                setSelectedTasks([]);
-              } else {
-                onClose();
-              }
-            }}></ArrowLeftIcon>
-            <Text style={styles.headText}>Tasks</Text>
-             <TrashIcon 
-                  size={20}
-                  color={selectedTasks.length > 0 ? '#F81414' : '#999'}
-                  onPress={() => {
-                      if (selectedTasks.length > 0) {
-                          handleDelete();
-                      }
-                  }}
-              />
-        </View> */}
         <View style={styles.headerContainer}>
                 <Pressable 
                     onPressIn={() => handlePressIn(arrowScale)}
                     onPressOut={() => handlePressOut(arrowScale)}
                     onPress={() => {
+                        handleButtonPress();
                         if (isSelectionMode) {
                             setIsSelectionMode(false);
                             setSelectedTasks([]);
@@ -219,6 +227,7 @@ export default function TaskPanel({ tasks, date, onClose, onDeleteTasks }: TaskP
                     onPressIn={() => selectedTasks.length > 0 && handlePressIn(trashScale)}
                     onPressOut={() => selectedTasks.length > 0 && handlePressOut(trashScale)}
                     onPress={() => {
+                        handleDeleteSound();
                         if (selectedTasks.length > 0) {
                             handleDelete();
                         }

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, PanResponder, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useAudioPlayer } from 'expo-audio';
 import Button from './Button';
 
 export type FilterType = 'dueDate' | 'priority';
@@ -10,12 +11,28 @@ interface TaskFilterProps {
   activeFilter: FilterType;
 }
 
+const buttonSound = require('@/assets/audio/ui_tap-variant-01.wav');
+const confirmSound = require('@/assets/audio/ellipsis_sound.wav');
+
+
 export default function TaskFilter({ onClose, onApplyFilter, activeFilter }: TaskFilterProps) {
   const [selectedFilter, setSelectedFilter] = useState<FilterType>(activeFilter);
   const panY = useRef(new Animated.Value(Dimensions.get('window').height)).current;
   const screenHeight = Dimensions.get('window').height;
   const dragHandleRef = useRef(null);
   const isDraggingHandle = useRef(false);
+  const playButtonSound = useAudioPlayer(buttonSound);
+  const playConfirmSound = useAudioPlayer(confirmSound);
+
+  const playTapSound = () => {
+    playButtonSound.seekTo(0);
+    playButtonSound.play();
+  }
+
+  const playConfirmSoundEffect = () => {
+    playConfirmSound.seekTo(0);
+    playConfirmSound.play();
+  }
 
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => isDraggingHandle.current,
@@ -91,7 +108,10 @@ export default function TaskFilter({ onClose, onApplyFilter, activeFilter }: Tas
       <View style={styles.filterOptions}>
         <Pressable
           style={[styles.filterOption, selectedFilter === 'dueDate' && styles.selectedOption]}
-          onPress={() => setSelectedFilter('dueDate')}
+          onPress={() => {
+            playTapSound();
+            setSelectedFilter('dueDate');
+          }}
         >
           <Text style={[styles.filterText, selectedFilter === 'dueDate' && styles.selectedText]}>
             Due Date
@@ -100,7 +120,10 @@ export default function TaskFilter({ onClose, onApplyFilter, activeFilter }: Tas
 
         <Pressable
           style={[styles.filterOption, selectedFilter === 'priority' && styles.selectedOption]}
-          onPress={() => setSelectedFilter('priority')}
+          onPress={() => {
+            playTapSound();
+            setSelectedFilter('priority');
+          }}
         >
           <Text style={[styles.filterText, selectedFilter === 'priority' && styles.selectedText]}>
             Priority
@@ -115,14 +138,20 @@ export default function TaskFilter({ onClose, onApplyFilter, activeFilter }: Tas
           bgColor="#FFFFFF" 
           textColor="#000000" 
           borderWidth={1}
-          onPress={handleReset}
+          onPress={() => {
+            playTapSound();
+            handleReset();
+          }}
         />
         <Button 
           width="45%" 
           label="Apply" 
           bgColor="#1AE843"
           textColor='#FFFFFF'
-          onPress={handleApply}
+          onPress={() => {
+            playConfirmSoundEffect();
+            handleApply();
+          }}
         />
       </View>
     </Animated.View>

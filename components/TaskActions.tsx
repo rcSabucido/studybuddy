@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Dimensions, PanResponder, StyleSheet, Text, View } from 'react-native';
 import Button from './Button';
+import { useAudioPlayer } from 'expo-audio';
 
 interface TaskActionsProps {
   taskLabel: string;
@@ -9,11 +10,26 @@ interface TaskActionsProps {
   onDelete: () => void;
 }
 
+const deleteSound = require('@/assets/audio/delete_sound.wav');
+const editSound = require('@/assets/audio/task_select_sound.wav');
+
 export default function TaskActions({ taskLabel, onClose, onEdit, onDelete }: TaskActionsProps) {
   const panY = useRef(new Animated.Value(Dimensions.get('window').height)).current;
   const screenHeight = Dimensions.get('window').height;
   const dragHandleRef = useRef(null);
   const isDraggingHandle = useRef(false);
+  const playDeleteSound = useAudioPlayer(deleteSound);
+  const playEditSound = useAudioPlayer(editSound);
+
+  const playDeleteSoundEffect = () => {
+    playDeleteSound.seekTo(0);
+    playDeleteSound.play();
+  };
+
+  const playEditSoundEffect = () => {
+    playEditSound.seekTo(0);
+    playEditSound.play();
+  };
 
 
   const resetPositionAnim = Animated.timing(panY, {
@@ -84,14 +100,20 @@ export default function TaskActions({ taskLabel, onClose, onEdit, onDelete }: Ta
           label="Edit" 
           bgColor="#9B41E9"
           textColor="#FFFFFF"
-          onPress={onEdit}
+          onPress={() => {
+            playEditSoundEffect();
+            onEdit();
+          }}
         />
         <Button 
           width="100%" 
           label="Delete" 
           bgColor="#FF3B30"
           textColor="#FFFFFF"
-          onPress={onDelete}
+          onPress={() => {
+            playDeleteSoundEffect();
+            onDelete();
+          }} 
         />
       </View>
     </Animated.View>

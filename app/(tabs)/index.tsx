@@ -8,6 +8,7 @@ import { router, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { AdjustmentsHorizontalIcon } from 'react-native-heroicons/outline';
+import { useAudioPlayer } from 'expo-audio'
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
@@ -21,6 +22,10 @@ type Task = {
     priority: number;
 };
 
+const buttonSound = require('@/assets/audio/ui_tap-variant-01.wav');
+const taskSound = require('@/assets/audio/task_select_sound.wav');
+const ellipsisSound = require('@/assets/audio/ellipsis_sound.wav');
+
 export default function Index() {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -32,6 +37,24 @@ export default function Index() {
         id: number;
         label: string;
     }>(null);
+    const playButtonSound = useAudioPlayer(buttonSound);
+    const playTaskSound = useAudioPlayer(taskSound);
+    const playEllipsisSound = useAudioPlayer(ellipsisSound);
+
+    const playTapSound = () => {
+        playButtonSound.seekTo(0);
+        playButtonSound.play();
+    }
+
+    const playTaskSelectSound = () => {
+        playTaskSound.seekTo(0);
+        playTaskSound.play();
+    }
+
+    const playEllipsisSelectSound = () => {
+        playEllipsisSound.seekTo(0);
+        playEllipsisSound.play();
+    }
 
     const fetchTasks = async () => {
         setIsLoading(true);
@@ -154,19 +177,31 @@ export default function Index() {
                     <Button width={'30%'} label="All Tasks" 
                     bgColor={!showTodayOnly ? '#9B41E9' : '#D9D9D9'}
                     textColor={!showTodayOnly ? '#FFFFFF' : '#000000'}
-                    onPress={() => setShowTodayOnly(false)}
+                    onPress={() => {
+                        setShowTodayOnly(false)
+                        playTapSound();
+                    }
+                    }
                     />
                     <Button width={'50%'} label="Today's Tasks" 
                     textColor={showTodayOnly ? '#FFFFFF' : '#000000'} 
                     bgColor={showTodayOnly ? '#9B41E9' : '#D9D9D9'}
-                    onPress={() => setShowTodayOnly(true)} 
+                    onPress={() => {
+                        setShowTodayOnly(true)
+                        playTapSound();
+                    }
+                   } 
                     />
                 </View>
                 <Button 
                     width={'15%'} 
                     icon={AdjustmentsHorizontalIcon} 
                     bgColor='#9B41E9'
-                    onPress={() => setIsFilterVisible(true)}         
+                    onPress={() => {
+                        setIsFilterVisible(true)
+                        playTapSound();
+                    }
+                    }         
                 >
                 </Button>
             </View>
@@ -190,8 +225,13 @@ export default function Index() {
                             label={task.label}
                             dueDate={task.dueDate}
                             priority={task.priority}
-                            onActionPress={() => handleTaskAction(task.id, task.label)}
+                            onActionPress={() => {
+                                playEllipsisSelectSound();
+                                handleTaskAction(task.id, task.label)
+                            }
+                            }
                             onTaskPress={() => {
+                                playTaskSelectSound();
                                 useRouter().push({pathname: "./specific_data_view", params: {
                                     taskId: task.id, taskLabel: task.label
                                 }})

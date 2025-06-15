@@ -9,10 +9,13 @@ import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-
 import { Calendar } from 'react-native-calendars';
 import { CalendarIcon, ClockIcon, ExclamationCircleIcon } from 'react-native-heroicons/outline';
 import Dropdown from 'react-native-input-select';
+import { useAudioPlayer } from 'expo-audio';
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
+const backSound = require('@/assets/audio/navigation_backward-selection.wav');
+const saveSound = require('@/assets/audio/state-change_confirm-up.wav');
 
 export default function EditTask() {
   const [isFreshData, setIsFreshData] = useState(true);
@@ -30,9 +33,21 @@ export default function EditTask() {
   const [showCalendar, setShowCalendar] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
   const params = useLocalSearchParams();
+  const playBackSound = useAudioPlayer(backSound);
+  const playSaveSound = useAudioPlayer(saveSound);
   const taskId = typeof params.taskId === 'string' ? parseInt(params.taskId) : 0;
 
   const taskData = params.taskData ? JSON.parse(params.taskData as string) : null;
+
+  const playBackSoundEffect = () =>{
+    playBackSound.seekTo(0);
+    playBackSound.play();
+  }
+
+  const playSaveSoundEffect = () => {
+    playSaveSound.seekTo(0);
+    playSaveSound.play();
+  }
 
   const validateInputs = () => {
     return name.trim() !== '' &&
@@ -112,6 +127,7 @@ export default function EditTask() {
   }
 
   const handleBackPress = () => {
+    playBackSoundEffect();
     if (hasUnsavedChanges()) {
       setShowSaveModal(true);
     } else {
@@ -260,7 +276,12 @@ export default function EditTask() {
         </View>
         {!showCalendar && (
           <View style={styles.saveButtonContainer}>
-            <Button label='Save' bgColor='#9B41E9' width={'30%'} onPress={handleSave}></Button>
+            <Button label='Save' bgColor='#9B41E9' width={'30%'} onPress={() => {
+                  playSaveSoundEffect();
+                  handleSave();  
+                  }
+                }
+                  ></Button>
           </View>
         )}
 
