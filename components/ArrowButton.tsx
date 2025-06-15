@@ -1,5 +1,5 @@
 import styles from '@/app/styles';
-import { Pressable, View, Animated } from 'react-native';
+import { Pressable, Animated } from 'react-native';
 import { ArrowLeftIcon } from 'react-native-heroicons/outline';
 import { useRef } from 'react';
 
