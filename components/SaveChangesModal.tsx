@@ -1,13 +1,29 @@
 import { Modal, Pressable, Text, View, Animated } from "react-native";
 import { useRef } from 'react';
+import { useAudioPlayer } from 'expo-audio';
 
 type Props = {
   onClose: (shouldSave: boolean) => void;
 };
 
+const buttonSound = require('@/assets/audio/ui_tap-variant-01.wav');
+const confirmsSound = require('@/assets/audio/ellipsis_sound.wav');
+
 export default function SaveChangesModal({ onClose }: Props) {
   const noButtonScale = useRef(new Animated.Value(1)).current;
   const yesButtonScale = useRef(new Animated.Value(1)).current;
+  const playButtonSound = useAudioPlayer(buttonSound);
+  const playConfirmSound = useAudioPlayer(confirmsSound);
+
+  const playTapSound = () => {
+    playButtonSound.seekTo(0);
+    playButtonSound.play();
+  }
+
+  const playConfirmSoundEffect = () => {
+    playConfirmSound.seekTo(0);
+    playConfirmSound.play();
+  }
 
   const handlePressIn = (animatedValue: Animated.Value) => {
     Animated.spring(animatedValue, {
@@ -63,7 +79,11 @@ export default function SaveChangesModal({ onClose }: Props) {
             <Pressable 
               onPressIn={() => handlePressIn(noButtonScale)}
               onPressOut={() => handlePressOut(noButtonScale)} 
-              onPress={() => onClose(false)}
+              onPress={() => {
+                playTapSound();
+                onClose(false);
+                }
+              }
             >
               <Animated.View style={{
                 transform: [{ scale: noButtonScale }],
@@ -85,7 +105,10 @@ export default function SaveChangesModal({ onClose }: Props) {
              <Pressable 
               onPressIn={() => handlePressIn(yesButtonScale)}
               onPressOut={() => handlePressOut(yesButtonScale)} 
-              onPress={() => onClose(true)}
+              onPress={() => {
+                playConfirmSoundEffect();
+                onClose(true);
+              }}
             >
               <Animated.View style={{
                 transform: [{ scale: yesButtonScale }],

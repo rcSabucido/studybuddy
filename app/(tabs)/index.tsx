@@ -22,7 +22,9 @@ type Task = {
     priority: number;
 };
 
-const audioSource = require('@/assets/audio/ui_tap-variant-01.wav');
+const buttonSound = require('@/assets/audio/ui_tap-variant-01.wav');
+const taskSound = require('@/assets/audio/task_select_sound.wav');
+const ellipsisSound = require('@/assets/audio/ellipsis_sound.wav');
 
 export default function Index() {
     const [tasks, setTasks] = useState<Task[]>([]);
@@ -35,11 +37,23 @@ export default function Index() {
         id: number;
         label: string;
     }>(null);
-    const player = useAudioPlayer(audioSource);
+    const playButtonSound = useAudioPlayer(buttonSound);
+    const playTaskSound = useAudioPlayer(taskSound);
+    const playEllipsisSound = useAudioPlayer(ellipsisSound);
 
     const playTapSound = () => {
-        player.seekTo(0);
-        player.play();
+        playButtonSound.seekTo(0);
+        playButtonSound.play();
+    }
+
+    const playTaskSelectSound = () => {
+        playTaskSound.seekTo(0);
+        playTaskSound.play();
+    }
+
+    const playEllipsisSelectSound = () => {
+        playEllipsisSound.seekTo(0);
+        playEllipsisSound.play();
     }
 
     const fetchTasks = async () => {
@@ -211,8 +225,13 @@ export default function Index() {
                             label={task.label}
                             dueDate={task.dueDate}
                             priority={task.priority}
-                            onActionPress={() => handleTaskAction(task.id, task.label)}
+                            onActionPress={() => {
+                                playEllipsisSelectSound();
+                                handleTaskAction(task.id, task.label)
+                            }
+                            }
                             onTaskPress={() => {
+                                playTaskSelectSound();
                                 useRouter().push({pathname: "./specific_data_view", params: {
                                     taskId: task.id, taskLabel: task.label
                                 }})
