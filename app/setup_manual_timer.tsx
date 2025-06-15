@@ -1,106 +1,84 @@
 import BackHeader from "@/components/BackHeader";
+import RollerPicker from "@/components/RollerPicker";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useMemo, useState } from "react";
+import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import { SectionsWheelPicker, WheelPickerProps } from "react-native-ui-lib";
-import styles from './styles';
+import styles from "./styles";
 
-function openManualTimer(hours: number, minutes: number, seconds: number, taskId: string | string[], taskLabel: string | string[]) {
+function openManualTimer(
+  hours: number,
+  minutes: number,
+  seconds: number,
+  taskId: string | string[],
+  taskLabel: string | string[]
+) {
   const router = useRouter();
-  router.push({pathname: "/manual_timer", params: {
-    hours, minutes, seconds, taskId, taskLabel
-  }})
+  router.push({
+    pathname: "/manual_timer",
+    params: { hours, minutes, seconds, taskId, taskLabel },
+  });
 }
 
 export default function SetupManualTimer() {
-  let { taskId, taskLabel } = useLocalSearchParams();
+  const { taskId, taskLabel } = useLocalSearchParams();
   const [hours, setHours] = useState(0);
-  const hoursChange = useCallback((item: number | string) => {
-    setHours((item + "").split("_")[0] as unknown as number);
-  }, []);
   const [minutes, setMinutes] = useState(0);
-  const minutesChange = useCallback((item: number | string) => {
-    setMinutes((item + "").split("_")[0] as unknown as number);
-  }, []);
   const [seconds, setSeconds] = useState(0);
-  const secondsChange = useCallback((item: number | string) => {
-    setSeconds((item + "").split("_")[0] as unknown as number);
-  }, []);
-  const sections: WheelPickerProps<string | number>[] = useMemo(() => {
-    return [
-      {
-        items: Array.from({length: 24}, (_, i) => ({value: `${i}_hour`, label: `${i}`})),
-        onChange: hoursChange,
-        initialValue: hours,
-        style: {paddingRight: 8},
-        label: 'hours'
-      },
-      {
-        items: Array.from({length: 60}, (_, i) => ({value: `${i}_minute`, label: `${i}`})),
-        onChange: minutesChange,
-        initialValue: minutes,
-        style: {paddingRight: 8},
-        label: 'minutes'
-      },
-      {
-        items: Array.from({length: 60}, (_, i) => ({value: `${i}_second`, label: `${i}`})),
-        onChange: secondsChange,
-        initialValue: seconds,
-        label: 'seconds'
-      },
-    ]
-  }, [
-    hours,
-    minutes,
-    seconds
-  ])
+
+  const hourOptions = Array.from({ length: 24 }, (_, i) => i);
+  const minuteSecondOptions = Array.from({ length: 60 }, (_, i) => i);
+
   return (
-    <>
-    <View
-      style={{
-        flex: 1,
-        alignItems: "center",
-        backgroundColor: "#ffffff",
-      }}
-    >
-      <BackHeader/>
-      <View style={{
-        height: '75%',
-        width: '100%'
-      }}>
-        <View style={{
-          flex: 1,
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-        }}>
-          <View style={{
-            width: '100%',
-            margin: 'auto',
-            justifyContent: "center",
+    <View style={{ flex: 1, alignItems: "center", backgroundColor: "#ffffff" }}>
+      <BackHeader />
+      <View style={{ height: "75%", width: "100%" }}>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: "column",
+            justifyContent: "space-between",
             alignItems: "center",
-          }}>
-            <Text style={[styles.header_text, {paddingBottom: 64}]}>Manual Timer</Text>
-            <SectionsWheelPicker
-              numberOfVisibleRows={4}
-              sections={sections}
-              itemHeight={48}
-              textStyle={{
-                color: "#ddd",
-                fontSize: 20,
-                fontFamily: 'Poppins_700Bold',
-              }}
-            />
+          }}
+        >
+          <View
+            style={{
+              width: "100%",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text style={[styles.header_text, { paddingBottom: 32 }]}>
+              Manual Timer
+            </Text>
+
+            <View style={{ gap: 16, flexDirection: "row", paddingTop: 32 }}>
+              <RollerPicker selectedItem={hours} label={"hour"} items={hourOptions} isNumerical={true} onSelect={function (newValue: any): void {
+                setHours(newValue as number);
+              } } />
+
+              <RollerPicker selectedItem={minutes} label={"minute"} items={minuteSecondOptions} isNumerical={true} onSelect={function (newValue: any): void {
+                setMinutes(newValue as number);
+              } } />
+
+              <RollerPicker selectedItem={seconds} label={"second"} items={minuteSecondOptions} isNumerical={true} onSelect={function (newValue: any): void {
+                setSeconds(newValue as number);
+              } } />
+            </View>
           </View>
-          <Pressable onPress={() => 
-              {
-                openManualTimer(hours, minutes, seconds, taskId, taskLabel)
-              }
-            } style={[styles.content_container, {height: "30%", width: "75%" /*, marginTop: 52*/}]}>
-              <Text style={styles.container_button_text}>Start Tracking</Text>
+
+          <Pressable
+            onPress={() =>
+              openManualTimer(hours, minutes, seconds, taskId, taskLabel)
+            }
+            style={[
+              styles.content_container,
+              { height: "30%", width: "75%" },
+            ]}
+          >
+            <Text style={styles.container_button_text}>Start Tracking</Text>
           </Pressable>
         </View>
       </View>
     </View>
-    </>
   );
 }
