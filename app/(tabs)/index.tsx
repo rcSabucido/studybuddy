@@ -8,6 +8,7 @@ import { router, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { AdjustmentsHorizontalIcon } from 'react-native-heroicons/outline';
+import { useAudioPlayer } from 'expo-audio'
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
@@ -21,6 +22,8 @@ type Task = {
     priority: number;
 };
 
+const audioSource = require('@/assets/audio/ui_tap-variant-01.wav');
+
 export default function Index() {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -32,6 +35,12 @@ export default function Index() {
         id: number;
         label: string;
     }>(null);
+    const player = useAudioPlayer(audioSource);
+
+    const playTapSound = () => {
+        player.seekTo(0);
+        player.play();
+    }
 
     const fetchTasks = async () => {
         setIsLoading(true);
@@ -154,19 +163,31 @@ export default function Index() {
                     <Button width={'30%'} label="All Tasks" 
                     bgColor={!showTodayOnly ? '#9B41E9' : '#D9D9D9'}
                     textColor={!showTodayOnly ? '#FFFFFF' : '#000000'}
-                    onPress={() => setShowTodayOnly(false)}
+                    onPress={() => {
+                        setShowTodayOnly(false)
+                        playTapSound();
+                    }
+                    }
                     />
                     <Button width={'50%'} label="Today's Tasks" 
                     textColor={showTodayOnly ? '#FFFFFF' : '#000000'} 
                     bgColor={showTodayOnly ? '#9B41E9' : '#D9D9D9'}
-                    onPress={() => setShowTodayOnly(true)} 
+                    onPress={() => {
+                        setShowTodayOnly(true)
+                        playTapSound();
+                    }
+                   } 
                     />
                 </View>
                 <Button 
                     width={'15%'} 
                     icon={AdjustmentsHorizontalIcon} 
                     bgColor='#9B41E9'
-                    onPress={() => setIsFilterVisible(true)}         
+                    onPress={() => {
+                        setIsFilterVisible(true)
+                        playTapSound();
+                    }
+                    }         
                 >
                 </Button>
             </View>
