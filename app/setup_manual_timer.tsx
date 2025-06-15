@@ -1,8 +1,9 @@
+import AnimatedPressable from "@/components/AnimatedPressable";
 import BackHeader from "@/components/BackHeader";
 import RollerPicker from "@/components/RollerPicker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import styles from "./styles";
 
 function openManualTimer(
@@ -66,17 +67,19 @@ export default function SetupManualTimer() {
             </View>
           </View>
 
-          <Pressable
-            onPress={() =>
+          <AnimatedPressable
+            onPress={() => {
+              if (hours == 0 && minutes == 0 && seconds == 0) return;
               openManualTimer(hours, minutes, seconds, taskId, taskLabel)
-            }
-            style={[
+            }}
+            viewStyle={[
               styles.content_container,
+              {backgroundColor: hours == 0 && minutes == 0 && seconds == 0 ? "grey" : "#9B41E9"},
               { height: "30%", width: "75%" },
             ]}
           >
             <Text style={styles.container_button_text}>Start Tracking</Text>
-          </Pressable>
+          </AnimatedPressable>
         </View>
       </View>
     </View>

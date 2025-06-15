@@ -1,3 +1,4 @@
+import AnimatedPressable from '@/components/AnimatedPressable';
 import Button from '@/components/Button';
 import MinStudyHoursModal from '@/components/MinStudyHoursModal';
 import PieProgress from "@/components/PieProgress";
@@ -186,7 +187,7 @@ export default function DataView() {
           fontFamily: 'Poppins_700Bold',
         }}>Minimum Hours to Study</Text>
 
-        <Pressable
+        <AnimatedPressable
         onPress={() => {
           setStudyHoursVisible(!studyHoursVisible)
         }}
@@ -223,7 +224,7 @@ export default function DataView() {
                   {`${minimumStudyHours} hour${minimumStudyHours > 1 ? 's' : ''}`}
               </Text>
           </View>
-        </Pressable>
+        </AnimatedPressable>
       </View>
       <View style={styles.content_container}>
         <Text style={{

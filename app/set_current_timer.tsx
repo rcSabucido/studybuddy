@@ -1,8 +1,9 @@
+import AnimatedPressable from "@/components/AnimatedPressable";
 import BackHeader from "@/components/BackHeader";
 import { createClient } from "@supabase/supabase-js";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { Image, Pressable, ScrollView, Text, View } from "react-native";
+import { Image, ScrollView, Text, View } from "react-native";
 import Dropdown from 'react-native-input-select';
 import styles from './styles';
 
@@ -120,7 +121,8 @@ export default function SetCurrentTimer() {
           {
             (taskId != null || (taskId == null && !isLoading)) &&
             <>
-              <Pressable style={[styles.content_container, {backgroundColor: "#F81414"}]}
+            <View style={{width: "90%", margin: "auto"}}>
+              <AnimatedPressable style={[styles.content_container, {backgroundColor: "#F81414"}]}
                 onPress={() => {
                   let fetchTaskId = taskId != null ? taskId : currentWork
                   if (fetchTaskId == null) return
@@ -131,8 +133,8 @@ export default function SetCurrentTimer() {
                   source={require('@/assets/images/pomodoro-white.png')}
                   style={{width: 160, height: 160}}
                 />
-              </Pressable>
-              <Pressable style={[styles.content_container, {marginTop: 32}]}
+              </AnimatedPressable>
+              <AnimatedPressable style={[styles.content_container, {marginTop: 32}]}
                 onPress={() => {
                   let fetchTaskId = taskId != null ? taskId : currentWork
                   if (fetchTaskId == null) return
@@ -143,7 +145,8 @@ export default function SetCurrentTimer() {
                   source={require('@/assets/images/clock-white.png')}
                   style={{width: 160, height: 160}}
                 />
-              </Pressable>
+              </AnimatedPressable>
+              </View>
             </>
           }
         </View>

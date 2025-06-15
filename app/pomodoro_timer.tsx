@@ -1,3 +1,4 @@
+import AnimatedPressable from "@/components/AnimatedPressable";
 import BackHeader from "@/components/BackHeader";
 import Button from "@/components/Button";
 import ConfirmationModal from "@/components/ConfirmationModal";
@@ -6,7 +7,7 @@ import { storeTaskProgress } from "@/shared/DataHelpers";
 import { createClient } from "@supabase/supabase-js";
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from "react";
-import { Dimensions, Pressable, Text, Vibration, View } from "react-native";
+import { Dimensions, Text, Vibration, View } from "react-native";
 import { ExclamationTriangleIcon } from 'react-native-heroicons/outline';
 import styles from './styles';
 
@@ -198,7 +199,7 @@ export default function PomodoroTimer() {
               }
             />
 
-            <Pressable
+            <AnimatedPressable
               onPress={() => {
                 if (!timerStarted) {
                   setTimerStarted(true);
@@ -206,12 +207,12 @@ export default function PomodoroTimer() {
                   stopTimer();
                 }
               }}
-              style={[styles.content_container, { height: 69, width: "85%", marginTop: 32 }]}
+              viewStyle={[styles.content_container, { height: 69, width: "85%", marginTop: 32 }]}
             >
               <Text style={styles.container_button_text}>
                 {timerStarted ? "Pause" : "Start"}
               </Text>
-            </Pressable>
+            </AnimatedPressable>
           </View>
         </View>
       </View>
