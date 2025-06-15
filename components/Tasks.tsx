@@ -9,7 +9,6 @@ type Props = {
     label: string,
     dueDate: string,
     priority: number,
-    onDelete: () => void,
     onActionPress: () => void,
     onTaskPress: () => void,
 };
@@ -49,7 +48,7 @@ const truncateText = (text: string, maxLength: number = 23) => {
     return text.slice(0, maxLength) + '...'; 
 }
 
-export default function Tasks({label, dueDate, priority, onDelete, onTaskPress, onActionPress}: Props) {
+export default function Tasks({label, dueDate, priority, onTaskPress, onActionPress}: Props) {
     const daysLeft = calculateRemainingDays(dueDate);
     const isOverdue = daysLeft < 0;
 

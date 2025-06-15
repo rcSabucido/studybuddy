@@ -15,9 +15,6 @@ export default function TaskActions({ taskLabel, onClose, onEdit, onDelete }: Ta
   const dragHandleRef = useRef(null);
   const isDraggingHandle = useRef(false);
 
-  const handleEdit = () => {
-    onEdit();
-  }
 
   const resetPositionAnim = Animated.timing(panY, {
     toValue: 0,
@@ -53,8 +50,8 @@ export default function TaskActions({ taskLabel, onClose, onEdit, onDelete }: Ta
     Animated.spring(panY, {
       toValue: 0,
       useNativeDriver: true,
-      tension: 40,
-      friction: 20,
+      tension: 80,
+      friction: 12,
     }).start();
 
     return () => {
@@ -87,7 +84,7 @@ export default function TaskActions({ taskLabel, onClose, onEdit, onDelete }: Ta
           label="Edit" 
           bgColor="#9B41E9"
           textColor="#FFFFFF"
-          onPress={handleEdit}
+          onPress={onEdit}
         />
         <Button 
           width="100%" 
