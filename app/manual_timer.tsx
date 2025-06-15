@@ -52,6 +52,7 @@ export default function ManualTimer() {
   const startTime = {
     hours: hoursNum, minutes: minutesNum, seconds: secondsNum
   }
+  console.log(startTime)
   const [ currentTime, setCurrentTime ] = useState({
     hours: hoursNum, minutes: minutesNum, seconds: secondsNum
   })
@@ -165,7 +166,7 @@ export default function ManualTimer() {
           <RadialChart
             size={Dimensions.get("window").width * 0.61}
             strokeWidth={20}
-            text={`${currentTime.minutes.toString().padStart(2, "0")}:${currentTime.seconds.toString().padStart(2, "0")}`}
+            text={`${startTime.hours > 0 ? `${currentTime.hours.toString().padStart(2, "0")}:` : ""}${currentTime.minutes.toString().padStart(2, "0")}:${currentTime.seconds.toString().padStart(2, "0")}`}
             largeText={hoursNum < 1}
             percentage={percentage}
           />
