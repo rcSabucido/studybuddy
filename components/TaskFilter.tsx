@@ -12,22 +12,10 @@ interface TaskFilterProps {
 
 export default function TaskFilter({ onClose, onApplyFilter, activeFilter }: TaskFilterProps) {
   const [selectedFilter, setSelectedFilter] = useState<FilterType>(activeFilter);
-  const panY = useRef(new Animated.Value(0)).current;
+  const panY = useRef(new Animated.Value(Dimensions.get('window').height)).current;
   const screenHeight = Dimensions.get('window').height;
   const dragHandleRef = useRef(null);
   const isDraggingHandle = useRef(false);
-
-  const resetPositionAnim = Animated.timing(panY, {
-    toValue: 0,
-    duration: 300,
-    useNativeDriver: false,
-  });
-
-  const closeAnim = Animated.timing(panY, {
-    toValue: screenHeight,
-    duration: 500,
-    useNativeDriver: false,
-  });
 
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => isDraggingHandle.current,
@@ -40,20 +28,41 @@ export default function TaskFilter({ onClose, onApplyFilter, activeFilter }: Tas
     onPanResponderRelease: (_, gestureState) => {
       isDraggingHandle.current = false;
       if (gestureState.dy > screenHeight / 3) {
-        closeAnim.start(() => onClose());
+        Animated.timing(panY, {
+          toValue: screenHeight,
+          duration: 200,
+          useNativeDriver: true,
+        }).start(() => onClose());
       } else {
-        resetPositionAnim.start();
+        Animated.spring(panY, {
+          toValue: 0,
+          tension: 100,
+          friction: 5,
+          useNativeDriver: true,
+        }).start();
       }
     },
   });
 
   useEffect(() => {
-    panY.setValue(0);
+    Animated.spring(panY, {
+      toValue: 0,
+      useNativeDriver: true,
+      tension: 80,
+      friction: 12,
+    }).start();
 
     return () => {
-      panY.setValue(0); 
-    }
+      panY.setValue(screenHeight);
+    };
   }, []);
+
+  const translateY = panY.interpolate({
+    inputRange: [0, screenHeight],
+    outputRange: [0, screenHeight],
+    extrapolate: 'clamp'
+  });
+
 
   const handleApply = () => {
     onApplyFilter(selectedFilter);
@@ -67,7 +76,7 @@ export default function TaskFilter({ onClose, onApplyFilter, activeFilter }: Tas
   };
 
   return (
-    <Animated.View style={[styles.container, { transform: [{ translateY: panY }] }]} {...panResponder.panHandlers}>
+    <Animated.View style={[styles.container, { transform: [{ translateY }] }]} {...panResponder.panHandlers}>
       <View
         ref={dragHandleRef}
         style={styles.dragIndicatorContainer}
@@ -98,7 +107,7 @@ export default function TaskFilter({ onClose, onApplyFilter, activeFilter }: Tas
           </Text>
         </Pressable>
       </View>
-
+      
       <View style={styles.buttonContainer}>
         <Button 
           width="45%" 
