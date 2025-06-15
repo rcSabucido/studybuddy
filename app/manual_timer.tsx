@@ -4,10 +4,11 @@ import ConfirmationModal from "@/components/ConfirmationModal";
 import RadialChart from "@/components/RadialChart";
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from "react";
-import { Dimensions, Pressable, Text, Vibration, View } from "react-native";
+import { Dimensions, Text, Vibration, View } from "react-native";
 import { ExclamationTriangleIcon } from 'react-native-heroicons/outline';
 import styles from './styles';
 
+import AnimatedPressable from "@/components/AnimatedPressable";
 import { storeTaskProgress } from "@/shared/DataHelpers";
 import { createClient } from "@supabase/supabase-js";
 import * as Notifications from 'expo-notifications';
@@ -171,7 +172,7 @@ export default function ManualTimer() {
             percentage={percentage}
           />
           }
-          <Pressable onPress={() => 
+          <AnimatedPressable onPress={() => 
               {
                 if (!timerStarted) {
                   setTimerStarted(true)
@@ -188,18 +189,18 @@ export default function ManualTimer() {
                   console.log("Taking a break")
                 }
               }
-            } style={[styles.content_container, {height: "15%", width: "85%", marginTop: 32}]}>
+            } viewStyle={[styles.content_container, {height: "15%", width: "85%", marginTop: 32}]}>
               <Text style={styles.container_button_text}>{timerStarted ? "Take a Break?" : "Start"}</Text>
-          </Pressable>
-          <Pressable onPress={() => 
+          </AnimatedPressable>
+          <AnimatedPressable onPress={() => 
               {
                 resetTimer()
                 setPercentage(100)
               }
-            } style={[styles.content_container,
+            } viewStyle={[styles.content_container,
                 {height: "15%", backgroundColor: "#F81414", width: "85%"}]}>
               <Text style={styles.container_button_text}>Reset</Text>
-          </Pressable>
+          </AnimatedPressable>
         </View>
       </View>
     </View>

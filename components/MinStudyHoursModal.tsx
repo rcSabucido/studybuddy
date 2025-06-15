@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Modal, Text, View } from "react-native";
-import Dropdown from 'react-native-input-select';
 import Button from './Button';
+import RollerPicker from './RollerPicker';
 
 type Props = {
   previousValue: number,
@@ -11,10 +11,7 @@ type Props = {
 export default function MinStudyHoursModal({ onClose, previousValue }: Props) {
   const [minimumHoursStudy, setMinimumHoursStudy] = useState(previousValue);
 
-  const hourOptions = Array.from({ length: 24 }, (_, i) => ({
-    label: `${i + 1}`,
-    value: i + 1,
-  }));
+  const hourOptions = Array.from({ length: 24 }, (_, i) => i + 1);
 
   return (
     <Modal animationType="fade" transparent={true} visible={true}>
@@ -33,13 +30,9 @@ export default function MinStudyHoursModal({ onClose, previousValue }: Props) {
         }}>
           <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 12 }}>Minimum Study Hours</Text>
 
-          <Dropdown
-            options={hourOptions}
-            placeholder="Select hours"
-            selectedValue={minimumHoursStudy}
-            onValueChange={(value) => setMinimumHoursStudy(value as number)}
-            primaryColor="#9B41E9"
-          />
+          <RollerPicker selectedItem={minimumHoursStudy} label={"hour"} items={hourOptions} isNumerical={true} onSelect={function (newValue: any): void {
+            setMinimumHoursStudy(newValue as number)
+          } } />
 
           <Button
             label="Accept"
