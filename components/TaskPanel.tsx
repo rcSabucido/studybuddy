@@ -54,8 +54,24 @@ export default function TaskPanel({ tasks, date, onClose, onDeleteTasks }: TaskP
     const isDraggingHandle = useRef(false);
     const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
     const [isSelectionMode, setIsSelectionMode] = useState(false);
+    const arrowScale = useRef(new Animated.Value(1)).current;
+    const trashScale = useRef(new Animated.Value(1)).current;
 
     const sortedTasks = [...tasks].sort((a, b) => a.priority - b.priority);
+
+    const handlePressIn = (animatedValue: Animated.Value) => {
+        Animated.spring(animatedValue, {
+            toValue: 0.75,
+            useNativeDriver: true,
+        }).start();
+    };
+
+    const handlePressOut = (animatedValue: Animated.Value) => {
+        Animated.spring(animatedValue, {
+            toValue: 1,
+            useNativeDriver: true,
+        }).start();
+    };
 
     const handleTaskLongPress = (taskId: string) => {
       setIsSelectionMode(true);
@@ -159,7 +175,7 @@ export default function TaskPanel({ tasks, date, onClose, onDeleteTasks }: TaskP
             }}>
             <View style={styles.dragIndicator} />
         </View>
-        <View style={styles.headerContainer}>
+        {/* <View style={styles.headerContainer}>
             <ArrowLeftIcon size={20} onPress={() => {
               if (isSelectionMode) {
                 setIsSelectionMode(false);
@@ -178,7 +194,44 @@ export default function TaskPanel({ tasks, date, onClose, onDeleteTasks }: TaskP
                       }
                   }}
               />
-        </View>
+        </View> */}
+        <View style={styles.headerContainer}>
+                <Pressable 
+                    onPressIn={() => handlePressIn(arrowScale)}
+                    onPressOut={() => handlePressOut(arrowScale)}
+                    onPress={() => {
+                        if (isSelectionMode) {
+                            setIsSelectionMode(false);
+                            setSelectedTasks([]);
+                        } else {
+                            onClose();
+                        }
+                    }}
+                >
+                    <Animated.View style={{ transform: [{ scale: arrowScale }] }}>
+                        <ArrowLeftIcon size={20} />
+                    </Animated.View>
+                </Pressable>
+
+                <Text style={styles.headText}>Tasks</Text>
+
+                <Pressable 
+                    onPressIn={() => selectedTasks.length > 0 && handlePressIn(trashScale)}
+                    onPressOut={() => selectedTasks.length > 0 && handlePressOut(trashScale)}
+                    onPress={() => {
+                        if (selectedTasks.length > 0) {
+                            handleDelete();
+                        }
+                    }}
+                >
+                    <Animated.View style={{ transform: [{ scale: trashScale }] }}>
+                        <TrashIcon 
+                            size={20}
+                            color={selectedTasks.length > 0 ? '#F81414' : '#999'}
+                        />
+                    </Animated.View>
+                </Pressable>
+            </View>
       <ScrollView style={styles.taskList} onTouchStart={() => {
         isDraggingHandle.current = false;
       }}>
