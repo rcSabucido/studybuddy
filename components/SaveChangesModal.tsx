@@ -1,10 +1,28 @@
-import { Modal, Pressable, Text, View } from "react-native";
+import { Modal, Pressable, Text, View, Animated } from "react-native";
+import { useRef } from 'react';
 
 type Props = {
   onClose: (shouldSave: boolean) => void;
 };
 
 export default function SaveChangesModal({ onClose }: Props) {
+  const noButtonScale = useRef(new Animated.Value(1)).current;
+  const yesButtonScale = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = (animatedValue: Animated.Value) => {
+    Animated.spring(animatedValue, {
+      toValue: 0.75,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = (animatedValue: Animated.Value) => {
+    Animated.spring(animatedValue, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start();
+  };
+
   return (
     <Modal animationType="fade" transparent={false} visible={true} backdropColor="rgba(0, 0, 0, 0.35))">
       <View style={{
@@ -12,7 +30,6 @@ export default function SaveChangesModal({ onClose }: Props) {
         height: 'auto',
         padding: 19,
         borderRadius: 16,
-        // filter: 'drop-shadow(4px 4px 4px rgba(0, 0, 0, 0.35))',
         shadowColor: 'rgba(0, 0, 0, 0.35)',
         shadowOffset: { width: 4, height: 4 },
         shadowOpacity: 0.35,
@@ -44,38 +61,46 @@ export default function SaveChangesModal({ onClose }: Props) {
             gap: 16,
           }}>
             <Pressable 
-              style={{
+              onPressIn={() => handlePressIn(noButtonScale)}
+              onPressOut={() => handlePressOut(noButtonScale)} 
+              onPress={() => onClose(false)}
+            >
+              <Animated.View style={{
+                transform: [{ scale: noButtonScale }],
                 backgroundColor: '#ffffff', 
                 paddingHorizontal: 32,
                 height: 50,
                 justifyContent: 'center',
                 borderRadius: 10,
                 borderWidth: 1,
-              }} 
-              onPress={() => onClose(false)}
-            >
-              <Text style={{
-                fontSize: 14,
-                fontFamily: 'Poppins_500Medium',
-                color: 'black'
-              }}>No</Text>
+              }}>
+                <Text style={{
+                  fontSize: 14,
+                  fontFamily: 'Poppins_500Medium',
+                  color: 'black'
+                }}>No</Text>
+              </Animated.View>
             </Pressable>
 
-            <Pressable 
-              style={{
+             <Pressable 
+              onPressIn={() => handlePressIn(yesButtonScale)}
+              onPressOut={() => handlePressOut(yesButtonScale)} 
+              onPress={() => onClose(true)}
+            >
+              <Animated.View style={{
+                transform: [{ scale: yesButtonScale }],
                 backgroundColor: '#1AE843', 
                 paddingHorizontal: 32,
                 height: 50,
                 justifyContent: 'center',
                 borderRadius: 10,
-              }} 
-              onPress={() => onClose(true)}
-            >
-              <Text style={{
-                fontSize: 14,
-                fontFamily: 'Poppins_500Medium',
-                color: 'white'
-              }}>Yes</Text>
+              }}>
+                <Text style={{
+                  fontSize: 14,
+                  fontFamily: 'Poppins_500Medium',
+                  color: 'white'
+                }}>Yes</Text>
+              </Animated.View>
             </Pressable>
           </View>
         </View>

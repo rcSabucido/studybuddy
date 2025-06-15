@@ -48,26 +48,30 @@ const truncateText = (text: string, maxLength: number = 23) => {
 }
 
 export default function TaskPanel({ tasks, date, onClose, onDeleteTasks }: TaskPanelProps & { onClose: () => void }) {
-    const panY = new Animated.Value(0);
+    const panY = useRef(new Animated.Value(Dimensions.get('window').height)).current;
     const screenHeight = Dimensions.get('window').height;
     const dragHandleRef = useRef(null);
     const isDraggingHandle = useRef(false);
     const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
     const [isSelectionMode, setIsSelectionMode] = useState(false);
+    const arrowScale = useRef(new Animated.Value(1)).current;
+    const trashScale = useRef(new Animated.Value(1)).current;
 
     const sortedTasks = [...tasks].sort((a, b) => a.priority - b.priority);
 
-    const resetPositionAnim = Animated.timing(panY, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: false,
-    });
+    const handlePressIn = (animatedValue: Animated.Value) => {
+        Animated.spring(animatedValue, {
+            toValue: 0.75,
+            useNativeDriver: true,
+        }).start();
+    };
 
-    const closeAnim = Animated.timing(panY, {
-        toValue: screenHeight,
-        duration: 500,
-        useNativeDriver: false,
-    });
+    const handlePressOut = (animatedValue: Animated.Value) => {
+        Animated.spring(animatedValue, {
+            toValue: 1,
+            useNativeDriver: true,
+        }).start();
+    };
 
     const handleTaskLongPress = (taskId: string) => {
       setIsSelectionMode(true);
@@ -83,6 +87,12 @@ export default function TaskPanel({ tasks, date, onClose, onDeleteTasks }: TaskP
         );
       }
     };
+
+  const translateY = panY.interpolate({
+    inputRange: [0, screenHeight],
+    outputRange: [0, screenHeight],
+    extrapolate: 'clamp'
+  });
 
     const handleDelete = async () => {
     try {
@@ -106,31 +116,45 @@ export default function TaskPanel({ tasks, date, onClose, onDeleteTasks }: TaskP
     }
   };
 
-    const panResponder = PanResponder.create({
-        onStartShouldSetPanResponder: (evt, gestureState) => {
-            return isDraggingHandle.current;
-        },
-        onMoveShouldSetPanResponder: (evt, gestureState) => {
-            return isDraggingHandle.current;
-        },
-        onPanResponderMove: (_, gestureState) => {
-            if (gestureState.dy > 0) {
-                panY.setValue(gestureState.dy);
-            }
-        },
-        onPanResponderRelease: (_, gestureState) => {
-            isDraggingHandle.current = false;
-            if (gestureState.dy > screenHeight / 3) {
-                closeAnim.start(() => onClose());
-            } else {
-                resetPositionAnim.start();
-            }
-        },
-    });
+   const panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: () => isDraggingHandle.current,
+    onMoveShouldSetPanResponder: () => isDraggingHandle.current,
+    onPanResponderMove: (_, gestureState) => {
+      if (gestureState.dy > 0) {
+        panY.setValue(gestureState.dy);
+      }
+    },
+    onPanResponderRelease: (_, gestureState) => {
+      isDraggingHandle.current = false;
+      if (gestureState.dy > screenHeight / 3) {
+        Animated.timing(panY, {
+          toValue: screenHeight,
+          duration: 200,
+          useNativeDriver: true,
+        }).start(() => onClose());
+      } else {
+        Animated.spring(panY, {
+          toValue: 0,
+          tension: 100,
+          friction: 5,
+          useNativeDriver: true,
+        }).start();
+      }
+    },
+  });
 
-    useEffect(() => {
-        panY.setValue(0);
-    }, [date]);
+  useEffect(() => {
+    Animated.spring(panY, {
+      toValue: 0,
+      useNativeDriver: true,
+      tension: 80,
+      friction: 12,
+    }).start();
+
+    return () => {
+      panY.setValue(screenHeight);
+    };
+  }, []);
 
     const getPriorityColor = (priority: number) => {
     switch(priority) {
@@ -142,7 +166,7 @@ export default function TaskPanel({ tasks, date, onClose, onDeleteTasks }: TaskP
   };
 
   return (
-    <Animated.View style={[styles.container, { transform: [{ translateY: panY }] }]} {...panResponder.panHandlers}>
+    <Animated.View style={[styles.container, { transform: [{ translateY }] }]} {...panResponder.panHandlers}>
         <View
             ref={dragHandleRef}
             style={styles.dragIndicatorContainer}
@@ -151,7 +175,7 @@ export default function TaskPanel({ tasks, date, onClose, onDeleteTasks }: TaskP
             }}>
             <View style={styles.dragIndicator} />
         </View>
-        <View style={styles.headerContainer}>
+        {/* <View style={styles.headerContainer}>
             <ArrowLeftIcon size={20} onPress={() => {
               if (isSelectionMode) {
                 setIsSelectionMode(false);
@@ -170,7 +194,44 @@ export default function TaskPanel({ tasks, date, onClose, onDeleteTasks }: TaskP
                       }
                   }}
               />
-        </View>
+        </View> */}
+        <View style={styles.headerContainer}>
+                <Pressable 
+                    onPressIn={() => handlePressIn(arrowScale)}
+                    onPressOut={() => handlePressOut(arrowScale)}
+                    onPress={() => {
+                        if (isSelectionMode) {
+                            setIsSelectionMode(false);
+                            setSelectedTasks([]);
+                        } else {
+                            onClose();
+                        }
+                    }}
+                >
+                    <Animated.View style={{ transform: [{ scale: arrowScale }] }}>
+                        <ArrowLeftIcon size={20} />
+                    </Animated.View>
+                </Pressable>
+
+                <Text style={styles.headText}>Tasks</Text>
+
+                <Pressable 
+                    onPressIn={() => selectedTasks.length > 0 && handlePressIn(trashScale)}
+                    onPressOut={() => selectedTasks.length > 0 && handlePressOut(trashScale)}
+                    onPress={() => {
+                        if (selectedTasks.length > 0) {
+                            handleDelete();
+                        }
+                    }}
+                >
+                    <Animated.View style={{ transform: [{ scale: trashScale }] }}>
+                        <TrashIcon 
+                            size={20}
+                            color={selectedTasks.length > 0 ? '#F81414' : '#999'}
+                        />
+                    </Animated.View>
+                </Pressable>
+            </View>
       <ScrollView style={styles.taskList} onTouchStart={() => {
         isDraggingHandle.current = false;
       }}>

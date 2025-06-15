@@ -24,6 +24,7 @@ export default function Index() {
     minutes: 0,
     period: 'AM' as const
   });
+  const [timeModified, setTimeModified] = useState(false);
   const [timeModal, setTimeModal] = useState(false);
   const [selectDate, setSelectDate] = useState('');
   const [showCalendar, setShowCalendar] = useState(false);
@@ -164,7 +165,7 @@ export default function Index() {
               setTimeModal(!timeModal);
             }} style={styles.timeButton}>
               <Text style={{color: 'dimgray'}}>
-                 {(timeValue.hours !== 12 || timeValue.minutes !== 0 || timeValue.period !== 'AM') 
+                 {timeModified
                     ? `${timeValue.hours}:${timeValue.minutes.toString().padStart(2, '0')} ${timeValue.period}`
                     : 'Set Time Notification'}
                 </Text>
@@ -174,6 +175,7 @@ export default function Index() {
            {timeModal && (<NotifyTimeModal previousValue={timeValue} onClose={(newValue: any) => {
             if (newValue) {
               setTimeValue(newValue);
+              setTimeModified(true);
             }
             setTimeModal(false);
            }}/>)}

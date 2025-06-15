@@ -190,7 +190,6 @@ export default function Index() {
                             label={task.label}
                             dueDate={task.dueDate}
                             priority={task.priority}
-                            onDelete={() => handleDeleteTask(task.id)}
                             onActionPress={() => handleTaskAction(task.id, task.label)}
                             onTaskPress={() => {
                                 useRouter().push({pathname: "./specific_data_view", params: {
