@@ -1,5 +1,6 @@
 import AnimatedPressable from '@/components/AnimatedPressable';
 import Button from '@/components/Button';
+import LoadingModal from '@/components/LoadingModal';
 import MinStudyHoursModal from '@/components/MinStudyHoursModal';
 import PieProgress from "@/components/PieProgress";
 import { getCurrentWeekBounds } from '@/shared/DataHelpers';
@@ -39,6 +40,7 @@ export default function DataView() {
   const [data, setData] = useState([0, 0, 0, 0, 0, 0, 0]);
   const [deficitData, setDeficitData] = useState([0, 0, 0, 0, 0, 0, 0]);
   const [totalHour, setTotalHour] = useState(-1);
+  const [verboseLoading, setVerboseLoading] = useState(false);
   
   const playerButtonSound = useAudioPlayer(buttonSound);
   const playerSelectSound = useAudioPlayer(selectSound);
@@ -125,6 +127,7 @@ export default function DataView() {
 
   useFocusEffect(
     useCallback(() => {
+      setVerboseLoading(false);
       fetchData();
     }, [])
   );
@@ -253,7 +256,11 @@ export default function DataView() {
 
         <View style={{margin: 'auto'}}>
           <AnimatedPressable
-            onPress={() => { playSelectSound(); openVerboseDataView(); }}
+            onPress={() => {
+              setVerboseLoading(true);
+              playSelectSound();
+              openVerboseDataView();
+            }}
             accessibilityLabel='View detailed statistics'>
             <LineChart
               data={{
@@ -316,6 +323,7 @@ export default function DataView() {
       icon={ChartBarIcon}
     />
     </View>
+    { verboseLoading && <LoadingModal/> }
     </>
   );
 }

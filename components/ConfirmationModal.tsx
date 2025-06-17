@@ -1,3 +1,4 @@
+import { useAudioPlayer } from "expo-audio";
 import { Modal, Text, View } from "react-native";
 import styles from '../app/styles';
 import Button from './Button';
@@ -9,7 +10,16 @@ type Props = {
   icon?: any,
 };
 
+const buttonSound = require('@/assets/audio/ui_tap-variant-01.wav');
+
 export default function ConfirmationModal({message, onYes, onNo, icon: IconComponent}: Props) {
+  const playerButtonSound = useAudioPlayer(buttonSound);
+
+  const playTapSound = () => {
+      playerButtonSound.seekTo(0);
+      playerButtonSound.play();
+  }
+  
   return (
     <>
       <Modal animationType="fade" transparent={false} visible={true} backdropColor="rgba(0, 0, 0, 0.35))">
@@ -45,7 +55,7 @@ export default function ConfirmationModal({message, onYes, onNo, icon: IconCompo
                   borderWidth: 1,
                   marginRight: 12,
                 }}
-                onPress={onNo}
+                onPress={() => {playTapSound(); onNo();}}
               />
               <Button
                 label="Yes"
@@ -56,7 +66,7 @@ export default function ConfirmationModal({message, onYes, onNo, icon: IconCompo
                   paddingHorizontal: 13,
                   height: 50,
                 }}
-                onPress={onYes}
+                onPress={() => {playTapSound(); onYes(); }}
               />
             </View>
           </View>
