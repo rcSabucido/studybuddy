@@ -4,11 +4,11 @@ import TaskFilter, { FilterType } from '@/components/TaskFilter';
 import Tasks from '@/components/Tasks';
 import { useFocusEffect } from '@react-navigation/native';
 import { createClient } from '@supabase/supabase-js';
+import { useAudioPlayer } from 'expo-audio';
 import { router, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { AdjustmentsHorizontalIcon } from 'react-native-heroicons/outline';
-import { useAudioPlayer } from 'expo-audio'
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
@@ -166,11 +166,21 @@ export default function Index() {
     return (
         <View style={styles.container}>
             <View style={styles.headerContainer}>
-                <Text style={styles.smallText}>Hello,</Text>
-                <Text style={styles.bigText}>You've got</Text>
-                <Text style={styles.purpleText}>
-                    {todayTasksCount} tasks{showTodayOnly ? ' today' : ' in total'}
-                    </Text>
+                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                    <View style={{width: "auto"}}>
+                        <Text style={styles.smallText}>Hello,</Text>
+                        <Text style={styles.bigText}>You've got</Text>
+                        <Text style={styles.purpleText}>
+                            {todayTasksCount} tasks{showTodayOnly ? ' today' : ' in total'}
+                        </Text>
+                    </View>
+                    <View style={{ justifyContent: "center" }}>
+                        <Image
+                            source={require('@/assets/images/logo-no-title.png')}
+                            style={{ width: 64, height: 76 }}
+                        />
+                    </View>
+                </View>
             </View>
             <View style={styles.allButtonContainer}>
                 <View style={styles.buttonContainer}>
