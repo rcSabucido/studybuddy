@@ -1,14 +1,17 @@
+import AnimatedPressable from '@/components/AnimatedPressable';
 import BackHeader from '@/components/BackHeader';
 import Button from '@/components/Button';
+import LoadingModal from '@/components/LoadingModal';
 import MinStudyHoursModal from '@/components/MinStudyHoursModal';
 import PieProgress from "@/components/PieProgress";
 import { getCurrentWeekBounds } from '@/shared/DataHelpers';
 import { useStore } from '@/store/GlobalState';
 import Feather from '@expo/vector-icons/Feather';
 import { createClient } from '@supabase/supabase-js';
+import { useAudioPlayer } from 'expo-audio';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Dimensions, Pressable, ScrollView, Text, View } from "react-native";
+import { Dimensions, ScrollView, Text, View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { ChartBarIcon } from 'react-native-heroicons/solid';
 import styles from './styles';
@@ -17,6 +20,9 @@ const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
 const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
+
+const buttonSound = require('@/assets/audio/ui_tap-variant-01.wav');
+const selectSound = require('@/assets/audio/task_select_sound.wav');
 
 function openVerboseDataView(taskId: string | string[], taskLabel: string | string[]) {
   const router = useRouter();
@@ -35,6 +41,20 @@ export default function DataView() {
   const [data, setData] = useState([0, 0, 0, 0, 0, 0, 0]);
   const [deficitData, setDeficitData] = useState([0, 0, 0, 0, 0, 0, 0]);
   const [totalHour, setTotalHour] = useState(-1);
+  const [verboseLoading, setVerboseLoading] = useState(false);
+
+  const playerButtonSound = useAudioPlayer(buttonSound);
+  const playerSelectSound = useAudioPlayer(selectSound);
+
+  const playTapSound = () => {
+      playerButtonSound.seekTo(0);
+      playerButtonSound.play();
+  }
+
+  const playSelectSound = () => {
+      playerSelectSound.seekTo(0);
+      playerSelectSound.play();
+  }
 
   const fetchData = async () => {
     console.log("Fetching deficit")
@@ -108,6 +128,7 @@ export default function DataView() {
   
   useFocusEffect(
     useCallback(() => {
+      setVerboseLoading(false);
       fetchData();
     }, [])
   );
@@ -170,8 +191,9 @@ export default function DataView() {
             fontFamily: 'Poppins_700Bold',
           }}>Minimum Hours to Study</Text>
 
-          <Pressable
+          <AnimatedPressable
           onPress={() => {
+            playTapSound();
             setStudyHoursVisible(!studyHoursVisible)
           }}
           accessibilityLabel='Change the minimum hours you need to study'
@@ -207,18 +229,22 @@ export default function DataView() {
                     {`${minimumStudyHours} hour${minimumStudyHours > 1 ? 's' : ''}`}
                 </Text>
             </View>
-          </Pressable>
+          </AnimatedPressable>
         </View>
         <View style={styles.content_container}>
           <Text style={{
             color: "#ddd",
             fontSize: 20,
             fontFamily: 'Poppins_700Bold',
-          }}>Deficit</Text>
+          }}>Deficit:</Text>
 
           <View style={{margin: 'auto'}}>
-            <Pressable
-              onPress={() => openVerboseDataView(taskId, taskLabel)}
+            <AnimatedPressable
+              onPress={() => {
+                playSelectSound();
+                setVerboseLoading(true);
+                openVerboseDataView(taskId, taskLabel)
+              }}
               accessibilityLabel='View detailed statistics'>
               <LineChart
                 data={{
@@ -255,12 +281,13 @@ export default function DataView() {
                   borderRadius: 16
                 }}
               />
-            </Pressable>
+            </AnimatedPressable>
           </View>
         </View>
       </ScrollView>
       { studyHoursVisible && <MinStudyHoursModal previousValue={minimumStudyHours} onClose={(newValue?: number) => {
         setStudyHoursVisible(false);
+        playTapSound();
         if (newValue !== undefined) {
           updateDeficitData(minimumStudyHours, newValue);
         }
@@ -276,10 +303,11 @@ export default function DataView() {
           bottom: 64,
           filter: 'drop-shadow(4px 4px 4px rgba(0, 0, 0, 0.35))',
         }}
-        onPress={() => openSetCurrentTimer(taskId, taskLabel)}
+        onPress={() => { playTapSound(); openSetCurrentTimer(taskId, taskLabel) }}
         icon={ChartBarIcon}
       />
     </View>
+    { verboseLoading && <LoadingModal/> }
     </>
   );
 }

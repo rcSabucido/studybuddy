@@ -11,12 +11,18 @@ import styles from './styles';
 import AnimatedPressable from "@/components/AnimatedPressable";
 import { storeTaskProgress } from "@/shared/DataHelpers";
 import { createClient } from "@supabase/supabase-js";
+import { useAudioPlayer } from "expo-audio";
 import * as Notifications from 'expo-notifications';
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
 const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
+
+const buttonSound = require('@/assets/audio/ui_tap-variant-01.wav');
+const selectSound = require('@/assets/audio/task_select_sound.wav');
+const finishSound = require('@/assets/audio/state-change_confirm-up.wav');
+const alarmSound = require('@/assets/audio/alarm_tone.wav');
 
 type Props = {
   hours: number,
@@ -49,6 +55,31 @@ export default function ManualTimer() {
   const intervalRef = useRef<number | null>(null);
   const [ percentage, setPercentage ] = useState(100);
   const studyIntervalRef = useRef<number>(0);
+
+  const playerButtonSound = useAudioPlayer(buttonSound);
+  const playerSelectSound = useAudioPlayer(selectSound);
+  const playerFinishSound = useAudioPlayer(finishSound);
+  const playerAlarmSound = useAudioPlayer(alarmSound);
+
+  const playTapSound = () => {
+      playerButtonSound.seekTo(0);
+      playerButtonSound.play();
+  }
+
+  const playSelectSound = () => {
+      playerSelectSound.seekTo(0);
+      playerSelectSound.play();
+  }
+
+  const playFinishSound = () => {
+      playerFinishSound.seekTo(0);
+      playerFinishSound.play();
+  }
+
+  const playAlarmSound = () => {
+      playerAlarmSound.seekTo(0);
+      playerAlarmSound.play();
+  }
 
   const startTime = {
     hours: hoursNum, minutes: minutesNum, seconds: secondsNum
@@ -102,6 +133,7 @@ export default function ManualTimer() {
           setPercentage(done ? 0 : getPercentageRemaining(startTime, newTime))
           if (done) {
             Vibration.vibrate(1000);
+            playAlarmSound();
           }
           console.log(newTime)
           studyIntervalRef.current++
@@ -174,6 +206,7 @@ export default function ManualTimer() {
           }
           <AnimatedPressable onPress={() => 
               {
+                playSelectSound();
                 if (!timerStarted) {
                   setTimerStarted(true)
                   // Reset radial chart percentage if start time = current time
@@ -194,7 +227,8 @@ export default function ManualTimer() {
           </AnimatedPressable>
           <AnimatedPressable onPress={() => 
               {
-                resetTimer()
+                resetTimer();
+                playTapSound();
                 setPercentage(100)
               }
             } viewStyle={[styles.content_container,
@@ -217,6 +251,7 @@ export default function ManualTimer() {
       }}
       textStyle={styles.container_button_text}
       onPress={() => {
+        playFinishSound();
         Notifications.scheduleNotificationAsync({
           content: {
             title: 'Manual Timer Task Done',
@@ -234,8 +269,8 @@ export default function ManualTimer() {
     {
       confirmationVisible &&
         <ConfirmationModal message="Are you sure you want to leave? This will stop the timer."
-          onYes={() => {updateStudyInterval(); useRouter().back()}}
-          onNo={() => {setConfirmationVisible(false)}}
+          onYes={() => {playTapSound(); updateStudyInterval(); useRouter().back()}}
+          onNo={() => {playTapSound(); setConfirmationVisible(false)}}
           icon={ExclamationTriangleIcon}
         />
     }

@@ -1,7 +1,9 @@
 import ArrowHeader from "@/components/ArrowHeader";
+import LoadingModal from "@/components/LoadingModal";
 import { getWeekBounds, getWeekBoundsDate } from "@/shared/DataHelpers";
 import { useStore } from "@/store/GlobalState";
 import { createClient } from "@supabase/supabase-js";
+import { useAudioPlayer } from "expo-audio";
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useState } from "react";
 import { Dimensions, Pressable, ScrollView, Text, View } from "react-native";
@@ -13,6 +15,8 @@ const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
 const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
+
+const selectSound = require('@/assets/audio/task_select_sound.wav');
 
 function goBack() {
   const router = useRouter();
@@ -26,6 +30,14 @@ export default function VerboseDataView() {
   const [longestDurationPerDay, setLongestDurationPerDay] = useState([0, 0, 0, 0, 0, 0, 0]);
   const [currentWeekBounds, setCurrentWeekBounds] = useState(getWeekBoundsDate(new Date()));
   const [currentWeekDate, setCurrentWeekDate] = useState(new Date())
+  const [dataLoading, setDataLoading] = useState(false)
+
+  const playerSelectSound = useAudioPlayer(selectSound);
+
+  const playSelectSound = () => {
+      playerSelectSound.seekTo(0);
+      playerSelectSound.play();
+  }
 
   const formatDate = (date: Date) => date.toLocaleDateString('en-US', {
     year: 'numeric',
@@ -42,6 +54,8 @@ export default function VerboseDataView() {
   }
 
   const fetchData = async (newWeekDate?: Date) => {
+    setDataLoading(true);
+    
     let weekBounds = getWeekBounds(newWeekDate ? newWeekDate : currentWeekDate)
     console.log("Current new week bounds:")
     console.log(weekBounds)
@@ -118,9 +132,12 @@ export default function VerboseDataView() {
             <Pressable style={styles.button} onPress={() => {
               let newDate = new Date(currentWeekDate.getTime() - 7 * 24 * 60 * 60 * 1000)
               console.log(`new date: ${formatDate(newDate)}`)
-              setCurrentWeekDate(newDate)
-              setCurrentWeekBounds(getWeekBoundsDate(newDate))
-              fetchData(newDate)
+              playSelectSound();
+              fetchData(newDate).then(() => {
+                setCurrentWeekDate(newDate);
+                setCurrentWeekBounds(getWeekBoundsDate(newDate));
+                setDataLoading(false);
+              });
             }}>
               <ArrowLeftIcon size={25} color="black"/>
             </Pressable>
@@ -133,9 +150,12 @@ export default function VerboseDataView() {
               if (formatDate(currentWeekDate) == formatDate(new Date())) return
               let newDate = new Date(currentWeekDate.getTime() + 7 * 24 * 60 * 60 * 1000)
               console.log(`new date: ${formatDate(newDate)}`)
-              setCurrentWeekDate(newDate)
-              setCurrentWeekBounds(getWeekBoundsDate(newDate))
-              fetchData(newDate)
+              playSelectSound();
+              fetchData(newDate).then(() => {
+                setCurrentWeekDate(newDate);
+                setCurrentWeekBounds(getWeekBoundsDate(newDate));
+                setDataLoading(false);
+              });
             }}>
               <ArrowRightIcon size={25} color={formatDate(currentWeekDate) == formatDate(new Date()) ? "grey" : "black"}/>
             </Pressable>
@@ -283,6 +303,7 @@ export default function VerboseDataView() {
         </View>
       </View>
       </ScrollView>
+      { dataLoading && <LoadingModal/> }
     </View>
     </>
   );

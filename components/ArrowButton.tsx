@@ -1,14 +1,23 @@
 import styles from '@/app/styles';
-import { Pressable, Animated } from 'react-native';
-import { ArrowLeftIcon } from 'react-native-heroicons/outline';
+import { useAudioPlayer } from 'expo-audio';
 import { useRef } from 'react';
+import { Animated, Pressable } from 'react-native';
+import { ArrowLeftIcon } from 'react-native-heroicons/outline';
 
 type Props = {
     onPress?: () => void;
 }
 
+const buttonSound = require('@/assets/audio/ui_tap-variant-01.wav');
+
 export default function ArrowButton({ onPress }: Props) {
     const scaleAnim = useRef(new Animated.Value(1)).current;
+    const playerButtonSound = useAudioPlayer(buttonSound);
+
+    const playTapSound = () => {
+        playerButtonSound.seekTo(0);
+        playerButtonSound.play();
+    }
 
     const handlePressIn = () => {
         Animated.spring(scaleAnim, {
@@ -25,7 +34,7 @@ export default function ArrowButton({ onPress }: Props) {
     }
     return(
         <Animated.View style={[styles.button_container, { transform: [{ scale: scaleAnim }] }]}>
-            <Pressable style={styles.button} onPress={onPress} onPressIn={handlePressIn} onPressOut={handlePressOut}>
+            <Pressable style={styles.button} onPress={onPress} onPressIn={() => {playTapSound(); handlePressIn(); }} onPressOut={handlePressOut}>
                 <ArrowLeftIcon size={25} color="black"/>
             </Pressable>
         </Animated.View>

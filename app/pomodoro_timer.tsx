@@ -5,6 +5,7 @@ import ConfirmationModal from "@/components/ConfirmationModal";
 import RadialChart from "@/components/RadialChart";
 import { storeTaskProgress } from "@/shared/DataHelpers";
 import { createClient } from "@supabase/supabase-js";
+import { useAudioPlayer } from "expo-audio";
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from "react";
 import { Dimensions, Text, Vibration, View } from "react-native";
@@ -18,6 +19,11 @@ const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
 
 const WORK_TIME_MINUTES = 2;
 const BREAK_TIME_MINUTES = 1;
+
+const buttonSound = require('@/assets/audio/ui_tap-variant-01.wav');
+const selectSound = require('@/assets/audio/task_select_sound.wav');
+const finishSound = require('@/assets/audio/state-change_confirm-up.wav');
+const alarmSound = require('@/assets/audio/alarm_tone.wav');
 
 function getPercentageRemaining(
   start: { minutes: number; seconds: number },
@@ -61,6 +67,31 @@ export default function PomodoroTimer() {
   const [workTime, setWorkTime] = useState({ minutes: WORK_TIME_MINUTES, seconds: 0 });
   const [breakTime, setBreakTime] = useState({ minutes: BREAK_TIME_MINUTES, seconds: 0 });
 
+  const playerButtonSound = useAudioPlayer(buttonSound);
+  const playerSelectSound = useAudioPlayer(selectSound);
+  const playerFinishSound = useAudioPlayer(finishSound);
+  const playerAlarmSound = useAudioPlayer(alarmSound);
+
+  const playTapSound = () => {
+      playerButtonSound.seekTo(0);
+      playerButtonSound.play();
+  }
+
+  const playSelectSound = () => {
+      playerSelectSound.seekTo(0);
+      playerSelectSound.play();
+  }
+
+  const playFinishSound = () => {
+      playerFinishSound.seekTo(0);
+      playerFinishSound.play();
+  }
+
+  const playAlarmSound = () => {
+      playerAlarmSound.seekTo(0);
+      playerAlarmSound.play();
+  }
+
   const updateStudyInterval = () => {
     console.log("updateStudyInterval")
     console.log(`studyIntervalRef.current = ${studyIntervalRef.current}`)
@@ -95,8 +126,10 @@ export default function PomodoroTimer() {
     } else {
       updateStudyInterval();
       setBreakTime({ minutes: BREAK_TIME_MINUTES, seconds: 0 });
+      playAlarmSound();
     }
     Vibration.vibrate(1000);
+    playFinishSound();
   };
 
   useEffect(() => {
@@ -206,6 +239,7 @@ export default function PomodoroTimer() {
                 } else {
                   stopTimer();
                 }
+                playTapSound();
               }}
               viewStyle={[styles.content_container, { height: 69, width: "85%", marginTop: 32 }]}
             >
@@ -238,8 +272,8 @@ export default function PomodoroTimer() {
       {confirmationVisible && (
         <ConfirmationModal
           message="Are you sure you want to leave? This will stop the timer."
-          onYes={() => {updateStudyInterval(); router.back()}}
-          onNo={() => setConfirmationVisible(false)}
+          onYes={() => {playTapSound(); updateStudyInterval(); router.back()}}
+          onNo={() => {playTapSound(); setConfirmationVisible(false)}}
           icon={ExclamationTriangleIcon}
         />
       )}
