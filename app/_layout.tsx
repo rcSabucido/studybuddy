@@ -4,6 +4,7 @@ import { fetchCommonHour } from "@/shared/DataAnalytics";
 import { createClient } from "@supabase/supabase-js";
 import * as Notifications from 'expo-notifications';
 import { useEffect } from "react";
+import { Vibration } from "react-native";
 import BackgroundService from 'react-native-background-actions';
 
 const sleep = (time: number) => new Promise<void>((resolve) => setTimeout(() => resolve(), time));
@@ -159,6 +160,7 @@ const backgroundTask = async (taskDataArguments: any) => {
         .neq('lastNotificationSentAt', getCurrentDateString());
 
       let commonHour: number = await fetchCommonHour();
+      let hasNotification: boolean = false;
 
       if (data != undefined) {
         for (let j = 0; j < data.length; j++) {
@@ -176,7 +178,13 @@ const backgroundTask = async (taskDataArguments: any) => {
               notifyTaskTimeChangeSuggestion(element.id, element.label, commonHour);
           }
           updateLastNotificationSentAt(element.id, element.label);
+          hasNotification = true;
         };
+      }
+
+      if (hasNotification) {
+        Vibration.vibrate(1000);
+        hasNotification = false;
       }
 
       await sleep(taskDataArguments?.delay ?? 60000 * 5);
@@ -195,7 +203,7 @@ const options = {
   color: '#ff00ff',
   linkingURI: 'studybuddy://',
   parameters: {
-    delay: 60000 / 2,
+    delay: 60000,
   },
 };
 
