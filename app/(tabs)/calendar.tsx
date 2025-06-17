@@ -2,12 +2,12 @@ import Button from '@/components/Button';
 import TaskPanel, { Task } from '@/components/TaskPanel';
 import { useFocusEffect } from '@react-navigation/native';
 import { createClient } from '@supabase/supabase-js';
+import { useAudioPlayer } from 'expo-audio';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Calendar } from 'react-native-calendars';
 import { PlusIcon } from 'react-native-heroicons/outline';
-import { useAudioPlayer } from 'expo-audio';
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
@@ -173,6 +173,12 @@ export default function Index() {
           markedDates={getMarkedDates()}
         />
       </View>
+      <View style={{ alignItems: "center", padding: 32 }}>
+        <Image
+          source={require('@/assets/images/logo-no-title.png')}
+          style={{ width: 128, height: 152 }}
+        />
+      </View>
       {selected && !isTaskPanelVisible && (
         <View>
           <Text style={styles.noTasksText}>No tasks so far...</Text>
@@ -225,7 +231,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: '#333',
     fontFamily: 'Poppins_700Bold',
-    paddingTop: 60,
     margin: 'auto'
   },
   innerScrollView: {
