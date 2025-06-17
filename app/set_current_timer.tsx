@@ -1,6 +1,7 @@
 import AnimatedPressable from "@/components/AnimatedPressable";
 import BackHeader from "@/components/BackHeader";
 import { createClient } from "@supabase/supabase-js";
+import { useAudioPlayer } from "expo-audio";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { Image, ScrollView, Text, View } from "react-native";
@@ -11,6 +12,9 @@ const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
 const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
+
+const buttonSound = require('@/assets/audio/ui_tap-variant-01.wav');
+const selectSound = require('@/assets/audio/task_select_sound.wav');
 
 function openManualTimer(taskId: string | string[], taskLabel: string | string[]) {
   const router = useRouter();
@@ -28,6 +32,19 @@ export default function SetCurrentTimer() {
   let { taskId, taskLabel } = params;
   const [taskChoices, setTaskChoices] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const playerButtonSound = useAudioPlayer(buttonSound);
+  const playerSelectSound = useAudioPlayer(selectSound);
+
+  const playTapSound = () => {
+      playerButtonSound.seekTo(0);
+      playerButtonSound.play();
+  }
+
+  const playSelectSound = () => {
+      playerSelectSound.seekTo(0);
+      playerSelectSound.play();
+  }
 
   const fetchTasks = async () => {
     try {
@@ -104,7 +121,7 @@ export default function SetCurrentTimer() {
                 placeholder="Select an option..."
                 options={taskChoices}
                 selectedValue={currentWork ? currentWork : undefined}
-                onValueChange={(value: any) => {setCurrentWork(value)}}
+                onValueChange={(value: any) => { playTapSound(); setCurrentWork(value); }}
                 dropdownStyle={{
                   backgroundColor: "#D9D9D9",
                 }}
@@ -126,6 +143,7 @@ export default function SetCurrentTimer() {
                 onPress={() => {
                   let fetchTaskId = taskId != null ? taskId : currentWork
                   if (fetchTaskId == null) return
+                  playSelectSound();
                   openPomodoroTimer(fetchTaskId, taskLabel)
                 }} accessibilityLabel="Use pomodoro timer">
                 <Text style={[styles.container_header_text, {padding: 8}]}>Use Pomodoro Timer</Text>
@@ -138,6 +156,7 @@ export default function SetCurrentTimer() {
                 onPress={() => {
                   let fetchTaskId = taskId != null ? taskId : currentWork
                   if (fetchTaskId == null) return
+                  playSelectSound();
                   openManualTimer(fetchTaskId, taskLabel)
                 }} accessibilityLabel="Use manual timer">
                 <Text style={[styles.container_header_text, {padding: 8}]}>Manually Track</Text>

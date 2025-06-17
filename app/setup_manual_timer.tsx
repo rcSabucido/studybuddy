@@ -1,10 +1,13 @@
 import AnimatedPressable from "@/components/AnimatedPressable";
 import BackHeader from "@/components/BackHeader";
 import RollerPicker from "@/components/RollerPicker";
+import { useAudioPlayer } from "expo-audio";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { Text, View } from "react-native";
 import styles from "./styles";
+
+const buttonSound = require('@/assets/audio/ui_tap-variant-01.wav');
 
 function openManualTimer(
   hours: number,
@@ -28,6 +31,13 @@ export default function SetupManualTimer() {
 
   const hourOptions = Array.from({ length: 24 }, (_, i) => i);
   const minuteSecondOptions = Array.from({ length: 60 }, (_, i) => i);
+
+  const playerButtonSound = useAudioPlayer(buttonSound);
+  
+  const playTapSound = () => {
+      playerButtonSound.seekTo(0);
+      playerButtonSound.play();
+  }
 
   return (
     <View style={{ flex: 1, alignItems: "center", backgroundColor: "#ffffff" }}>
@@ -69,6 +79,7 @@ export default function SetupManualTimer() {
 
           <AnimatedPressable
             onPress={() => {
+              playTapSound();
               if (hours == 0 && minutes == 0 && seconds == 0) return;
               openManualTimer(hours, minutes, seconds, taskId, taskLabel)
             }}
