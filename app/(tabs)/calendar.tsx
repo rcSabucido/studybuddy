@@ -173,16 +173,18 @@ export default function Index() {
           markedDates={getMarkedDates()}
         />
       </View>
-      <View style={{ alignItems: "center", padding: 32 }}>
-        <Image
-          source={require('@/assets/images/logo-no-title.png')}
-          style={{ width: 128, height: 152 }}
-        />
-      </View>
       {selected && !isTaskPanelVisible && (
-        <View>
-          <Text style={styles.noTasksText}>No tasks so far...</Text>
-        </View>
+        <>
+          <View style={{ alignItems: "center", padding: 32 }}>
+            <Image
+              source={require('@/assets/images/logo-no-title.png')}
+              style={{ width: 128, height: 152 }}
+            />
+          </View>
+          <View>
+            <Text style={styles.noTasksText}>No tasks so far...</Text>
+          </View>
+        </>
       )}
     </ScrollView>
     {isTaskPanelVisible && (
