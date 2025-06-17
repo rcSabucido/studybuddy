@@ -53,9 +53,7 @@ export default function VerboseDataView() {
     }
   }
 
-  const fetchData = async (newWeekDate?: Date) => {
-    setDataLoading(true);
-    
+  const fetchData = async (newWeekDate?: Date) => {    
     let weekBounds = getWeekBounds(newWeekDate ? newWeekDate : currentWeekDate)
     console.log("Current new week bounds:")
     console.log(weekBounds)
@@ -130,6 +128,7 @@ export default function VerboseDataView() {
         <View style={[{flexDirection: 'row', justifyContent: 'space-around', width: '100%', height: 56}]}>
           <View style={styles.button_container}>
             <Pressable style={styles.button} onPress={() => {
+              setDataLoading(true);
               let newDate = new Date(currentWeekDate.getTime() - 7 * 24 * 60 * 60 * 1000)
               console.log(`new date: ${formatDate(newDate)}`)
               playSelectSound();
@@ -147,6 +146,7 @@ export default function VerboseDataView() {
           </Text>
           <View style={styles.button_container}>
             <Pressable style={styles.button} onPress={() => {
+              setDataLoading(true);
               if (formatDate(currentWeekDate) == formatDate(new Date())) return
               let newDate = new Date(currentWeekDate.getTime() + 7 * 24 * 60 * 60 * 1000)
               console.log(`new date: ${formatDate(newDate)}`)
