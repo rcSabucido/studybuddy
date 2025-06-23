@@ -4,7 +4,7 @@
     "slug": "studybuddy",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/sb-icon.png",
     "scheme": "studybuddy",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -32,10 +32,9 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#ffffff",
+          "image": "./assets/images/sb-splash-icon.png",
+          "imageWidth": 200
         }
       ],
       [
