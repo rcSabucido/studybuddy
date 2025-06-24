@@ -18,6 +18,24 @@ const getCurrentDateString = () => {
   return new Date().toISOString().split('T')[0];
 }
 
+const daysDiffFromNow = (dateStr: string) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const inputDate = new Date(dateStr);
+  const diffInMs = inputDate.getTime() - today.getTime();
+
+  const result = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+  return result;
+}
+
+const daysDiffDates = (dateStr1: string, dateStr2: string) => {
+  const inputDate1 = new Date(dateStr1);
+  const inputDate2 = new Date(dateStr2);
+  const diffInMs = inputDate1.getTime() - inputDate2.getTime();
+
+  return Math.abs(Math.floor(diffInMs / (1000 * 60 * 60 * 24)));
+}
+
 const getClippedTimeRangeAroundNow = () => {
   const now = new Date();
   const minutesBefore = 10 * 60 * 1000;
@@ -55,11 +73,11 @@ const getStudyDaysRange = (isP2?: boolean) => {
   return { from: format(begin), to: format(end) };
 } 
 
-const notifyTaskPriority = async (taskLabel: string | string[]) => {
+const notifyTaskPriority = async (taskLabel: string | string[], dueDiff: number) => {
   await Notifications.scheduleNotificationAsync({
     content: {
       title: 'Hi! Its your StudyBuddy.',
-      body: `${taskLabel} is due x days left, start working already!`,
+      body: `${taskLabel} is due in ${dueDiff} ${dueDiff == 1 ? "day" : "days"}, start working already!`,
     },
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
@@ -73,12 +91,12 @@ const notifyTaskTimeChangeSuggestion = async (taskId: string | string[], taskLab
     if (hour == 0) return "12 AM"
     if (hour == 12) return "12 PM"
     else if (hour < 12) return `${hour} AM`
-     return `${hour - 12} {PM}`
+     return `${hour - 12} PM`
   }
   await Notifications.scheduleNotificationAsync({
     content: {
       title: `${taskLabel} time change suggestion`,
-      body: `We’ve noticed you tend to work best at ${formatHour(commonHour)}. If you tap this notification, the set time will change for ${taskLabel}.`,
+      body: `We’ve noticed you tend to work on this task best at ${formatHour(commonHour)}. If you tap this notification, the set time will change for ${taskLabel}.`,
       data: { taskId, commonHour },
     },
     trigger: {
@@ -88,11 +106,11 @@ const notifyTaskTimeChangeSuggestion = async (taskId: string | string[], taskLab
   });
 }
 
-const notifyTaskUrgent = async (taskLabel: string | string[]) => {
+const notifyTaskUrgent = async (taskLabel: string | string[], overdue?: boolean) => {
   await Notifications.scheduleNotificationAsync({
     content: {
       title: `${taskLabel} needs attention!`,
-      body: "You've been putting this off. You don't have to finish it but you need to begin as it needs your attention today.",
+      body: overdue ? "This task is overdue and it needs your attention today." : "You've been putting this off. You don't have to finish it but you need to begin as it needs your attention today.",
     },
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
@@ -125,8 +143,22 @@ const checkTaskProcrastination = async (
   taskId: string | string[],
   taskLabel: string | string[],
   taskPriority: number,
+  taskDueDate: string,
+  taskCreationDate: string,
 ): Promise<boolean> => {
   let isP2 = taskPriority == 2;
+
+  let dueDiff = daysDiffFromNow(taskDueDate);
+  // Overdue tasks should be prioritized more.
+  if (dueDiff < 0) {
+    return true;
+  }
+
+  // Ignore if the due date is far away and the task is newly created.
+  if (dueDiff > (isP2 ? 3 : 7) && daysDiffFromNow(taskCreationDate) < 3) {
+    return false;
+  }
+
   let dateRange = getStudyDaysRange(isP2);
   
   let { count, error } = await supabase
@@ -150,8 +182,9 @@ const checkTaskProcrastination = async (
 
 const backgroundTask = async (taskDataArguments: any) => {
   await new Promise( async (resolve) => {
+    let timeRange = getClippedTimeRangeAroundNow();
+
     for (let i = 0; BackgroundService.isRunning(); i++) {
-      let timeRange = getClippedTimeRangeAroundNow();
       let { data, error } = await supabase
         .from('activeTasksView')
         .select('*')
@@ -159,26 +192,44 @@ const backgroundTask = async (taskDataArguments: any) => {
         .lte('time', timeRange.to)
         .neq('lastNotificationSentAt', getCurrentDateString());
 
-      let commonHour: number = await fetchCommonHour();
       let hasNotification: boolean = false;
 
+      //console.log("===============")
       if (data != undefined) {
         for (let j = 0; j < data.length; j++) {
           let element = data[j];
-          let isProcrastination = await checkTaskProcrastination(element.id, element.label, element.priority);
+          console.log(element)
+
+          let canUpdateLastNotificationAt = false;
+        
+          let isProcrastination = await checkTaskProcrastination(element.id, element.label, element.priority, element.date, element.creationDate);
           if (isProcrastination) {
-            notifyTaskUrgent(element.label)
+            notifyTaskUrgent(element.label, daysDiffFromNow(element.date) < 0)
+            hasNotification = true;
+            canUpdateLastNotificationAt = true;
           } else {
+            let commonHour: number = await fetchCommonHour(element.id);
             let elementHour = Number(element.time.split(":")[0]);
             let hourDiff = Math.abs(elementHour - commonHour);
-            console.log(`elementHour: ${elementHour}, hourDiff: ${hourDiff}, commonHour: ${commonHour}`)
-            if (hourDiff < 2)
-              notifyTaskPriority(element.label);
-            else
-              notifyTaskTimeChangeSuggestion(element.id, element.label, commonHour);
+            let dueDiff = daysDiffFromNow(element.date);
+            let notifDiff = daysDiffFromNow(element.lastNotificationSentAt);
+            //console.log(`elementHour: ${elementHour}, hourDiff: ${hourDiff}, commonHour: ${commonHour}, notifDiff: ${notifDiff}, dueDiff: ${dueDiff}`)
+            let daysAllowance = element.priority == 2 ? 3 : 7
+            if (notifDiff < -daysAllowance || dueDiff < daysAllowance) {
+              if (hourDiff < 2) {
+                notifyTaskPriority(element.label, daysDiffFromNow(element.date));
+                hasNotification = true;
+                canUpdateLastNotificationAt = true;
+              } else {
+                notifyTaskTimeChangeSuggestion(element.id, element.label, commonHour);
+                hasNotification = true;
+                canUpdateLastNotificationAt = true;
+              }
+            }
           }
-          updateLastNotificationSentAt(element.id, element.label);
-          hasNotification = true;
+          if (canUpdateLastNotificationAt) {
+            updateLastNotificationSentAt(element.id, element.label);
+          }
         };
       }
 

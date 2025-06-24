@@ -45,10 +45,11 @@ function getCommonHours(dataset: any[], gapAllowanceMinutes = 10) {
   }
   let filteredHours = hours.filter(element => element.hits > 0);
   filteredHours.sort((a, b) => b.hits - a.hits)
+  console.log(filteredHours)
   return filteredHours
 }
 
-export async function fetchCommonHour() {
+export async function fetchCommonHour(taskId: number) {
   let weekBounds = getCurrentPreviousWeekBounds();
 
   {
@@ -56,16 +57,16 @@ export async function fetchCommonHour() {
       .from('ActivityPeaks')
       .select('*')
       .eq('startDate', weekBounds.sunday)
-      .eq('endDate', weekBounds.saturday);
-
+      .eq('endDate', weekBounds.saturday)
+      .eq('taskId', taskId);
     
     if (data == null) {
       console.error("Activity peaks data is null")
-      return
+      return -1
     }
     if (error) {
       console.error("Error fetching activity peaks data: ", error)
-      return
+      return -1
     }
     if (data.length > 0) {
       return data[0].topHour;
@@ -76,11 +77,13 @@ export async function fetchCommonHour() {
     .from('TaskProgress')
     .select('*')
     .gte('date', weekBounds.sunday)
-    .lte('date', weekBounds.saturday);
+    .lte('date', weekBounds.saturday)
+    .eq('taskId', taskId);
   
   if (data == null) {
+    // Not enough data for that task...
     console.error("Task progress data is null")
-    return
+    return -1
   }
   if (error) {
     console.error("Error fetching progress data: ", error)
@@ -96,7 +99,8 @@ export async function fetchCommonHour() {
     .insert({
       startDate: weekBounds.sunday,
       endDate: weekBounds.saturday,
-      topHour: commonHours[0].hour
+      topHour: commonHours[0].hour,
+      taskId: taskId,
     });
 
   if (params.error) {
