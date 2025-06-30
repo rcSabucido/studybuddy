@@ -3,7 +3,7 @@ import Button from '@/components/Button';
 import LoadingModal from '@/components/LoadingModal';
 import MinStudyHoursModal from '@/components/MinStudyHoursModal';
 import PieProgress from "@/components/PieProgress";
-import { getCurrentWeekBounds } from '@/shared/DataHelpers';
+import { formatStudyTime, formatStudyTimeText, getCurrentWeekBounds } from '@/shared/DataHelpers';
 import { useStore } from '@/store/GlobalState';
 import Feather from '@expo/vector-icons/Feather';
 import { createClient } from '@supabase/supabase-js';
@@ -132,6 +132,8 @@ export default function DataView() {
     }, [])
   );
 
+  let totalTimeText = formatStudyTime(totalHour);
+
   return (
     <>
     <View style={{flex: 1}}>
@@ -154,13 +156,18 @@ export default function DataView() {
                 marginLeft: 'auto',
                 marginRight: 'auto',
               }}>{ totalHour > -1 ? "You've studied for" : "Loading your current" }</Text>
-            <Text style={{
+            {
+              totalHour == -1 && <Text style={{
                 fontSize: 24,
                 color: '#333',
                 fontFamily: 'Poppins_700Bold',
                 marginLeft: 'auto',
                 marginRight: 'auto',
-              }}>{totalHour != -1 ? `${ totalHour > -1 ? `for ${totalHour > 1 ? `${totalHour} ` : ""}${totalHour == 1 ? "hour" : totalHour > 1 ? "hours" : ""}${totalHour > 1 ? "and" : ""}${totalHour % 1.0 != 0 ? `${Math.ceil(totalHour % 1 * 60)} ${Math.ceil(totalHour % 1 * 60) == 1 ? "minute" : "minutes"}` : ""} today.` : ""}` : "study data..." }</Text>
+              }}>{"study data..."}</Text>
+            }
+            {
+              totalHour > 0 && formatStudyTimeText({totalHour: totalHour})
+            }
           </>
           :
           <>
@@ -198,7 +205,7 @@ export default function DataView() {
           margin: 'auto',
           marginRight: 24
         }}>Score: </Text>
-        <PieProgress progress={totalHour > -1 ? totalHour / minimumStudyHours : 0}></PieProgress>
+        <PieProgress progress={totalHour > -1 ? Math.min(1, Math.max(0, totalHour / minimumStudyHours)) : 0}></PieProgress>
       </View>
       <View style={styles.content_container}>
         <Text style={{
