@@ -17,8 +17,8 @@ const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
 const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
 
-const WORK_TIME_MINUTES = 2;
-const BREAK_TIME_MINUTES = 1;
+const WORK_TIME_MINUTES = 25;
+const BREAK_TIME_MINUTES = 5;
 
 const buttonSound = require('@/assets/audio/ui_tap-variant-01.wav');
 const selectSound = require('@/assets/audio/task_select_sound.wav');

@@ -3,13 +3,13 @@ import Button from '@/components/Button';
 import NotifyTimeModal from '@/components/NotifyTimeModal';
 import SaveChangesModal from '@/components/SaveChangesModal';
 import { createClient } from '@supabase/supabase-js';
+import { useAudioPlayer } from 'expo-audio';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { Calendar } from 'react-native-calendars';
 import { CalendarIcon, ClockIcon, ExclamationCircleIcon } from 'react-native-heroicons/outline';
 import Dropdown from 'react-native-input-select';
-import { useAudioPlayer } from 'expo-audio';
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
@@ -81,7 +81,8 @@ export default function Index() {
           priority: Number(priorityStatus),
           date: selectDate,
           time: convertTo24HourFormat(timeValue),
-          isActive: true
+          isActive: true,
+          creationDate: new Date().toISOString().split('T')[0]
         });
 
       if (error) throw error;

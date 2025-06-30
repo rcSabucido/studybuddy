@@ -4,7 +4,7 @@ import Svg, { G, Path } from 'react-native-svg';
 
 const PieProgress = ({ size = 84, progress = 0.975, color = '#72E2AE', backgroundColor = '#e6e6e6' }) => {
   const radius = size / 2;
-  const angle = progress * 360;
+  const angle = Math.min(0.999, progress) * 360;
 
   const polarToCartesian = (centerX: number, centerY: number, radius: number, angleInDegrees: number) => {
     const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0;
